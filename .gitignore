@@ -1,0 +1,57 @@
+# Root .gitignore for iKho repository
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+
+# Build outputs
+**/bin/
+**/obj/
+**/publish/
+
+# .NET
+*.user
+*.suo
+*.userosscache
+*.userprefs
+*.DotSettings.user
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.cache/
+coverage/
+.vite/
+
+# Environment files
+.env
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor swap / temp files
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# Test results / other
+TestResults/
+*.coverage
+
+# Misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
