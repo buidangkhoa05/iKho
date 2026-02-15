@@ -1,0 +1,9 @@
+# Root BUILD file for Task Manager Monorepo
+
+package(default_visibility = ["//visibility:public"])
+
+# Filegroup for all source files (useful for IDE integration)
+filegroup(
+    name = "all_files",
+    srcs = glob(["**/*"]),
+)
