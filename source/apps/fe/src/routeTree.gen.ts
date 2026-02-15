@@ -9,8 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VariantsRouteImport } from './routes/variants'
+import { Route as StockAdjustmentRouteImport } from './routes/stock-adjustment'
+import { Route as ReorderRouteImport } from './routes/reorder'
+import { Route as ProductsRouteImport } from './routes/products'
+import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as BundlesRouteImport } from './routes/bundles'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VariantsRoute = VariantsRouteImport.update({
+  id: '/variants',
+  path: '/variants',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StockAdjustmentRoute = StockAdjustmentRouteImport.update({
+  id: '/stock-adjustment',
+  path: '/stock-adjustment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReorderRoute = ReorderRouteImport.update({
+  id: '/reorder',
+  path: '/reorder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BundlesRoute = BundlesRouteImport.update({
+  id: '/bundles',
+  path: '/bundles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +55,116 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bundles': typeof BundlesRoute
+  '/categories': typeof CategoriesRoute
+  '/products': typeof ProductsRoute
+  '/reorder': typeof ReorderRoute
+  '/stock-adjustment': typeof StockAdjustmentRoute
+  '/variants': typeof VariantsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bundles': typeof BundlesRoute
+  '/categories': typeof CategoriesRoute
+  '/products': typeof ProductsRoute
+  '/reorder': typeof ReorderRoute
+  '/stock-adjustment': typeof StockAdjustmentRoute
+  '/variants': typeof VariantsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bundles': typeof BundlesRoute
+  '/categories': typeof CategoriesRoute
+  '/products': typeof ProductsRoute
+  '/reorder': typeof ReorderRoute
+  '/stock-adjustment': typeof StockAdjustmentRoute
+  '/variants': typeof VariantsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/bundles'
+    | '/categories'
+    | '/products'
+    | '/reorder'
+    | '/stock-adjustment'
+    | '/variants'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/bundles'
+    | '/categories'
+    | '/products'
+    | '/reorder'
+    | '/stock-adjustment'
+    | '/variants'
+  id:
+    | '__root__'
+    | '/'
+    | '/bundles'
+    | '/categories'
+    | '/products'
+    | '/reorder'
+    | '/stock-adjustment'
+    | '/variants'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BundlesRoute: typeof BundlesRoute
+  CategoriesRoute: typeof CategoriesRoute
+  ProductsRoute: typeof ProductsRoute
+  ReorderRoute: typeof ReorderRoute
+  StockAdjustmentRoute: typeof StockAdjustmentRoute
+  VariantsRoute: typeof VariantsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/variants': {
+      id: '/variants'
+      path: '/variants'
+      fullPath: '/variants'
+      preLoaderRoute: typeof VariantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stock-adjustment': {
+      id: '/stock-adjustment'
+      path: '/stock-adjustment'
+      fullPath: '/stock-adjustment'
+      preLoaderRoute: typeof StockAdjustmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reorder': {
+      id: '/reorder'
+      path: '/reorder'
+      fullPath: '/reorder'
+      preLoaderRoute: typeof ReorderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bundles': {
+      id: '/bundles'
+      path: '/bundles'
+      fullPath: '/bundles'
+      preLoaderRoute: typeof BundlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +177,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BundlesRoute: BundlesRoute,
+  CategoriesRoute: CategoriesRoute,
+  ProductsRoute: ProductsRoute,
+  ReorderRoute: ReorderRoute,
+  StockAdjustmentRoute: StockAdjustmentRoute,
+  VariantsRoute: VariantsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,15 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { DashboardLayout } from '@/shared/layouts'
-import { DashboardView } from '@/features/dashboard'
+import { ReorderList } from '@/features/reorder'
 
-export const Route = createFileRoute('/')({
-  component: Dashboard,
+export const Route = createFileRoute('/reorder')({
+  component: ReorderPage,
 })
 
-function Dashboard() {
+function ReorderPage() {
   return (
     <DashboardLayout>
-      <DashboardView />
+      <ReorderList />
     </DashboardLayout>
   )
 }

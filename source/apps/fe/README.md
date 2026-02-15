@@ -1,6 +1,6 @@
 # iKho - Warehouse Management System (Frontend)
 
-A modern warehouse management application built with TanStack Start, React 19, and Tailwind CSS 4.
+A modern warehouse management application built with TanStack Start, React 19, and Tailwind CSS 4, following **Vertical Slice Architecture**.
 
 ## Quick Start
 
@@ -20,90 +20,193 @@ iKho is a warehouse inventory management system with features for:
 
 ---
 
-## Project Structure
+## Project Structure (Vertical Slice Architecture)
 
 ```
 src/
-├── components/
-│   ├── ui/                    # Reusable UI components (shadcn/ui style)
+├── features/                    # Feature slices (domain-driven)
+│   ├── products/                # Products feature
+│   │   ├── components/          # Feature-specific components
+│   │   │   ├── ProductList.tsx
+│   │   │   ├── ProductTable.tsx
+│   │   │   └── ProductFilters.tsx
+│   │   ├── types.ts             # Feature types/interfaces
+│   │   ├── mockData.ts          # Mock data for development
+│   │   ├── store.ts             # Feature-scoped Zustand store
+│   │   └── index.ts             # Barrel export
+│   ├── categories/              # Categories feature
+│   │   ├── components/
+│   │   │   ├── CategoryList.tsx
+│   │   │   ├── CategoryTable.tsx
+│   │   │   └── CategoryDialog.tsx
+│   │   ├── types.ts
+│   │   ├── mockData.ts
+│   │   ├── store.ts
+│   │   └── index.ts
+│   ├── dashboard/               # Dashboard feature
+│   ├── variants/                # Product variants feature
+│   ├── bundles/                 # Product bundles feature
+│   ├── reorder/                 # Reorder management feature
+│   ├── stock-adjustment/        # Stock adjustment feature
+│   └── index.ts                 # Features barrel export
+├── shared/                      # Shared layer
+│   ├── components/              # Reusable UI components (shadcn/ui)
 │   │   ├── button.tsx
-│   │   ├── dialog.tsx         # Centered modal dialogs
-│   │   ├── select.tsx         # Dropdown selects
-│   │   ├── sheet.tsx          # Slide-in panels
+│   │   ├── dialog.tsx
+│   │   ├── input.tsx
+│   │   ├── select.tsx
 │   │   ├── table.tsx
-│   │   ├── textarea.tsx
-│   │   └── ...
-│   ├── views/                 # Feature view components
-│   │   ├── InventoryViews.tsx # Dashboard, Products, Variants, etc.
-│   │   └── CategoryViews.tsx  # Category management feature
-│   ├── DashboardLayout.tsx    # Main layout wrapper
-│   ├── Sidebar.tsx            # Navigation sidebar
-│   ├── Header.tsx
-│   └── Footer.tsx
-├── routes/
-│   ├── __root.tsx             # Root layout with Head/Body
-│   └── index.tsx              # Main route with view switching
-├── store/
-│   └── useStore.ts            # Zustand global state
+│   │   └── index.ts
+│   ├── layouts/                 # Layout components
+│   │   ├── DashboardLayout.tsx
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── ThemeProvider.tsx
+│   │   ├── LanguageToggle.tsx
+│   │   └── index.ts
+│   └── index.ts
+├── core/                        # Core types and utilities
+│   ├── types.ts                 # Base entity types, pagination, etc.
+│   └── index.ts
+├── services/                    # API and external services
+│   ├── api.ts                   # API client
+│   └── index.ts
+├── routes/                      # TanStack Router routes (URL-based)
+│   ├── __root.tsx               # Root layout
+│   ├── index.tsx                # Dashboard (/)
+│   ├── products.tsx             # Products (/products)
+│   ├── categories.tsx           # Categories (/categories)
+│   ├── variants.tsx             # Variants (/variants)
+│   ├── bundles.tsx              # Bundles (/bundles)
+│   ├── reorder.tsx              # Reorder (/reorder)
+│   └── stock-adjustment.tsx     # Stock Adjustment (/stock-adjustment)
 ├── lib/
-│   └── utils.ts               # Utility functions (cn, etc.)
-├── i18n.ts                    # i18next configuration
-├── router.tsx                 # TanStack Router setup
-└── styles.css                 # Global styles + Tailwind
+│   └── utils.ts                 # Utility functions (cn, etc.)
+├── i18n.ts                      # i18next configuration
+├── router.tsx                   # TanStack Router setup
+├── routeTree.gen.ts             # Auto-generated route tree
+└── styles.css                   # Global styles + Tailwind
 
 public/
 └── locales/
-    ├── en/translation.json    # English translations
-    └── vi/translation.json    # Vietnamese translations
+    ├── en/translation.json      # English translations
+    └── vi/translation.json      # Vietnamese translations
 ```
 
 ---
 
 ## Architecture Patterns
 
-### View-Based Navigation (Not URL Routing)
+### Vertical Slice Architecture
 
-The app uses **in-page view switching** rather than URL-based routing for main features:
+The app follows **Vertical Slice Architecture** where code is organized by **feature** rather than technical layer:
+
+```
+features/
+├── products/          # Everything related to products
+├── categories/        # Everything related to categories
+└── dashboard/         # Everything related to dashboard
+```
+
+Each feature slice contains:
+- `components/` - React components specific to this feature
+- `types.ts` - TypeScript interfaces and types
+- `store.ts` - Feature-scoped Zustand store
+- `mockData.ts` - Mock data for development
+- `index.ts` - Barrel export for clean imports
+
+### URL-Based Routing
+
+The app uses **URL-based routing** with TanStack Router:
+
+| Route | Feature |
+|-------|---------|
+| `/` | Dashboard |
+| `/products` | Products management |
+| `/categories` | Category management |
+| `/variants` | Product variants |
+| `/bundles` | Product bundles |
+| `/reorder` | Reorder management |
+| `/stock-adjustment` | Stock adjustments |
+
+**Adding a new feature:**
+1. Create feature folder in `src/features/newfeature/`
+2. Add components, types, store, and index.ts
+3. Create route file in `src/routes/newfeature.tsx`
+4. Add navigation link in `src/shared/layouts/Sidebar.tsx`
+5. Add translation keys in `public/locales/`
+
+### Path Aliases
+
+The project uses TypeScript path aliases for clean imports:
 
 ```tsx
-// routes/index.tsx
-function Dashboard() {
-  const [activeView, setActiveView] = useState('dashboard')
+// Feature imports
+import { ProductList, useProductStore } from "@/features/products"
 
-  const renderView = () => {
-    switch(activeView) {
-      case 'dashboard': return <DashboardView />
-      case 'product-list': return <ProductList />
-      case 'category-list': return <CategoryList />
-      // ...
-    }
-  }
+// Shared UI components
+import { Button, Input, Table } from "@/shared/components"
+
+// Layouts
+import { DashboardLayout, Header } from "@/shared/layouts"
+
+// Core types
+import { BaseEntity, PaginationParams } from "@/core"
+
+// Services
+import { apiClient } from "@/services"
+```
+
+### Feature-Scoped State (Zustand)
+
+Each feature has its own Zustand store for isolated state management:
+
+```tsx
+// src/features/products/store.ts
+import { create } from "zustand"
+
+interface ProductStore {
+  filters: ProductFilters
+  viewMode: "list" | "grid"
+  setFilter: (key: string, value: string) => void
+  setViewMode: (mode: "list" | "grid") => void
+  resetFilters: () => void
+}
+
+export const useProductStore = create<ProductStore>((set) => ({
+  filters: initialFilters,
+  viewMode: "list",
+  setFilter: (key, value) => set((state) => ({
+    filters: { ...state.filters, [key]: value }
+  })),
+  setViewMode: (mode) => set({ viewMode: mode }),
+  resetFilters: () => set({ filters: initialFilters }),
+}))
+```
+
+Usage in components:
+```tsx
+import { useProductStore } from "@/features/products"
+
+function ProductList() {
+  const { filters, setFilter, viewMode } = useProductStore()
+  // ...
 }
 ```
 
-**Adding a new view:**
-1. Create view component in `components/views/`
-2. Add navigation button in `Sidebar.tsx`
-3. Add case in `routes/index.tsx` switch statement
-4. Add translation keys in both `en/` and `vi/` locales
-
 ### UI Components (shadcn/ui Pattern)
 
-All UI components follow the shadcn/ui pattern:
-- Use Radix UI primitives under the hood
-- Include `data-slot` attributes for styling hooks
-- Export individual parts for composition
-- Use `cn()` utility for class merging
+All UI components follow the shadcn/ui pattern and are located in `src/shared/components/`:
 
 ```tsx
-// Example: Using Dialog component
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/shared/components"
 
 <Dialog open={isOpen} onOpenChange={setIsOpen}>
   <DialogContent>
@@ -117,17 +220,6 @@ import {
     </DialogFooter>
   </DialogContent>
 </Dialog>
-```
-
-### State Management
-
-**Local state (useState):** Used for view-specific state like form data, dialog open/close
-
-**Global state (Zustand):** Available in `store/useStore.ts` for cross-component state
-
-```tsx
-// Using Zustand store
-const { count, increase } = useStore()
 ```
 
 ### Internationalization (i18n)
@@ -149,16 +241,51 @@ function MyComponent() {
 
 ---
 
-## Feature: Category Management
+## Feature: Products
 
-Located in `src/components/views/CategoryViews.tsx`
+Located in `src/features/products/`
 
 ### Components
 
 | Component | Description |
 |-----------|-------------|
-| `CategoryList` | Main view with searchable table displaying hierarchical categories |
-| `CategoryDialog` | Modal form for creating/editing categories |
+| `ProductList` | Main view with filters and product table |
+| `ProductTable` | Data table displaying products |
+| `ProductFilters` | Filter controls (search, status, category) |
+
+### Product Data Structure
+
+```typescript
+interface Product {
+  id: string
+  name: string
+  sku: string
+  description: string
+  categoryId: string
+  price: number
+  costPrice: number
+  quantity: number
+  minQuantity: number
+  status: "in_stock" | "low_stock" | "out_of_stock"
+  imageUrl: string
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+---
+
+## Feature: Categories
+
+Located in `src/features/categories/`
+
+### Components
+
+| Component | Description |
+|-----------|-------------|
+| `CategoryList` | Main view with searchable table |
+| `CategoryTable` | Data table with hierarchy display |
+| `CategoryDialog` | Modal form for create/edit |
 
 ### Category Data Structure
 
@@ -188,17 +315,17 @@ Categories display with visual indentation based on `level`:
 
 ```
 Overview
-├── Dashboard
+├── Dashboard           → /
 
 Inventory
-├── Products
-├── Product Variants
-├── Product Bundles
-├── Reorder
-└── Stock Adjustment
+├── Products            → /products
+├── Product Variants    → /variants
+├── Product Bundles     → /bundles
+├── Reorder             → /reorder
+└── Stock Adjustment    → /stock-adjustment
 
 Settings
-└── Categories          ← NEW
+└── Categories          → /categories
 ```
 
 ---
@@ -207,16 +334,15 @@ Settings
 
 | Component | File | Usage |
 |-----------|------|-------|
-| Button | `ui/button.tsx` | Buttons with variants: default, destructive, outline, secondary, ghost, link |
-| Dialog | `ui/dialog.tsx` | Centered modal dialogs |
-| Select | `ui/select.tsx` | Dropdown select inputs |
-| Sheet | `ui/sheet.tsx` | Slide-in side panels |
-| Table | `ui/table.tsx` | Data tables |
-| Input | `ui/input.tsx` | Text inputs |
-| Textarea | `ui/textarea.tsx` | Multiline text inputs |
-| Label | `ui/label.tsx` | Form labels |
-| Badge | `ui/badge.tsx` | Status badges |
-| Card | `ui/card.tsx` | Card containers |
+| Button | `shared/components/button.tsx` | Buttons with variants |
+| Dialog | `shared/components/dialog.tsx` | Centered modal dialogs |
+| Select | `shared/components/select.tsx` | Dropdown select inputs |
+| Table | `shared/components/table.tsx` | Data tables |
+| Input | `shared/components/input.tsx` | Text inputs |
+| Textarea | `shared/components/textarea.tsx` | Multiline text inputs |
+| Label | `shared/components/label.tsx` | Form labels |
+| Badge | `shared/components/badge.tsx` | Status badges |
+| DropdownMenu | `shared/components/dropdown-menu.tsx` | Context menus |
 
 ---
 
@@ -245,11 +371,31 @@ npm run test     # Run Vitest tests
 
 ## Routing
 
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
+This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are auto-generated in `src/routeTree.gen.ts`.
 
-### Adding A New URL Route
+### Adding A New Feature Route
 
-Add a new file in `./src/routes` directory. TanStack will auto-generate the route tree.
+1. Create route file in `src/routes/newfeature.tsx`:
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router"
+import { DashboardLayout } from "@/shared/layouts"
+import { NewFeatureList } from "@/features/newfeature"
+
+export const Route = createFileRoute('/newfeature')({
+  component: NewFeaturePage,
+})
+
+function NewFeaturePage() {
+  return (
+    <DashboardLayout>
+      <NewFeatureList />
+    </DashboardLayout>
+  )
+}
+```
+
+2. TanStack Router will auto-generate the route tree on save
 
 ### Server Functions
 
@@ -266,17 +412,17 @@ const getServerTime = createServerFn({
 ### Data Fetching with Loaders
 
 ```tsx
-export const Route = createFileRoute('/people')({
+export const Route = createFileRoute('/products')({
   loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
+    const response = await fetch('/api/products')
     return response.json()
   },
-  component: PeopleComponent,
+  component: ProductsPage,
 })
 
-function PeopleComponent() {
+function ProductsPage() {
   const data = Route.useLoaderData()
-  return <ul>{data.results.map((p) => <li key={p.name}>{p.name}</li>)}</ul>
+  return <ProductList products={data} />
 }
 ```
 
@@ -290,3 +436,4 @@ function PeopleComponent() {
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Zustand](https://zustand-demo.pmnd.rs/)
 - [react-i18next](https://react.i18next.com/)
+- [Vertical Slice Architecture](https://dev.to/fpaghar/folder-structuring-techniques-for-beginner-to-advanced-react-projects-30d7)

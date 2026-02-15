@@ -9,12 +9,18 @@ Use this list as a system prompt or context for future chat sessions to ensure t
 - **Language**: TypeScript
 - **Frontend Framework**: React 19
 - **Full-Stack Framework**: TanStack Start
-- **Routing**: TanStack Router
+- **Routing**: TanStack Router (URL-based file routing)
 - **Build Tool**: Vite 7
 - **Server Engine**: Nitro (via TanStack Start)
 
+## Architecture
+- **Pattern**: Vertical Slice Architecture
+- **Organization**: Feature-based folder structure
+- **Routing**: URL-based with TanStack Router file conventions
+
 ## State Management
-- **Global State**: Zustand
+- **Feature State**: Zustand (feature-scoped stores per slice)
+- **Pattern**: Each feature has its own store in `features/<name>/store.ts`
 
 ## Styling & UI
 - **CSS Framework**: Tailwind CSS 4
@@ -22,23 +28,52 @@ Use this list as a system prompt or context for future chat sessions to ensure t
 - **UI Components**: shadcn/ui pattern (Radix UI primitives)
 - **Internationalization**: react-i18next with JSON locale files
 
+## Project Structure
+
+```
+src/
+├── features/           # Feature slices (domain-driven)
+│   ├── products/       # Product management
+│   ├── categories/     # Category management
+│   ├── dashboard/      # Dashboard overview
+│   ├── variants/       # Product variants
+│   ├── bundles/        # Product bundles
+│   ├── reorder/        # Reorder management
+│   └── stock-adjustment/
+├── shared/             # Shared layer
+│   ├── components/     # UI components (shadcn/ui)
+│   └── layouts/        # Layout components
+├── core/               # Core types and utilities
+├── services/           # API and external services
+├── routes/             # TanStack Router routes
+└── lib/                # Utility functions
+```
+
+## Path Aliases
+```json
+{
+  "@/features/*": "src/features/*",
+  "@/shared/*": "src/shared/*",
+  "@/core/*": "src/core/*",
+  "@/services/*": "src/services/*",
+  "@/lib/*": "src/lib/*"
+}
+```
+
 ## UI Component Library
 The project uses a shadcn/ui-style component library built on Radix UI primitives:
 
-| Component | Radix Primitive | Description |
-|-----------|-----------------|-------------|
-| Button | - | Multi-variant button |
-| Dialog | @radix-ui/react-dialog | Centered modal dialogs |
-| Select | @radix-ui/react-select | Dropdown select inputs |
-| Sheet | @radix-ui/react-dialog | Slide-in side panels |
-| Collapsible | @radix-ui/react-collapsible | Expandable sections |
-| DropdownMenu | @radix-ui/react-dropdown-menu | Context menus |
-| Table | - | Data tables |
-| Input | - | Text inputs |
-| Textarea | - | Multiline text inputs |
-| Label | @radix-ui/react-label | Form labels |
-| Badge | - | Status badges |
-| Card | - | Card containers |
+| Component | Radix Primitive | Location |
+|-----------|-----------------|----------|
+| Button | - | `shared/components/button.tsx` |
+| Dialog | @radix-ui/react-dialog | `shared/components/dialog.tsx` |
+| Select | @radix-ui/react-select | `shared/components/select.tsx` |
+| DropdownMenu | @radix-ui/react-dropdown-menu | `shared/components/dropdown-menu.tsx` |
+| Table | - | `shared/components/table.tsx` |
+| Input | - | `shared/components/input.tsx` |
+| Textarea | - | `shared/components/textarea.tsx` |
+| Label | @radix-ui/react-label | `shared/components/label.tsx` |
+| Badge | - | `shared/components/badge.tsx` |
 
 ## Testing
 - **Unit/Integration**: Vitest

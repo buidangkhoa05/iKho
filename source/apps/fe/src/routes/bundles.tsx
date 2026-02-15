@@ -1,15 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { DashboardLayout } from '@/shared/layouts'
-import { DashboardView } from '@/features/dashboard'
+import { BundleList } from '@/features/bundles'
 
-export const Route = createFileRoute('/')({
-  component: Dashboard,
+export const Route = createFileRoute('/bundles')({
+  component: BundlesPage,
 })
 
-function Dashboard() {
+function BundlesPage() {
   return (
     <DashboardLayout>
-      <DashboardView />
+      <BundleList />
     </DashboardLayout>
   )
 }
