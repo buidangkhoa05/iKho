@@ -1,0 +1,14 @@
+# Bazel configuration for monorepo
+
+# Enable Bzlmod (default in Bazel 7+)
+common --enable_bzlmod
+
+# Build optimizations
+build --jobs=auto
+build --verbose_failures
+
+# Test configuration
+test --test_output=errors
+
+# Platform-specific settings
+build:windows --enable_runfiles
