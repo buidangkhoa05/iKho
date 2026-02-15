@@ -19,6 +19,26 @@ Use this list as a system prompt or context for future chat sessions to ensure t
 ## Styling & UI
 - **CSS Framework**: Tailwind CSS 4
 - **Icons**: Lucide React
+- **UI Components**: shadcn/ui pattern (Radix UI primitives)
+- **Internationalization**: react-i18next with JSON locale files
+
+## UI Component Library
+The project uses a shadcn/ui-style component library built on Radix UI primitives:
+
+| Component | Radix Primitive | Description |
+|-----------|-----------------|-------------|
+| Button | - | Multi-variant button |
+| Dialog | @radix-ui/react-dialog | Centered modal dialogs |
+| Select | @radix-ui/react-select | Dropdown select inputs |
+| Sheet | @radix-ui/react-dialog | Slide-in side panels |
+| Collapsible | @radix-ui/react-collapsible | Expandable sections |
+| DropdownMenu | @radix-ui/react-dropdown-menu | Context menus |
+| Table | - | Data tables |
+| Input | - | Text inputs |
+| Textarea | - | Multiline text inputs |
+| Label | @radix-ui/react-label | Form labels |
+| Badge | - | Status badges |
+| Card | - | Card containers |
 
 ## Testing
 - **Unit/Integration**: Vitest
@@ -35,6 +55,13 @@ Use this list as a system prompt or context for future chat sessions to ensure t
 - `tailwindcss`
 - `vite`
 - `vitest`
+- `react-i18next` / `i18next`
+- `@radix-ui/react-dialog`
+- `@radix-ui/react-select`
+- `@radix-ui/react-dropdown-menu`
+- `@radix-ui/react-collapsible`
+- `@radix-ui/react-label`
+- `lucide-react`
 
 ## Design System & Guidelines
 ### Color Palette (MANDATORY)
