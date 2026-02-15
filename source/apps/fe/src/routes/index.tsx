@@ -9,6 +9,7 @@ import {
   ReorderList, 
   StockAdjustmentList 
 } from '../components/views/InventoryViews'
+import { CategoryList } from '../components/views/CategoryViews'
 
 export const Route = createFileRoute('/')({
   component: Dashboard,
@@ -25,6 +26,7 @@ function Dashboard() {
       case 'bundle-list': return <BundleList />
       case 'reorder-list': return <ReorderList />
       case 'stock-adjustment-list': return <StockAdjustmentList />
+      case 'category-list': return <CategoryList />
       default: return <DashboardView />
     }
   }

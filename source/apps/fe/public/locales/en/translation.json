@@ -10,7 +10,9 @@
     "variants": "Product Variants",
     "bundles": "Product Bundles",
     "reorder": "Reorder",
-    "stock_adjustment": "Stock Adjustment"
+    "stock_adjustment": "Stock Adjustment",
+    "settings": "Settings",
+    "categories": "Categories"
   },
   "common": {
     "add": "Add",
@@ -85,5 +87,24 @@
   },
   "footer": {
     "built_with": "Built with TanStack Start, React, Zustand, and Tailwind CSS."
+  },
+  "categories": {
+    "title": "Categories",
+    "add_category": "Add Category",
+    "edit_category": "Edit Category",
+    "add_description": "Create a new category for organizing your products.",
+    "edit_description": "Update the category details below.",
+    "search_placeholder": "Search categories...",
+    "name": "Category Name",
+    "parent": "Parent Category",
+    "parent_none": "None (Root Level)",
+    "description": "Description",
+    "image": "Image URL",
+    "status": "Status",
+    "status_active": "Active",
+    "status_inactive": "Inactive",
+    "sort_order": "Sort Order",
+    "products_count": "Products",
+    "delete_confirm": "Are you sure you want to delete this category?"
   }
 }

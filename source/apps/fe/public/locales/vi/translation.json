@@ -10,7 +10,9 @@
     "variants": "Biến thể sản phẩm",
     "bundles": "Bộ sản phẩm",
     "reorder": "Đặt hàng lại",
-    "stock_adjustment": "Điều chỉnh kho"
+    "stock_adjustment": "Điều chỉnh kho",
+    "settings": "Cài đặt",
+    "categories": "Danh mục"
   },
   "common": {
     "add": "Thêm",
@@ -85,5 +87,24 @@
   },
   "footer": {
     "built_with": "Được xây dựng với TanStack Start, React, Zustand và Tailwind CSS."
+  },
+  "categories": {
+    "title": "Danh mục",
+    "add_category": "Thêm danh mục",
+    "edit_category": "Sửa danh mục",
+    "add_description": "Tạo danh mục mới để tổ chức sản phẩm của bạn.",
+    "edit_description": "Cập nhật thông tin danh mục bên dưới.",
+    "search_placeholder": "Tìm kiếm danh mục...",
+    "name": "Tên danh mục",
+    "parent": "Danh mục cha",
+    "parent_none": "Không có (Gốc)",
+    "description": "Mô tả",
+    "image": "Đường dẫn hình ảnh",
+    "status": "Trạng thái",
+    "status_active": "Hoạt động",
+    "status_inactive": "Không hoạt động",
+    "sort_order": "Thứ tự sắp xếp",
+    "products_count": "Sản phẩm",
+    "delete_confirm": "Bạn có chắc chắn muốn xóa danh mục này?"
   }
 }

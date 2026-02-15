@@ -4,7 +4,8 @@ import {
   Layers,
   PackagePlus,
   RefreshCw,
-  ClipboardList
+  ClipboardList,
+  FolderTree
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -81,6 +82,21 @@ export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
             >
               <ClipboardList className="mr-2 h-4 w-4" />
               {t('sidebar.stock_adjustment')}
+            </Button>
+          </div>
+        </div>
+        <div className="px-3 py-2">
+          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+            {t('sidebar.settings')}
+          </h2>
+          <div className="space-y-1">
+            <Button 
+              variant={activeView === 'category-list' ? "secondary" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => onViewChange('category-list')}
+            >
+              <FolderTree className="mr-2 h-4 w-4" />
+              {t('sidebar.categories')}
             </Button>
           </div>
         </div>
