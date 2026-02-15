@@ -1,0 +1,8 @@
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary")
+
+csharp_binary(
+    name = "user-api",
+    srcs = ["Program.cs"],
+    target_frameworks = ["net10.0"],
+    visibility = ["//visibility:public"],
+)
