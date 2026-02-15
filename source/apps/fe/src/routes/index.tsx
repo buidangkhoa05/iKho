@@ -7,9 +7,9 @@ import {
   VariantList, 
   BundleList, 
   ReorderList, 
-  StockAdjustmentList 
-} from '../components/views/InventoryViews'
-import { CategoryList } from '../components/views/CategoryViews'
+  StockAdjustmentList,
+  CategoryList 
+} from '../components/views'
 
 export const Route = createFileRoute('/')({
   component: Dashboard,
