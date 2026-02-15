@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UserActivity",
+  "description": "Represents a user activity event published to the 'user-activity' Kafka topic.",
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string",
+      "description": "Unique identifier for the user"
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Session identifier"
+    },
+    "activityType": {
+      "type": "string",
+      "enum": ["PageView", "Click", "Search", "Login", "Logout", "Purchase", "AddToCart", "RemoveFromCart"],
+      "description": "Type of user activity"
+    },
+    "page": {
+      "type": "string",
+      "description": "Page URL or path where the activity occurred"
+    },
+    "referrer": {
+      "type": "string",
+      "description": "Referring page URL"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional key-value metadata for the activity",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "device": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["Desktop", "Mobile", "Tablet"]
+        },
+        "os": { "type": "string" },
+        "browser": { "type": "string" },
+        "userAgent": { "type": "string" }
+      }
+    },
+    "ipAddress": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "Client IP address"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the activity occurred"
+    }
+  },
+  "required": ["userId", "activityType", "timestamp"]
+}
