@@ -9,6 +9,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useTranslation } from "react-i18next"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   activeView: string
@@ -16,14 +17,14 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
-
+  const { t } = useTranslation()
 
   return (
     <div className={cn("pb-12 w-64 border-r bg-background", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            Overview
+            {t('sidebar.overview')}
           </h2>
           <div className="space-y-1">
             <Button 
@@ -32,13 +33,13 @@ export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
               onClick={() => onViewChange('dashboard')}
             >
               <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
+              {t('sidebar.dashboard')}
             </Button>
           </div>
         </div>
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            Inventory
+            {t('sidebar.inventory')}
           </h2>
           <div className="space-y-1">
             <Button 
@@ -47,7 +48,7 @@ export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
               onClick={() => onViewChange('product-list')}
             >
               <Package className="mr-2 h-4 w-4" />
-              Products
+              {t('sidebar.products')}
             </Button>
             <Button 
               variant={activeView === 'variant-list' ? "secondary" : "ghost"} 
@@ -55,7 +56,7 @@ export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
               onClick={() => onViewChange('variant-list')}
             >
               <Layers className="mr-2 h-4 w-4" />
-              Product Variants
+              {t('sidebar.variants')}
             </Button>
             <Button 
               variant={activeView === 'bundle-list' ? "secondary" : "ghost"} 
@@ -63,7 +64,7 @@ export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
               onClick={() => onViewChange('bundle-list')}
             >
               <PackagePlus className="mr-2 h-4 w-4" />
-              Product Bundles
+              {t('sidebar.bundles')}
             </Button>
             <Button 
               variant={activeView === 'reorder-list' ? "secondary" : "ghost"} 
@@ -71,7 +72,7 @@ export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
               onClick={() => onViewChange('reorder-list')}
             >
               <RefreshCw className="mr-2 h-4 w-4" />
-              Reorder
+              {t('sidebar.reorder')}
             </Button>
              <Button 
               variant={activeView === 'stock-adjustment-list' ? "secondary" : "ghost"} 
@@ -79,7 +80,7 @@ export function Sidebar({ className, activeView, onViewChange }: SidebarProps) {
               onClick={() => onViewChange('stock-adjustment-list')}
             >
               <ClipboardList className="mr-2 h-4 w-4" />
-              Stock Adjustment
+              {t('sidebar.stock_adjustment')}
             </Button>
           </div>
         </div>

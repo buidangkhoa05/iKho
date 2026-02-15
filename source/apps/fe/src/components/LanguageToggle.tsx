@@ -24,11 +24,11 @@ export function LanguageToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => changeLanguage('en')}>
-          English
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeLanguage('vi')}>
           Tiếng Việt
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLanguage('en')}>
+          English
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

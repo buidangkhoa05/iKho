@@ -27,23 +27,52 @@
   "products": {
     "title": "Sản phẩm",
     "add_product": "Thêm sản phẩm",
-    "search_placeholder": "Tìm kiếm sản phẩm..."
+    "search_placeholder": "Tìm kiếm sản phẩm...",
+    "name": "Tên",
+    "sku": "SKU",
+    "category": "Danh mục",
+    "price": "Giá",
+    "stock": "Tồn kho"
   },
   "variants": {
     "title": "Biến thể sản phẩm",
-    "add_variant": "Thêm biến thể"
+    "add_variant": "Thêm biến thể",
+    "variant_name": "Tên biến thể",
+    "color": "Màu sắc",
+    "size": "Kích cỡ"
   },
   "bundles": {
     "title": "Bộ sản phẩm",
-    "create_bundle": "Tạo bộ sản phẩm"
+    "create_bundle": "Tạo bộ sản phẩm",
+    "bundle_name": "Tên bộ sản phẩm",
+    "components": "Các thành phần",
+    "bundle_price": "Giá bộ sản phẩm"
   },
   "reorder": {
     "title": "Điểm đặt hàng lại",
-    "new_reorder": "Tạo đơn đặt hàng lại"
+    "new_reorder": "Tạo đơn đặt hàng lại",
+    "product": "Sản phẩm",
+    "current_stock": "Tồn kho hiện tại",
+    "reorder_point": "Điểm đặt hàng lại",
+    "low": "Thấp"
   },
   "stock_adjustment": {
     "title": "Điều chỉnh kho",
-    "new_adjustment": "Tạo phiếu điều chỉnh"
+    "new_adjustment": "Tạo phiếu điều chỉnh",
+    "date": "Ngày",
+    "reference": "Tham chiếu",
+    "reason": "Lý do",
+    "qty": "Số lượng"
+  },
+  "dashboard": {
+    "total_revenue": "Tổng doanh thu",
+    "from_last_month": "+20.1% so với tháng trước",
+    "subscriptions": "Đăng ký",
+    "from_last_month_high": "+180.1% so với tháng trước",
+    "sales": "Bán hàng",
+    "sales_increase": "+19% so với tháng trước",
+    "active_now": "Hoạt động hiện tại",
+    "since_last_hour": "+201 từ giờ trước"
   },
   "theme": {
     "light": "Sáng",
@@ -53,5 +82,8 @@
   "language": {
     "english": "Tiếng Anh",
     "vietnamese": "Tiếng Việt"
+  },
+  "footer": {
+    "built_with": "Được xây dựng với TanStack Start, React, Zustand và Tailwind CSS."
   }
 }

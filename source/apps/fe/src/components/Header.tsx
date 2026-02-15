@@ -2,9 +2,12 @@ import { Moon, Sun, Monitor } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { useTheme } from './ThemeProvider'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { LanguageToggle } from './LanguageToggle'
 
 export function Header() {
   const { theme, setTheme } = useTheme()
+  const { t } = useTranslation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const toggleTheme = () => {
@@ -24,7 +27,7 @@ export function Header() {
       <div className="container flex h-14 items-center px-4 md:px-6 mx-auto">
         <div className="mr-4 hidden md:flex">
           <Link to="/" className="mr-6 flex items-center space-x-2 font-bold text-xl text-secondary-foreground dark:text-gray-100">
-            <span className="hidden font-bold sm:inline-block">My App</span>
+            <span className="hidden font-bold sm:inline-block">{t('app.title')}</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link
@@ -32,7 +35,7 @@ export function Header() {
               className="transition-colors hover:text-secondary-foreground/80 text-secondary-foreground/60 dark:text-gray-400 dark:hover:text-gray-200"
               activeProps={{ className: 'text-secondary-foreground dark:text-gray-100' }}
             >
-              Home
+              {t('sidebar.overview')}
             </Link>
           </nav>
         </div>
@@ -52,6 +55,7 @@ export function Header() {
           <div className="w-full flex-1 md:w-auto md:flex-none">
             {/* Search or other header items can go here */}
           </div>
+          <LanguageToggle />
           <button
             onClick={toggleTheme}
             className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-white/10 dark:hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 w-9 text-secondary-foreground dark:text-gray-200"

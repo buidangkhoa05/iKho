@@ -15,7 +15,7 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    fallbackLng: 'en',
+    fallbackLng: 'vi',
     debug: true,
 
     interpolation: {
@@ -23,7 +23,7 @@ i18n
     },
     
     // Initial language if detection fails or not wanted
-    // lng: 'en', 
+    lng: 'vi', 
   });
 
 export default i18n;

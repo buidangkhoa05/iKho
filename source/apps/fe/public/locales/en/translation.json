@@ -27,23 +27,52 @@
   "products": {
     "title": "Products",
     "add_product": "Add Product",
-    "search_placeholder": "Search products..."
+    "search_placeholder": "Search products...",
+    "name": "Name",
+    "sku": "SKU",
+    "category": "Category",
+    "price": "Price",
+    "stock": "Stock"
   },
   "variants": {
     "title": "Product Variants",
-    "add_variant": "Add Variant"
+    "add_variant": "Add Variant",
+    "variant_name": "Variant Name",
+    "color": "Color",
+    "size": "Size"
   },
   "bundles": {
     "title": "Product Bundles",
-    "create_bundle": "Create Bundle"
+    "create_bundle": "Create Bundle",
+    "bundle_name": "Bundle Name",
+    "components": "Components",
+    "bundle_price": "Bundle Price"
   },
   "reorder": {
     "title": "Reorder Points",
-    "new_reorder": "New Reorder"
+    "new_reorder": "New Reorder",
+    "product": "Product",
+    "current_stock": "Current Stock",
+    "reorder_point": "Reorder Point",
+    "low": "Low"
   },
   "stock_adjustment": {
     "title": "Stock Adjustments",
-    "new_adjustment": "New Adjustment"
+    "new_adjustment": "New Adjustment",
+    "date": "Date",
+    "reference": "Reference",
+    "reason": "Reason",
+    "qty": "Qty"
+  },
+  "dashboard": {
+    "total_revenue": "Total Revenue",
+    "from_last_month": "+20.1% from last month",
+    "subscriptions": "Subscriptions",
+    "from_last_month_high": "+180.1% from last month",
+    "sales": "Sales",
+    "sales_increase": "+19% from last month",
+    "active_now": "Active Now",
+    "since_last_hour": "+201 since last hour"
   },
   "theme": {
     "light": "Light",
@@ -53,5 +82,8 @@
   "language": {
     "english": "English",
     "vietnamese": "Vietnamese"
+  },
+  "footer": {
+    "built_with": "Built with TanStack Start, React, Zustand, and Tailwind CSS."
   }
 }

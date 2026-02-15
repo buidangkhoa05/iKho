@@ -5,6 +5,8 @@ import appCss from '../styles.css?url'
 import { ThemeProvider } from '../components/ThemeProvider'
 import { Header } from '../components/Header'
 import { Footer } from '../components/Footer'
+import '../i18n'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -31,8 +33,10 @@ export const Route = createRootRoute({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { i18n } = useTranslation()
+  
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={i18n.language} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

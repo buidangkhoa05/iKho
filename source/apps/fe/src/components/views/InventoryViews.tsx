@@ -9,15 +9,18 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Search } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 export function DashboardView() {
+  const { t } = useTranslation()
+  
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
+      <h2 className="text-2xl font-bold tracking-tight">{t('sidebar.dashboard')}</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
           <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="tracking-tight text-sm font-medium">Total Revenue</h3>
+            <h3 className="tracking-tight text-sm font-medium">{t('dashboard.total_revenue')}</h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -32,11 +35,11 @@ export function DashboardView() {
             </svg>
           </div>
           <div className="text-2xl font-bold">$45,231.89</div>
-          <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+          <p className="text-xs text-muted-foreground">{t('dashboard.from_last_month')}</p>
         </div>
         <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="tracking-tight text-sm font-medium">Subscriptions</h3>
+            <h3 className="tracking-tight text-sm font-medium">{t('dashboard.subscriptions')}</h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -53,11 +56,11 @@ export function DashboardView() {
             </svg>
           </div>
           <div className="text-2xl font-bold">+2350</div>
-          <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+          <p className="text-xs text-muted-foreground">{t('dashboard.from_last_month_high')}</p>
         </div>
          <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="tracking-tight text-sm font-medium">Sales</h3>
+            <h3 className="tracking-tight text-sm font-medium">{t('dashboard.sales')}</h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -73,11 +76,11 @@ export function DashboardView() {
             </svg>
           </div>
           <div className="text-2xl font-bold">+12,234</div>
-          <p className="text-xs text-muted-foreground">+19% from last month</p>
+          <p className="text-xs text-muted-foreground">{t('dashboard.sales_increase')}</p>
         </div>
          <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="tracking-tight text-sm font-medium">Active Now</h3>
+            <h3 className="tracking-tight text-sm font-medium">{t('dashboard.active_now')}</h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -92,7 +95,7 @@ export function DashboardView() {
             </svg>
           </div>
           <div className="text-2xl font-bold">+573</div>
-          <p className="text-xs text-muted-foreground">+201 since last hour</p>
+          <p className="text-xs text-muted-foreground">{t('dashboard.since_last_hour')}</p>
         </div>
       </div>
     </div>
@@ -100,18 +103,20 @@ export function DashboardView() {
 }
 
 export function ProductList() {
+  const { t } = useTranslation()
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-         <h2 className="text-2xl font-bold tracking-tight">Products</h2>
+         <h2 className="text-2xl font-bold tracking-tight">{t('sidebar.products')}</h2>
          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Add Product
+            <Plus className="mr-2 h-4 w-4" /> {t('products.add_product')}
          </Button>
       </div>
       <div className="flex items-center space-x-2">
         <div className="relative w-full max-w-sm">
              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-             <Input placeholder="Search products..." className="pl-8" />
+             <Input placeholder={t('products.search_placeholder')} className="pl-8" />
         </div>
       </div>
       <div className="rounded-md border">
@@ -119,11 +124,11 @@ export function ProductList() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>SKU</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">Stock</TableHead>
+              <TableHead>{t('products.name')}</TableHead>
+              <TableHead>{t('products.sku')}</TableHead>
+              <TableHead>{t('products.category')}</TableHead>
+              <TableHead className="text-right">{t('products.price')}</TableHead>
+              <TableHead className="text-right">{t('products.stock')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -159,22 +164,24 @@ export function ProductList() {
 }
 
 export function VariantList() {
-   return (
+  const { t } = useTranslation()
+  
+  return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-         <h2 className="text-2xl font-bold tracking-tight">Product Variants</h2>
+         <h2 className="text-2xl font-bold tracking-tight">{t('sidebar.variants')}</h2>
          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Add Variant
+            <Plus className="mr-2 h-4 w-4" /> {t('variants.add_variant')}
          </Button>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Variant Name</TableHead>
-              <TableHead>Color</TableHead>
-              <TableHead>Size</TableHead>
-              <TableHead className="text-right">Stock</TableHead>
+              <TableHead>{t('variants.variant_name')}</TableHead>
+              <TableHead>{t('variants.color')}</TableHead>
+              <TableHead>{t('variants.size')}</TableHead>
+              <TableHead className="text-right">{t('products.stock')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -198,21 +205,23 @@ export function VariantList() {
 }
 
 export function BundleList() {
-    return (
+  const { t } = useTranslation()
+  
+  return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-         <h2 className="text-2xl font-bold tracking-tight">Product Bundles</h2>
+         <h2 className="text-2xl font-bold tracking-tight">{t('sidebar.bundles')}</h2>
          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Create Bundle
+            <Plus className="mr-2 h-4 w-4" /> {t('bundles.create_bundle')}
          </Button>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Bundle Name</TableHead>
-              <TableHead>Components</TableHead>
-              <TableHead className="text-right">Bundle Price</TableHead>
+              <TableHead>{t('bundles.bundle_name')}</TableHead>
+              <TableHead>{t('bundles.components')}</TableHead>
+              <TableHead className="text-right">{t('bundles.bundle_price')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -229,22 +238,24 @@ export function BundleList() {
 }
 
 export function ReorderList() {
-    return (
+  const { t } = useTranslation()
+  
+  return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-         <h2 className="text-2xl font-bold tracking-tight">Reorder Points</h2>
+         <h2 className="text-2xl font-bold tracking-tight">{t('sidebar.reorder')}</h2>
          <Button>
-            <Plus className="mr-2 h-4 w-4" /> New Reorder
+            <Plus className="mr-2 h-4 w-4" /> {t('reorder.new_reorder')}
          </Button>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead>Current Stock</TableHead>
-              <TableHead>Reorder Point</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>{t('reorder.product')}</TableHead>
+              <TableHead>{t('reorder.current_stock')}</TableHead>
+              <TableHead>{t('reorder.reorder_point')}</TableHead>
+              <TableHead>{t('common.status')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -252,7 +263,7 @@ export function ReorderList() {
               <TableCell className="font-medium">Gaming Mouse</TableCell>
               <TableCell>45</TableCell>
               <TableCell>50</TableCell>
-              <TableCell className="text-destructive font-bold">Low</TableCell>
+              <TableCell className="text-destructive font-bold">{t('reorder.low')}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -262,22 +273,24 @@ export function ReorderList() {
 }
 
 export function StockAdjustmentList() {
-    return (
+  const { t } = useTranslation()
+  
+  return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-         <h2 className="text-2xl font-bold tracking-tight">Stock Adjustments</h2>
+         <h2 className="text-2xl font-bold tracking-tight">{t('sidebar.stock_adjustment')}</h2>
          <Button>
-            <Plus className="mr-2 h-4 w-4" /> New Adjustment
+            <Plus className="mr-2 h-4 w-4" /> {t('stock_adjustment.new_adjustment')}
          </Button>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Reference</TableHead>
-              <TableHead>Reason</TableHead>
-              <TableHead className="text-right">Qty</TableHead>
+              <TableHead>{t('stock_adjustment.date')}</TableHead>
+              <TableHead>{t('stock_adjustment.reference')}</TableHead>
+              <TableHead>{t('stock_adjustment.reason')}</TableHead>
+              <TableHead className="text-right">{t('stock_adjustment.qty')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
