@@ -1,0 +1,57 @@
+{
+  "app": {
+    "title": "Kho iKho"
+  },
+  "sidebar": {
+    "overview": "Tổng quan",
+    "dashboard": "Bảng điều khiển",
+    "inventory": "Kho hàng",
+    "products": "Sản phẩm",
+    "variants": "Biến thể sản phẩm",
+    "bundles": "Bộ sản phẩm",
+    "reorder": "Đặt hàng lại",
+    "stock_adjustment": "Điều chỉnh kho"
+  },
+  "common": {
+    "add": "Thêm",
+    "create": "Tạo",
+    "search": "Tìm kiếm",
+    "actions": "Hành động",
+    "status": "Trạng thái",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "view": "Xem"
+  },
+  "products": {
+    "title": "Sản phẩm",
+    "add_product": "Thêm sản phẩm",
+    "search_placeholder": "Tìm kiếm sản phẩm..."
+  },
+  "variants": {
+    "title": "Biến thể sản phẩm",
+    "add_variant": "Thêm biến thể"
+  },
+  "bundles": {
+    "title": "Bộ sản phẩm",
+    "create_bundle": "Tạo bộ sản phẩm"
+  },
+  "reorder": {
+    "title": "Điểm đặt hàng lại",
+    "new_reorder": "Tạo đơn đặt hàng lại"
+  },
+  "stock_adjustment": {
+    "title": "Điều chỉnh kho",
+    "new_adjustment": "Tạo phiếu điều chỉnh"
+  },
+  "theme": {
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống"
+  },
+  "language": {
+    "english": "Tiếng Anh",
+    "vietnamese": "Tiếng Việt"
+  }
+}

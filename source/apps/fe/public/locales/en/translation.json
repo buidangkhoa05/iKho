@@ -1,0 +1,57 @@
+{
+  "app": {
+    "title": "iKho Warehouse"
+  },
+  "sidebar": {
+    "overview": "Overview",
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "products": "Products",
+    "variants": "Product Variants",
+    "bundles": "Product Bundles",
+    "reorder": "Reorder",
+    "stock_adjustment": "Stock Adjustment"
+  },
+  "common": {
+    "add": "Add",
+    "create": "Create",
+    "search": "Search",
+    "actions": "Actions",
+    "status": "Status",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View"
+  },
+  "products": {
+    "title": "Products",
+    "add_product": "Add Product",
+    "search_placeholder": "Search products..."
+  },
+  "variants": {
+    "title": "Product Variants",
+    "add_variant": "Add Variant"
+  },
+  "bundles": {
+    "title": "Product Bundles",
+    "create_bundle": "Create Bundle"
+  },
+  "reorder": {
+    "title": "Reorder Points",
+    "new_reorder": "New Reorder"
+  },
+  "stock_adjustment": {
+    "title": "Stock Adjustments",
+    "new_adjustment": "New Adjustment"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "english": "English",
+    "vietnamese": "Vietnamese"
+  }
+}
