@@ -12,3 +12,6 @@ test --test_output=errors
 
 # Platform-specific settings
 build:windows --enable_runfiles
+
+# Add Git utilities (gzip) to PATH for Windows
+build:windows --action_env=PATH

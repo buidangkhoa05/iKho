@@ -8,6 +8,9 @@
     "preview": "vite preview",
     "test": "vitest run"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.7.0",
