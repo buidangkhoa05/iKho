@@ -1,6 +1,6 @@
 # Frontend app — brief
 
-Location: `source/apps/fe`
+Location: `source/apps/admin-fe`
 
 ## Purpose
 Lightweight SPA UI for the iKho monorepo. Built with TanStack Start (file-based routing) and Vite — intended as the primary web frontend for demos and local development.
@@ -13,34 +13,38 @@ Lightweight SPA UI for the iKho monorepo. Built with TanStack Start (file-based 
 - Zustand for global state
 - i18next for i18n
 - Vitest for unit tests
+- **Nx** for monorepo task orchestration and caching
 
 ## Quick start
-- Install: `npm install` (run inside `source/apps/fe`)
-- Dev: `npm run dev` (Vite → port 3000)
-- Build: `npm run build`
-- Preview: `npm run preview`
-- Test: `npm run test` (Vitest)
+- Install: `pnpm install` (run from `source/` workspace root)
+- Dev: `pnpm nx dev admin-fe` or `pnpm dev` (Vite → port 3000)
+- Build: `pnpm nx build admin-fe` or `pnpm build`
+- Preview: `pnpm nx preview admin-fe`
+- Test: `pnpm nx test admin-fe` or `pnpm test` (Vitest)
+- Graph: `pnpm nx graph` — visualize workspace project graph
 
 ## Key files
 - `src/routes/` — file-based routes (add new route files here)
 - `src/routes/__root.tsx` — root layout / shell
-- `src/components/` — UI components (Header, Sidebar, ThemeProvider, etc.)
-- `src/components/ui/` — UI primitives
-- `src/store/useStore.ts` — Zustand store
+- `src/features/` — feature modules (Vertical Slice Architecture)
+- `src/shared/components/` — shadcn/ui components
+- `src/shared/layouts/` — layout components (Header, Sidebar, ThemeProvider, etc.)
+- `src/core/` — shared types and base entities
+- `src/services/` — API client
 - `src/lib/utils.ts` — utilities
 - `public/locales/*` — translations (en, vi)
 - `vite.config.ts`, `package.json`, `tsconfig.json` — configuration & scripts
 
 ## Conventions
-- Commit scope: `source(fe): <short-description>`
+- Commit scope: `source(admin-fe): <short-description>`
 - Add routes under `src/routes/` and follow existing route/component patterns
 - Add unit tests (Vitest) when changing behavior
 - Keep changes small and focused; prefer one feature per commit
+- Run tasks through Nx for caching benefits: `pnpm nx <target> admin-fe`
 
 ## Notes / gotchas
-- `source/apps/fe/.git.backup` contains the original nested repo metadata (kept as a backup when the folder was absorbed into the monorepo)
 - Demo files under `src/routes/demo/` can be removed safely
-- Consider adding CI to run `npm run test` and `npm run build`
+- CI should run `pnpm nx affected -t test build` to only build/test changed projects
 
 ---
 (Generated automatically from repository source structure)

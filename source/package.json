@@ -1,0 +1,27 @@
+{
+  "name": "@ikho/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.30.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "msw",
+      "nx"
+    ]
+  },
+  "scripts": {
+    "dev": "nx dev admin-fe",
+    "build": "nx build admin-fe",
+    "test": "nx test admin-fe",
+    "lint": "nx lint admin-fe",
+    "nx": "nx",
+    "graph": "nx graph"
+  },
+  "devDependencies": {
+    "nx": "^21.3.2",
+    "@nx/vite": "^21.3.2",
+    "@nx/js": "^21.3.2",
+    "@nx/workspace": "^21.3.2"
+  }
+}

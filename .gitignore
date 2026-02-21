@@ -56,5 +56,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Bazel
+# Nx
+.nx/
+.nx/cache
+.nx/workspace-data
+
+# Bazel (legacy — can be removed)
 bazel-*

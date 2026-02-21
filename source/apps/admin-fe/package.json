@@ -1,5 +1,5 @@
 {
-  "name": "fe",
+  "name": "admin-fe",
   "private": true,
   "type": "module",
   "scripts": {
@@ -7,9 +7,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": []
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

@@ -3,6 +3,8 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend';
 
+const isServer = typeof window === 'undefined';
+
 i18n
   // load translation using http -> see /public/locales (i.e. https://github.com/i18next/react-i18next/tree/master/example/react/public/locales)
   // learn more: https://github.com/i18next/i18next-http-backend
@@ -16,14 +18,22 @@ i18n
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
     fallbackLng: 'vi',
-    debug: true,
+    debug: !isServer,
 
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
     
     // Initial language if detection fails or not wanted
-    lng: 'vi', 
+    lng: 'vi',
+
+    backend: {
+      // Use absolute URL on server (Nitro serves on localhost:3000),
+      // relative path on client
+      loadPath: isServer
+        ? 'http://localhost:3000/locales/{{lng}}/{{ns}}.json'
+        : '/locales/{{lng}}/{{ns}}.json',
+    },
   });
 
 export default i18n;
