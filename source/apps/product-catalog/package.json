@@ -1,0 +1,12 @@
+{
+  "name": "product-catalog",
+  "private": true,
+  "scripts": {
+    "dev": "go run ./cmd/server",
+    "build": "go build -o ./dist/product-catalog ./cmd/server",
+    "test": "go test ./...",
+    "lint": "go vet ./...",
+    "fmt": "gofmt -l -w .",
+    "tidy": "go mod tidy"
+  }
+}
