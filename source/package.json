@@ -19,9 +19,9 @@
     "graph": "nx graph"
   },
   "devDependencies": {
-    "nx": "^21.3.2",
-    "@nx/vite": "^21.3.2",
-    "@nx/js": "^21.3.2",
-    "@nx/workspace": "^21.3.2"
+    "nx": "21.3.2",
+    "@nx/vite": "21.3.2",
+    "@nx/js": "21.3.2",
+    "@nx/workspace": "21.3.2"
   }
 }
