@@ -34,4 +34,5 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(migrateCmd)
 	rootCmd.AddCommand(generateCmd)
+	rootCmd.AddCommand(dumpCmd)
 }

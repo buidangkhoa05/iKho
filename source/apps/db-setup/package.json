@@ -11,6 +11,8 @@
     "migrate:up": "go run . migrate up",
     "migrate:down": "go run . migrate down",
     "migrate:status": "go run . migrate status",
-    "generate:model": "go run . generate"
+    "generate:model": "go run . generate",
+    "dump": "go run . dump",
+    "dump:data": "go run . dump --schema-only=false"
   }
 }
