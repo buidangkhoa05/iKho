@@ -11,6 +11,6 @@
     "migrate:up": "go run . migrate up",
     "migrate:down": "go run . migrate down",
     "migrate:status": "go run . migrate status",
-    "generate": "go run . generate"
+    "generate:model": "go run . generate"
   }
 }

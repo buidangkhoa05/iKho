@@ -16,11 +16,12 @@ import (
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Run sqlc generate, split models, and compile-check",
-	Long: `generate runs three steps in sequence:
+	Long: `generate runs four steps in sequence:
 
   1. sqlc generate       — regenerates db/ from query.sql + migrations/
   2. model split         — splits db/models.go into one .go file per struct
-  3. go build ./...      — compile-checks the entire project`,
+  3. go mod tidy         — resolves any new imports from generated code
+  4. go build ./...      — compile-checks the entire project`,
 	RunE:         runGenerate,
 	SilenceUsage: true,
 }
@@ -32,7 +33,7 @@ func runGenerate(_ *cobra.Command, _ []string) error {
 	}
 
 	// Step 1: sqlc generate.
-	fmt.Println("\n==> Step 1/3: Running sqlc generate...")
+	fmt.Println("\n==> Step 1/4: Running sqlc generate...")
 	sqlcCmd := exec.Command("sqlc", "generate")
 	sqlcCmd.Dir = root
 	sqlcCmd.Stdout = os.Stdout
@@ -43,7 +44,7 @@ func runGenerate(_ *cobra.Command, _ []string) error {
 	fmt.Println("    [OK] sqlc generate completed.")
 
 	// Step 2: split db/models.go into per-struct files.
-	fmt.Println("\n==> Step 2/3: Splitting db/models.go into per-struct files...")
+	fmt.Println("\n==> Step 2/4: Splitting db/models.go into per-struct files...")
 	modelsFile := filepath.Join(root, "db", "models.go")
 	outDir := filepath.Join(root, "db", "models")
 
@@ -67,8 +68,19 @@ func runGenerate(_ *cobra.Command, _ []string) error {
 	}
 	fmt.Println("    [OK] Model split completed.")
 
-	// Step 3: compile-check.
-	fmt.Println("\n==> Step 3/3: Running go build ./... to verify...")
+	// Step 3: go mod tidy — resolve any new imports from generated code.
+	fmt.Println("\n==> Step 3/4: Running go mod tidy...")
+	tidyCmd := exec.Command("go", "mod", "tidy")
+	tidyCmd.Dir = root
+	tidyCmd.Stdout = os.Stdout
+	tidyCmd.Stderr = os.Stderr
+	if err := tidyCmd.Run(); err != nil {
+		return fmt.Errorf("go mod tidy failed: %w", err)
+	}
+	fmt.Println("    [OK] go mod tidy completed.")
+
+	// Step 4: compile-check.
+	fmt.Println("\n==> Step 4/4: Running go build ./... to verify...")
 	buildCmd := exec.Command("go", "build", "./...")
 	buildCmd.Dir = root
 	buildCmd.Stdout = os.Stdout
