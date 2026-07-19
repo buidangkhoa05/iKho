@@ -1,5 +1,6 @@
 using System.CodeDom.Compiler;
 using System.Text;
+using System.Text.RegularExpressions;
 using Avro;
 using Microsoft.CSharp;
 using NJsonSchema;
@@ -13,20 +14,7 @@ if (args.Length != 1)
 
 var libraryRoot = Path.GetFullPath(args[0]);
 
-var generationPlan = new SchemaGenerationPlan(
-    JsonSchemas:
-    [
-        new JsonSchemaContract(
-            SchemaPath: Path.Combine(libraryRoot, "schemas", "domains", "warehouse", "api", "v1", "StockReservedRequest.json"),
-            OutputPath: Path.Combine(libraryRoot, "Generated", "Contracts", "Warehouse", "Api", "V1", "StockReservedRequest.cs"),
-            Namespace: "Ikho.SchemaManagement.Contracts.Warehouse.Api.V1")
-    ],
-    AvroSchemas:
-    [
-        new AvroSchemaContract(
-            SchemaPath: Path.Combine(libraryRoot, "schemas", "domains", "warehouse", "events", "v1", "InventoryReceived.avro"),
-            OutputDirectory: Path.Combine(libraryRoot, "Generated", "Contracts", "Warehouse", "Events", "V1"))
-    ]);
+var generationPlan = SchemaGenerationPlanDiscovery.Discover(libraryRoot);
 
 var generator = new SchemaContractGenerator();
 await generator.GenerateAsync(generationPlan, CancellationToken.None);
@@ -44,6 +32,107 @@ internal sealed record JsonSchemaContract(
 internal sealed record AvroSchemaContract(
     string SchemaPath,
     string OutputDirectory);
+
+/// <summary>
+/// Discovers schema-backed contracts by convention from the <c>schemas/domains/{domain}/{api|events}/{version}</c>
+/// folder layout, removing the need to manually register each new schema file.
+/// </summary>
+internal static class SchemaGenerationPlanDiscovery
+{
+    private const string RootNamespace = "Ikho.Contracts";
+    private static readonly Regex VersionFolderPattern = new(@"^v(\d+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    /// Walks <c>schemas/domains</c> under the given library root and builds a <see cref="SchemaGenerationPlan"/>
+    /// containing every recognized JSON Schema (<c>api</c>) and Avro (<c>events</c>) file found.
+    /// </summary>
+    public static SchemaGenerationPlan Discover(string libraryRoot)
+    {
+        var domainsRoot = Path.Combine(libraryRoot, "schemas", "domains");
+        var jsonSchemas = new List<JsonSchemaContract>();
+        var avroSchemas = new List<AvroSchemaContract>();
+
+        if (!Directory.Exists(domainsRoot))
+        {
+            return new SchemaGenerationPlan(jsonSchemas, avroSchemas);
+        }
+
+        foreach (var domainDirectory in Directory.EnumerateDirectories(domainsRoot).OrderBy(path => path, StringComparer.Ordinal))
+        {
+            var domainName = ToPascalCase(Path.GetFileName(domainDirectory));
+
+            DiscoverContractType(libraryRoot, domainDirectory, "api", domainName, jsonSchemas, avroSchemas);
+            DiscoverContractType(libraryRoot, domainDirectory, "events", domainName, jsonSchemas, avroSchemas);
+        }
+
+        return new SchemaGenerationPlan(jsonSchemas, avroSchemas);
+    }
+
+    /// <summary>
+    /// Discovers versioned schema files under a single <c>api</c> or <c>events</c> folder within a domain.
+    /// </summary>
+    private static void DiscoverContractType(
+        string libraryRoot,
+        string domainDirectory,
+        string typeFolderName,
+        string domainName,
+        List<JsonSchemaContract> jsonSchemas,
+        List<AvroSchemaContract> avroSchemas)
+    {
+        var typeDirectory = Path.Combine(domainDirectory, typeFolderName);
+
+        if (!Directory.Exists(typeDirectory))
+        {
+            return;
+        }
+
+        var typeName = ToPascalCase(typeFolderName);
+
+        foreach (var versionDirectory in Directory.EnumerateDirectories(typeDirectory).OrderBy(path => path, StringComparer.Ordinal))
+        {
+            var versionFolderName = Path.GetFileName(versionDirectory);
+            var versionMatch = VersionFolderPattern.Match(versionFolderName);
+
+            if (!versionMatch.Success)
+            {
+                continue;
+            }
+
+            var versionName = $"V{versionMatch.Groups[1].Value}";
+            var @namespace = $"{RootNamespace}.{domainName}.{typeName}.{versionName}";
+
+            foreach (var schemaPath in Directory.EnumerateFiles(versionDirectory, "*.json").OrderBy(path => path, StringComparer.Ordinal))
+            {
+                var fileName = Path.GetFileNameWithoutExtension(schemaPath);
+                var outputPath = Path.Combine(libraryRoot, "Generated", "Contracts", domainName, typeName, versionName, $"{fileName}.cs");
+
+                jsonSchemas.Add(new JsonSchemaContract(
+                    SchemaPath: schemaPath,
+                    OutputPath: outputPath,
+                    Namespace: @namespace));
+            }
+
+            foreach (var schemaPath in Directory.EnumerateFiles(versionDirectory, "*.avro").OrderBy(path => path, StringComparer.Ordinal))
+            {
+                var outputDirectory = Path.Combine(libraryRoot, "Generated", "Contracts", domainName, typeName, versionName);
+
+                avroSchemas.Add(new AvroSchemaContract(
+                    SchemaPath: schemaPath,
+                    OutputDirectory: outputDirectory));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Converts a lowercase or kebab-case folder name (e.g. <c>categories</c>, <c>purchase-orders</c>) into
+    /// PascalCase (e.g. <c>Categories</c>, <c>PurchaseOrders</c>) for use in namespaces and output folder names.
+    /// </summary>
+    private static string ToPascalCase(string segment)
+    {
+        var parts = segment.Split('-', StringSplitOptions.RemoveEmptyEntries);
+        return string.Concat(parts.Select(part => char.ToUpperInvariant(part[0]) + part[1..]));
+    }
+}
 
 internal sealed class SchemaContractGenerator
 {

@@ -8,7 +8,7 @@
 #nullable enable
 
 
-namespace Ikho.SchemaManagement.Contracts.Warehouse.Api.V1
+namespace Ikho.Contracts.Warehouse.Api.V1
 {
     #pragma warning disable // Disable all warnings
 
