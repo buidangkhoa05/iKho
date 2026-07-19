@@ -1,0 +1,50 @@
+{
+  "name": "IkhoSchemaManagement",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "root": "libs/ikho-schema-management",
+  "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "metadata": {
+        "description": "Generate tracked C# contracts from JSON Schema and Avro definitions."
+      },
+      "inputs": [
+        "{projectRoot}/schemas/**/*",
+        "{projectRoot}/infrastructure/**/*",
+        "{projectRoot}/IkhoSchemaManagement.csproj"
+      ],
+      "outputs": [
+        "{projectRoot}/Generated/Contracts"
+      ],
+      "options": {
+        "cwd": "..",
+        "command": "pwsh -NoProfile -File ./source/libs/ikho-schema-management/infrastructure/generate.ps1"
+      }
+    },
+    "generate-container": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "metadata": {
+        "description": "Generate tracked C# contracts inside the containerized schema generator."
+      },
+      "inputs": [
+        "{projectRoot}/schemas/**/*",
+        "{projectRoot}/infrastructure/**/*",
+        "{projectRoot}/IkhoSchemaManagement.csproj"
+      ],
+      "outputs": [
+        "{projectRoot}/Generated/Contracts"
+      ],
+      "options": {
+        "cwd": "..",
+        "commands": [
+          "docker build -t ikho-schema-codegen -f ./source/libs/ikho-schema-management/infrastructure/Dockerfile.generator .",
+          "docker run --rm -v ${PWD}/source:/workspace/source ikho-schema-codegen pwsh /workspace/source/libs/ikho-schema-management/infrastructure/generate.ps1"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

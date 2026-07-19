@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Ikho.SchemaManagement</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="infrastructure\IkhoSchemaGenerator\**\*.cs" />
+    <EmbeddedResource Remove="infrastructure\IkhoSchemaGenerator\**\*" />
+    <None Remove="infrastructure\IkhoSchemaGenerator\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Apache.Avro" Version="1.12.1" />
+  </ItemGroup>
+
+</Project>

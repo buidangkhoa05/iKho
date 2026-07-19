@@ -1,0 +1,35 @@
+{
+  "type": "record",
+  "name": "InventoryReceived",
+  "namespace": "Ikho.SchemaManagement.Contracts.Warehouse.Events.V1",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "sku",
+      "type": "string"
+    },
+    {
+      "name": "quantity",
+      "type": "int"
+    },
+    {
+      "name": "receivedAtUtc",
+      "type": "string"
+    },
+    {
+      "name": "warehouseCode",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "createdOn",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StockReservedRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reservationId", "sku", "quantity", "reservedAtUtc"],
+  "properties": {
+    "reservationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sku": {
+      "type": "string",
+      "minLength": 1
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "reservedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "locationCode": {
+      "type": ["string", "null"]
+    },
+    "createdOn": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
