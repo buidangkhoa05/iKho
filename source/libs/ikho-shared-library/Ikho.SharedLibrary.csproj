@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ikho-schema-management\IkhoSchemaManagement.csproj" />
+    <ProjectReference Include="..\ikho-schema-management\Ikho.SchemaManagement.csproj" />
   </ItemGroup>
 
 </Project>
