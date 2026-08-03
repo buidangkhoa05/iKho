@@ -73,6 +73,47 @@ so behavior can change per environment without code changes.
 To add a new backend service: add a new route + cluster pair, pointing `Match.Path` at the
 new service's path prefix and `Destinations` at its base address.
 
+For the planned warehouse microservices split, route naming should align to the capability-oriented service names. Recommended route and cluster pattern:
+
+```jsonc
+"ReverseProxy": {
+  "Routes": {
+    "warehouse-catalog-route": {
+      "ClusterId": "warehouse-catalog-cluster",
+      "Match": { "Path": "/api/warehouse/catalog/{**catch-all}" }
+    },
+    "warehouse-inventory-route": {
+      "ClusterId": "warehouse-inventory-cluster",
+      "Match": { "Path": "/api/warehouse/inventory/{**catch-all}" }
+    },
+    "warehouse-inbound-route": {
+      "ClusterId": "warehouse-inbound-cluster",
+      "Match": { "Path": "/api/warehouse/inbound/{**catch-all}" }
+    },
+    "warehouse-outbound-route": {
+      "ClusterId": "warehouse-outbound-cluster",
+      "Match": { "Path": "/api/warehouse/outbound/{**catch-all}" }
+    }
+  },
+  "Clusters": {
+    "warehouse-catalog-cluster": {
+      "Destinations": { "destination1": { "Address": "http://localhost:5151" } }
+    },
+    "warehouse-inventory-cluster": {
+      "Destinations": { "destination1": { "Address": "http://localhost:5152" } }
+    },
+    "warehouse-inbound-cluster": {
+      "Destinations": { "destination1": { "Address": "http://localhost:5153" } }
+    },
+    "warehouse-outbound-cluster": {
+      "Destinations": { "destination1": { "Address": "http://localhost:5154" } }
+    }
+  }
+}
+```
+
+This path-based split keeps the frontend stable because all service calls still pass through `/api/*`, while making service ownership visible and preventing route collisions as more warehouse capabilities are added.
+
 ### Authentication (`Jwt` section)
 
 - `Authority` / `Audience` are **placeholders** — no identity provider has been selected yet.
@@ -130,6 +171,33 @@ required. Run it with `pnpm nx serve Ikho.ApiGateway` (or `dotnet run` from the 
 - Containerization (Dockerfile) and production deployment/CI wiring.
 - Multiple backend clusters — only `Ikho.SharedLibrary` exists today.
 - Response caching / request aggregation.
+
+## Planned Gateway Growth For Warehouse Microservices
+
+The gateway is the natural expansion point for the warehouse microservices program because it already centralizes routing and cross-cutting concerns. As the warehouse services are introduced, this document should remain the reference for:
+
+1. route naming conventions
+2. cluster naming conventions
+3. environment-specific destination management
+4. any service-specific auth, rate-limiting, or routing exceptions
+
+The planned downstream services are:
+
+1. `Ikho.WarehouseOrganization`
+2. `Ikho.WarehouseCatalog`
+3. `Ikho.WarehousePartner`
+4. `Ikho.WarehouseInventory`
+5. `Ikho.WarehouseInbound`
+6. `Ikho.WarehouseOutbound`
+7. `Ikho.WarehouseReturns`
+8. `Ikho.WarehouseBilling`
+9. `Ikho.WarehouseReporting`
+
+Related planning docs:
+
+1. [warehouse-domain-model.md](./warehouse-domain-model.md)
+2. [warehouse-db-relationships.md](./warehouse-db-relationships.md)
+3. [../plans/warehouse-microservices-rollout-plan.md](../plans/warehouse-microservices-rollout-plan.md)
 
 ## Open questions
 

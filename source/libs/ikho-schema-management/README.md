@@ -31,6 +31,37 @@ schemas/domains/warehouse/api/v1/StockReservedRequest.json
 
 Domains with no schema files yet (empty `api`/`events` folders, or no folders at all) are simply skipped by the generator.
 
+## Planned Warehouse Domain Structure
+
+For the planned warehouse microservices rollout, prefer capability-specific schema domains instead of one large `warehouse` bucket. This keeps generated contracts aligned with service boundaries.
+
+Recommended examples:
+
+```text
+schemas/domains/warehouse-organization/api/v1/CreateWarehouseRequest.json
+schemas/domains/warehouse-organization/events/v1/WarehouseCreated.avro
+schemas/domains/warehouse-catalog/api/v1/CreateProductRequest.json
+schemas/domains/warehouse-inventory/events/v1/StockReserved.avro
+schemas/domains/warehouse-outbound/api/v1/CreateSalesOrderRequest.json
+```
+
+These produce generated contracts such as:
+
+```text
+Generated/Contracts/WarehouseOrganization/Api/V1/CreateWarehouseRequest.cs
+Generated/Contracts/WarehouseOrganization/Events/V1/WarehouseCreated.cs
+Generated/Contracts/WarehouseCatalog/Api/V1/CreateProductRequest.cs
+Generated/Contracts/WarehouseInventory/Events/V1/StockReserved.cs
+Generated/Contracts/WarehouseOutbound/Api/V1/CreateSalesOrderRequest.cs
+```
+
+And namespaces such as:
+
+```text
+Ikho.SchemaManagement.Contracts.WarehouseOrganization.Api.V1
+Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1
+```
+
 ## Versioning Rules
 
 1. Use major versions only: `v1`, `v2`, `v3`, and so on.

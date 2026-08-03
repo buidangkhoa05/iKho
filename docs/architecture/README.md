@@ -53,6 +53,15 @@ C4Container
         Container(gateway, "Ikho.ApiGateway", ".NET 10 / YARP", "Single entry point: routing, CORS, JWT auth scaffolding, rate limiting, correlation IDs, request logging")
         Container(api, "Ikho.SharedLibrary", ".NET 10 Minimal API", "Backend REST API (Vertical Slice Architecture)")
         Container(schema, "Ikho.SchemaManagement", ".NET library + codegen CLI", "Generates C# contracts from JSON Schema/Avro definitions, referenced by Ikho.SharedLibrary at build time")
+        Container(orgsvc, "Ikho.WarehouseOrganization", ".NET 10 Minimal API", "Planned warehouse structure service owning companies, warehouses, bins, and docks")
+        Container(catalogsvc, "Ikho.WarehouseCatalog", ".NET 10 Minimal API", "Planned product master-data service for warehouse operations")
+        Container(partnersvc, "Ikho.WarehousePartner", ".NET 10 Minimal API", "Planned supplier and customer master-data service")
+        Container(inventorysvc, "Ikho.WarehouseInventory", ".NET 10 Minimal API", "Planned stock system of record owning ledger, lots, serials, and reservations")
+        Container(inboundsvc, "Ikho.WarehouseInbound", ".NET 10 Minimal API", "Planned receiving and putaway workflow service")
+        Container(outboundsvc, "Ikho.WarehouseOutbound", ".NET 10 Minimal API", "Planned allocation, picking, packing, and shipping workflow service")
+        Container(returnssvc, "Ikho.WarehouseReturns", ".NET 10 Minimal API", "Planned reverse-logistics and disposition service")
+        Container(billingsvc, "Ikho.WarehouseBilling", ".NET 10 Minimal API", "Planned billing and financial snapshot service")
+        Container(reportingsvc, "Ikho.WarehouseReporting", ".NET 10 Minimal API or worker", "Planned projection/read-model service for dashboards and analytics")
     }
 
     Rel(user, ui, "Uses", "HTTPS")
@@ -60,6 +69,23 @@ C4Container
     Rel(ui, gateway, "Calls /api/*", "HTTPS/JSON (dev: via proxy.conf.json)")
     Rel(gateway, api, "Forwards /api/* to shared-library-cluster", "HTTP/JSON")
     Rel(api, schema, "References generated contracts from", "Project reference")
+    Rel(gateway, orgsvc, "Planned /api/warehouse/organization/*", "HTTP/JSON")
+    Rel(gateway, catalogsvc, "Planned /api/warehouse/catalog/*", "HTTP/JSON")
+    Rel(gateway, partnersvc, "Planned /api/warehouse/partner/*", "HTTP/JSON")
+    Rel(gateway, inventorysvc, "Planned /api/warehouse/inventory/*", "HTTP/JSON")
+    Rel(gateway, inboundsvc, "Planned /api/warehouse/inbound/*", "HTTP/JSON")
+    Rel(gateway, outboundsvc, "Planned /api/warehouse/outbound/*", "HTTP/JSON")
+    Rel(gateway, returnssvc, "Planned /api/warehouse/returns/*", "HTTP/JSON")
+    Rel(gateway, billingsvc, "Planned /api/warehouse/billing/*", "HTTP/JSON")
+    Rel(schema, orgsvc, "Planned contract reference", "Project reference")
+    Rel(schema, catalogsvc, "Planned contract reference", "Project reference")
+    Rel(schema, partnersvc, "Planned contract reference", "Project reference")
+    Rel(schema, inventorysvc, "Planned contract reference", "Project reference")
+    Rel(schema, inboundsvc, "Planned contract reference", "Project reference")
+    Rel(schema, outboundsvc, "Planned contract reference", "Project reference")
+    Rel(schema, returnssvc, "Planned contract reference", "Project reference")
+    Rel(schema, billingsvc, "Planned contract reference", "Project reference")
+    Rel(schema, reportingsvc, "Planned contract reference", "Project reference")
 ```
 
 | Container | Path | Port(s) |
@@ -69,6 +95,15 @@ C4Container
 | `Ikho.ApiGateway` | [source/apps/ikho-api-gateway](../../source/apps/ikho-api-gateway) | 5080 / 7080 |
 | `Ikho.SharedLibrary` | [source/libs/ikho-shared-library](../../source/libs/ikho-shared-library) | 5143 / 7270 |
 | `Ikho.SchemaManagement` | [source/libs/ikho-schema-management](../../source/libs/ikho-schema-management) | — (build-time codegen, not a running service) |
+| `Ikho.WarehouseOrganization` | Planned | TBD |
+| `Ikho.WarehouseCatalog` | Planned | TBD |
+| `Ikho.WarehousePartner` | Planned | TBD |
+| `Ikho.WarehouseInventory` | Planned | TBD |
+| `Ikho.WarehouseInbound` | Planned | TBD |
+| `Ikho.WarehouseOutbound` | Planned | TBD |
+| `Ikho.WarehouseReturns` | Planned | TBD |
+| `Ikho.WarehouseBilling` | Planned | TBD |
+| `Ikho.WarehouseReporting` | Planned | TBD |
 
 ## 3. Component Diagrams
 
@@ -109,6 +144,14 @@ features are added under `Features/{Feature}/` (per
 [csharp.instructions.md](../../.github/instructions/csharp.instructions.md)), add a component
 diagram here showing the endpoint/service/repository slices.
 
+### 3.3 Planned Warehouse Domain Decomposition
+
+The current architecture is evolving from a single shared backend into multiple capability-based warehouse services. The planned service boundaries, entity ownership, and execution order are documented here:
+
+1. [warehouse-domain-model.md](./warehouse-domain-model.md)
+2. [warehouse-db-relationships.md](./warehouse-db-relationships.md)
+3. [../plans/warehouse-microservices-rollout-plan.md](../plans/warehouse-microservices-rollout-plan.md)
+
 ## Adding a new container or component
 
 When adding a new deployable app/service:
@@ -125,5 +168,8 @@ When adding a new deployable app/service:
 ## Related documents
 
 - [api-gateway.md](./api-gateway.md) — API Gateway deep dive (config, pipeline, open questions)
+- [warehouse-domain-model.md](./warehouse-domain-model.md) — logical domain map for warehouse bounded contexts and entities
+- [warehouse-db-relationships.md](./warehouse-db-relationships.md) — centralized logical database ownership and relationship rules
+- [../plans/warehouse-microservices-rollout-plan.md](../plans/warehouse-microservices-rollout-plan.md) — master rollout and sequencing plan for warehouse microservices
 - [docs/plans](../plans) — implementation plans for past/in-flight features
 - [.github/copilot-instructions.md](../../.github/copilot-instructions.md) — repo-wide conventions for AI agents (and a useful quick-start for humans too)
