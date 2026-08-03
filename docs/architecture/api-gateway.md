@@ -1,7 +1,8 @@
 # API Gateway Architecture
 
 > Living document — update this whenever the gateway's topology, config sections, or
-> cross-cutting concerns change.
+> cross-cutting concerns change. Part of the wider system architecture — see
+> [README.md](./README.md) for the C4 System Context / Container / Component overview.
 
 ## Overview
 
