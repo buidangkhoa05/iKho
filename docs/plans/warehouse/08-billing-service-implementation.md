@@ -8,6 +8,20 @@ This document plans the implementation of `Ikho.WarehouseBilling`, the service t
 2. Preserve financial snapshots independent of later changes in partner or product data.
 3. Consume receipt and shipment facts without introducing cross-database joins.
 
+## Architecture
+
+This service follows **Vertical Slice Architecture** (mandatory for all `Ikho.Warehouse*`
+services — see [csharp.instructions.md](../../../.github/instructions/csharp.instructions.md)
+and [warehouse-service-template.md](../../architecture/warehouse-service-template.md)):
+
+1. Each feature lives under `Features/{Feature}/`, owning its endpoint, service, repository,
+   request/response DTOs, and validator — no `Controllers/`, `Services/`, or `Repositories/`
+   layer folders.
+2. Cross-cutting/local concerns live in `Shared/`; shared domain types live in `Domain/`.
+3. Bootstraps via `Ikho.SharedLibrary` (`AddServiceDefaults<TDbContext>()` /
+   `UseServiceDefaults()`) for correlation ids, request logging, health checks, outbox
+   publishing, and idempotency.
+
 ## Owned Entities
 
 1. `Invoice`

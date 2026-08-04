@@ -21,10 +21,15 @@ This document defines the cross-cutting platform work that should be completed b
 
 ## Execution Steps
 
-1. Define the standard service layout.
+1. Define the standard service layout, following **Vertical Slice Architecture** (mandatory
+   for every `Ikho.Warehouse*` service — see
+   [csharp.instructions.md](../../../.github/instructions/csharp.instructions.md) and
+   [warehouse-service-template.md](../../architecture/warehouse-service-template.md)).
    - `Program.cs`
-   - `Features/{Feature}/`
+   - `Features/{Feature}/` — each feature owns its endpoint, service, repository, DTOs, and
+     validator; no `Controllers/`, `Services/`, or `Repositories/` layer folders
    - `Shared/` for cross-cutting service-local concerns
+   - `Domain/` for shared domain/value types
    - configuration and launch settings
 2. Define a gateway routing pattern.
    - `/api/warehouse/catalog/*`

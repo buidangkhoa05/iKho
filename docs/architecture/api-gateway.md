@@ -73,7 +73,13 @@ so behavior can change per environment without code changes.
 To add a new backend service: add a new route + cluster pair, pointing `Match.Path` at the
 new service's path prefix and `Destinations` at its base address.
 
-For the planned warehouse microservices split, route naming should align to the capability-oriented service names. Recommended route and cluster pattern:
+For the planned warehouse microservices split, route naming aligns to the capability-oriented
+service names. Placeholder routes and clusters for all nine planned services are already
+present in [appsettings.json](../../source/apps/ikho-api-gateway/appsettings.json), pointing at
+sequential local ports (`5151`–`5159`, in rollout-plan capability order: Organization, Catalog,
+Partner, Inventory, Inbound, Outbound, Returns, Billing, Reporting). These destinations are
+unreachable until each service actually exists — update the `Address` once a service is
+running. Pattern:
 
 ```jsonc
 "ReverseProxy": {
@@ -81,32 +87,11 @@ For the planned warehouse microservices split, route naming should align to the 
     "warehouse-catalog-route": {
       "ClusterId": "warehouse-catalog-cluster",
       "Match": { "Path": "/api/warehouse/catalog/{**catch-all}" }
-    },
-    "warehouse-inventory-route": {
-      "ClusterId": "warehouse-inventory-cluster",
-      "Match": { "Path": "/api/warehouse/inventory/{**catch-all}" }
-    },
-    "warehouse-inbound-route": {
-      "ClusterId": "warehouse-inbound-cluster",
-      "Match": { "Path": "/api/warehouse/inbound/{**catch-all}" }
-    },
-    "warehouse-outbound-route": {
-      "ClusterId": "warehouse-outbound-cluster",
-      "Match": { "Path": "/api/warehouse/outbound/{**catch-all}" }
     }
   },
   "Clusters": {
     "warehouse-catalog-cluster": {
-      "Destinations": { "destination1": { "Address": "http://localhost:5151" } }
-    },
-    "warehouse-inventory-cluster": {
       "Destinations": { "destination1": { "Address": "http://localhost:5152" } }
-    },
-    "warehouse-inbound-cluster": {
-      "Destinations": { "destination1": { "Address": "http://localhost:5153" } }
-    },
-    "warehouse-outbound-cluster": {
-      "Destinations": { "destination1": { "Address": "http://localhost:5154" } }
     }
   }
 }
@@ -198,6 +183,7 @@ Related planning docs:
 1. [warehouse-domain-model.md](./warehouse-domain-model.md)
 2. [warehouse-db-relationships.md](./warehouse-db-relationships.md)
 3. [../plans/warehouse-microservices-rollout-plan.md](../plans/warehouse-microservices-rollout-plan.md)
+4. [warehouse-service-template.md](./warehouse-service-template.md) — standard service layout, bootstrap, and `Ikho.SharedLibrary` usage
 
 ## Open questions
 

@@ -60,6 +60,12 @@ The recommended service naming convention uses warehouse-qualified service names
 6. Services publishing integration events should use an outbox pattern.
 7. Reporting is projection-only and does not own transactional truth.
 8. Shared schemas belong in `source/libs/ikho-schema-management` and use major versions only.
+9. Every service is built using **Vertical Slice Architecture** — features live under
+   `Features/{Feature}/`, owning their endpoint, service, repository, DTOs, and validator; no
+   `Controllers/`, `Services/`, or `Repositories/` layer folders. See
+   [csharp.instructions.md](../../.github/instructions/csharp.instructions.md) and
+   [warehouse-service-template.md](../architecture/warehouse-service-template.md) for the
+   standard layout and `Ikho.SharedLibrary` bootstrap.
 
 ## Recommended Execution Order
 
@@ -180,13 +186,13 @@ Use this checklist to track execution progress across the full warehouse rollout
 
 ### Foundation And Platform
 
-- [ ] Finalize service naming and repository conventions
-- [ ] Define service bootstrap/template for future warehouse services
-- [ ] Define gateway route and cluster naming conventions
-- [ ] Decide message broker for integration events
-- [ ] Define outbox pattern and event publishing workflow
-- [ ] Define consumer idempotency and retry policy
-- [ ] Standardize health checks, readiness checks, and logging
+- [x] Finalize service naming and repository conventions
+- [x] Define service bootstrap/template for future warehouse services
+- [x] Define gateway route and cluster naming conventions
+- [x] Decide message broker for integration events
+- [x] Define outbox pattern and event publishing workflow
+- [x] Define consumer idempotency and retry policy
+- [x] Standardize health checks, readiness checks, and logging
 - [ ] Define warehouse schema folder structure under `Ikho.SchemaManagement`
 
 ### Master Data Services
