@@ -10,4 +10,12 @@
     <ProjectReference Include="..\ikho-schema-management\Ikho.SchemaManagement.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.6.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
+  </ItemGroup>
+
 </Project>
