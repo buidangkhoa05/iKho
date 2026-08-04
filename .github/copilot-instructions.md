@@ -2,13 +2,25 @@
 
 ## Architecture
 
-Monorepo at `source/` managed by **pnpm** + **Nx 23**. Two apps, one shared library.
+Monorepo at `source/` managed by **pnpm** + **Nx 23**.
 
-| App / Lib | Stack | Purpose |
-|-----------|-------|---------|
+### `source/apps/` — Deployable services
+
+| App | Stack | Purpose |
+|-----|-------|---------|
 | `ikho-ui` | Angular 19 (standalone, esbuild, SSR) | Main SPA frontend |
-| `IkhoSharedLibrary` | .NET 10 Minimal API | REST API backend |
+| `ikho-api-gateway` | .NET 10 / YARP | Reverse proxy — single entry point |
+| `ikho-warehouse-organization` | .NET 10 Minimal API | Warehouse structure service (companies, warehouses, location hierarchy) |
+
+### `source/libs/` — Shared libraries (not independently deployable)
+
+| Lib | Stack | Purpose |
+|-----|-------|---------|
+| `ikho-shared-library` | .NET 10 | Cross-cutting concerns: outbox, idempotency, Kafka, health checks, middleware |
+| `ikho-schema-management` | .NET library + codegen | Generates C# contracts from Avro schemas; build-time only |
 | `ikho-shared-ui` | Angular 19 buildable library | Shared UI components (`@ikho/shared-ui`) |
+
+**Rule**: Only libraries that are consumed by multiple apps (or that are build-time tools with no HTTP port) belong in `libs/`. Every independently deployable .NET service belongs in `apps/`.
 
 **Universal pattern**: Vertical Slice Architecture across all languages.
 
@@ -18,14 +30,15 @@ Monorepo at `source/` managed by **pnpm** + **Nx 23**. Two apps, one shared libr
 
 ```sh
 cd source
-pnpm install                          # install all JS deps
-pnpm nx serve ikho-ui                 # Angular dev server at :4200 (proxies /api to :5143)
-pnpm nx serve IkhoSharedLibrary       # .NET API at :5143
-pnpm nx build ikho-ui                 # Angular production build
-pnpm nx build ikho-shared-ui          # buildable library compile
-pnpm nx test ikho-ui                  # vitest-angular tests
-pnpm nx run-many -t build             # build all projects
-pnpm nx graph                         # visualise project dependency graph
+pnpm install                               # install all JS deps
+pnpm nx serve ikho-ui                      # Angular dev server at :4200 (proxies /api to :5143)
+pnpm nx serve IkhoSharedLibrary            # .NET shared lib API at :5143
+pnpm nx serve IkhoWarehouseOrganization    # Organization service at :5151
+pnpm nx build ikho-ui                      # Angular production build
+pnpm nx build ikho-shared-ui               # buildable library compile
+pnpm nx test ikho-ui                       # vitest-angular tests
+pnpm nx run-many -t build                  # build all projects
+pnpm nx graph                              # visualise project dependency graph
 ```
 
 ## Angular Frontend Conventions

@@ -1,0 +1,59 @@
+using Ikho.WarehouseOrganization.Domain;
+using Ikho.WarehouseOrganization.Shared;
+using Microsoft.EntityFrameworkCore;
+
+namespace Ikho.WarehouseOrganization.Features.Companies;
+
+/// <summary>
+/// Data access for <see cref="Company"/>.
+/// </summary>
+public interface ICompanyRepository
+{
+    /// <summary>
+    /// Finds a company by id, or <see langword="null"/> if it does not exist.
+    /// </summary>
+    Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Returns all companies ordered by code.
+    /// </summary>
+    Task<List<Company>> GetAllAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Returns <see langword="true"/> if a company with <paramref name="code"/> already exists.
+    /// </summary>
+    Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Tracks a new company for insertion on the next <see cref="SaveChangesAsync"/> call.
+    /// </summary>
+    void Add(Company company);
+
+    /// <summary>
+    /// Persists tracked changes to the database.
+    /// </summary>
+    Task SaveChangesAsync(CancellationToken cancellationToken);
+}
+
+/// <inheritdoc />
+public sealed class CompanyRepository(OrganizationDbContext dbContext) : ICompanyRepository
+{
+    /// <inheritdoc />
+    public Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
+        dbContext.Companies.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<List<Company>> GetAllAsync(CancellationToken cancellationToken) =>
+        dbContext.Companies.OrderBy(c => c.Code).ToListAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken) =>
+        dbContext.Companies.AnyAsync(c => c.Code == code, cancellationToken);
+
+    /// <inheritdoc />
+    public void Add(Company company) => dbContext.Companies.Add(company);
+
+    /// <inheritdoc />
+    public Task SaveChangesAsync(CancellationToken cancellationToken) =>
+        dbContext.SaveChangesAsync(cancellationToken);
+}

@@ -16,7 +16,7 @@ to `Ikho.SharedLibrary.csproj`, the same way it already references `Ikho.SchemaM
 ## Standard project layout
 
 ```
-source/libs/ikho-warehouse-{capability}/
+source/apps/ikho-warehouse-{capability}/
   Ikho.Warehouse{Capability}.csproj
   Program.cs                     # composition root
   appsettings.json                # Database, MessageBroker, Cors, Jwt sections

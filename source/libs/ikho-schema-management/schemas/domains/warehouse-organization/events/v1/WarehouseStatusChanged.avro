@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "WarehouseStatusChanged",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseOrganization.Events.V1",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "warehouseId",
+      "type": "string"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean"
+    },
+    {
+      "name": "changedOn",
+      "type": "string"
+    }
+  ]
+}

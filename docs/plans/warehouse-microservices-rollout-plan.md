@@ -60,7 +60,10 @@ The recommended service naming convention uses warehouse-qualified service names
 6. Services publishing integration events should use an outbox pattern.
 7. Reporting is projection-only and does not own transactional truth.
 8. Shared schemas belong in `source/libs/ikho-schema-management` and use major versions only.
-9. Every service is built using **Vertical Slice Architecture** — features live under
+9. Every independently deployable .NET service belongs in `source/apps/`. Libraries consumed by
+   multiple services (cross-cutting concerns, codegen) belong in `source/libs/`. Never place a
+   runnable microservice under `source/libs/`.
+10. Every service is built using **Vertical Slice Architecture** — features live under
    `Features/{Feature}/`, owning their endpoint, service, repository, DTOs, and validator; no
    `Controllers/`, `Services/`, or `Repositories/` layer folders. See
    [csharp.instructions.md](../../.github/instructions/csharp.instructions.md) and
@@ -197,7 +200,7 @@ Use this checklist to track execution progress across the full warehouse rollout
 
 ### Master Data Services
 
-- [ ] Implement `Ikho.WarehouseOrganization`
+- [x] Implement `Ikho.WarehouseOrganization`
 - [ ] Implement `Ikho.WarehouseCatalog`
 - [ ] Implement `Ikho.WarehousePartner`
 - [ ] Publish initial master-data events

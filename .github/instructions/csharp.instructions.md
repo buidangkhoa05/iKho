@@ -37,6 +37,7 @@ applyTo: '**/*.cs'
 - Explain the purpose of each generated file and folder to build understanding of the project structure.
 - Organize code using **Vertical Slice Architecture** (feature folders) as the primary structural pattern.
 - Explain the Program.cs and configuration system in ASP.NET Core 10 including environment-specific settings.
+- **Workspace placement rule**: Every independently deployable .NET service (owns a port, a database, and a `Program.cs`) belongs in `source/apps/`. Only libraries that are consumed by multiple services and are not standalone runtimes (e.g. shared middleware, codegen tools) belong in `source/libs/`. Never place a runnable microservice under `source/libs/`.
 
 ## Vertical Slice Architecture
 

@@ -53,7 +53,7 @@ C4Container
         Container(gateway, "Ikho.ApiGateway", ".NET 10 / YARP", "Single entry point: routing, CORS, JWT auth scaffolding, rate limiting, correlation IDs, request logging")
         Container(api, "Ikho.SharedLibrary", ".NET 10 Minimal API", "Backend REST API (Vertical Slice Architecture)")
         Container(schema, "Ikho.SchemaManagement", ".NET library + codegen CLI", "Generates C# contracts from JSON Schema/Avro definitions, referenced by Ikho.SharedLibrary at build time")
-        Container(orgsvc, "Ikho.WarehouseOrganization", ".NET 10 Minimal API", "Planned warehouse structure service owning companies, warehouses, bins, and docks")
+        Container(orgsvc, "Ikho.WarehouseOrganization", ".NET 10 Minimal API", "Warehouse structure service owning companies, warehouses, bins, and docks")
         Container(catalogsvc, "Ikho.WarehouseCatalog", ".NET 10 Minimal API", "Planned product master-data service for warehouse operations")
         Container(partnersvc, "Ikho.WarehousePartner", ".NET 10 Minimal API", "Planned supplier and customer master-data service")
         Container(inventorysvc, "Ikho.WarehouseInventory", ".NET 10 Minimal API", "Planned stock system of record owning ledger, lots, serials, and reservations")
@@ -69,7 +69,7 @@ C4Container
     Rel(ui, gateway, "Calls /api/*", "HTTPS/JSON (dev: via proxy.conf.json)")
     Rel(gateway, api, "Forwards /api/* to shared-library-cluster", "HTTP/JSON")
     Rel(api, schema, "References generated contracts from", "Project reference")
-    Rel(gateway, orgsvc, "Planned /api/warehouse/organization/*", "HTTP/JSON")
+    Rel(gateway, orgsvc, "/api/warehouse/organization/*", "HTTP/JSON")
     Rel(gateway, catalogsvc, "Planned /api/warehouse/catalog/*", "HTTP/JSON")
     Rel(gateway, partnersvc, "Planned /api/warehouse/partner/*", "HTTP/JSON")
     Rel(gateway, inventorysvc, "Planned /api/warehouse/inventory/*", "HTTP/JSON")
@@ -77,7 +77,7 @@ C4Container
     Rel(gateway, outboundsvc, "Planned /api/warehouse/outbound/*", "HTTP/JSON")
     Rel(gateway, returnssvc, "Planned /api/warehouse/returns/*", "HTTP/JSON")
     Rel(gateway, billingsvc, "Planned /api/warehouse/billing/*", "HTTP/JSON")
-    Rel(schema, orgsvc, "Planned contract reference", "Project reference")
+    Rel(schema, orgsvc, "Contract reference", "Project reference")
     Rel(schema, catalogsvc, "Planned contract reference", "Project reference")
     Rel(schema, partnersvc, "Planned contract reference", "Project reference")
     Rel(schema, inventorysvc, "Planned contract reference", "Project reference")
@@ -95,7 +95,7 @@ C4Container
 | `Ikho.ApiGateway` | [source/apps/ikho-api-gateway](../../source/apps/ikho-api-gateway) | 5080 / 7080 |
 | `Ikho.SharedLibrary` | [source/libs/ikho-shared-library](../../source/libs/ikho-shared-library) | 5143 / 7270 |
 | `Ikho.SchemaManagement` | [source/libs/ikho-schema-management](../../source/libs/ikho-schema-management) | — (build-time codegen, not a running service) |
-| `Ikho.WarehouseOrganization` | Planned | TBD |
+| `Ikho.WarehouseOrganization` | [source/apps/ikho-warehouse-organization](../../source/apps/ikho-warehouse-organization) | 5151 |
 | `Ikho.WarehouseCatalog` | Planned | TBD |
 | `Ikho.WarehousePartner` | Planned | TBD |
 | `Ikho.WarehouseInventory` | Planned | TBD |
