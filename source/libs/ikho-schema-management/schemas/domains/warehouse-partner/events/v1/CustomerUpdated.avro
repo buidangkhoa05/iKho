@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "CustomerUpdated",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehousePartner.Events.V1",
+  "fields": [
+    { "name": "eventId",    "type": "string" },
+    { "name": "customerId", "type": "string" },
+    { "name": "code",       "type": "string" },
+    { "name": "name",       "type": "string" },
+    { "name": "updatedOn",  "type": "string" }
+  ]
+}

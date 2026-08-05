@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "PartnerStatusChanged",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehousePartner.Events.V1",
+  "fields": [
+    { "name": "eventId",     "type": "string" },
+    { "name": "partnerType", "type": "string" },
+    { "name": "partnerId",   "type": "string" },
+    { "name": "isActive",    "type": "boolean" },
+    { "name": "changedOn",   "type": "string" }
+  ]
+}

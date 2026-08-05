@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "SupplierCreated",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehousePartner.Events.V1",
+  "fields": [
+    { "name": "eventId",    "type": "string" },
+    { "name": "supplierId", "type": "string" },
+    { "name": "code",       "type": "string" },
+    { "name": "name",       "type": "string" },
+    { "name": "createdOn",  "type": "string" }
+  ]
+}
