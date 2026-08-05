@@ -43,7 +43,11 @@ This keeps generated namespaces aligned with service boundaries while staying co
 1. `CreateProductRequest`
 2. `ProductResponse`
 3. `ProductCreated`
-4. `ProductTrackingPolicyChanged`
+4. `ProductUpdated`
+5. `ProductStatusChanged`
+6. `ProductTrackingPolicyChanged`
+7. `CategoryCreated`, `CategoryUpdated`
+8. `BrandCreated`, `BrandUpdated`
 
 ### Partner
 

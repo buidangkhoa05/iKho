@@ -53,6 +53,8 @@ Publishes:
 2. `ProductUpdated`
 3. `ProductStatusChanged`
 4. `ProductTrackingPolicyChanged`
+5. `CategoryCreated`, `CategoryUpdated`
+6. `BrandCreated`, `BrandUpdated`
 
 Consumes:
 

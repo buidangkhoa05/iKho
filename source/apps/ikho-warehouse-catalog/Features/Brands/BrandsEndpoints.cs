@@ -1,3 +1,4 @@
+using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Ikho.WarehouseCatalog.Features.Brands;
@@ -13,9 +14,11 @@ public static class BrandsEndpoints
         group.MapPost("/", async Task<Results<Created<BrandResponse>, Conflict<string>>> (
             CreateBrandRequest request,
             BrandsService service,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
-            var brand = await service.CreateAsync(request, cancellationToken);
+            var correlationId = httpContext.GetCorrelationId();
+            var brand = await service.CreateAsync(request, correlationId, cancellationToken);
 
             return brand is null
                 ? TypedResults.Conflict($"Brand code '{request.Code}' is already in use.")
@@ -26,9 +29,11 @@ public static class BrandsEndpoints
             Guid id,
             UpdateBrandRequest request,
             BrandsService service,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
-            var brand = await service.UpdateAsync(id, request, cancellationToken);
+            var correlationId = httpContext.GetCorrelationId();
+            var brand = await service.UpdateAsync(id, request, correlationId, cancellationToken);
             return brand is null ? TypedResults.NotFound() : TypedResults.Ok(brand);
         });
 

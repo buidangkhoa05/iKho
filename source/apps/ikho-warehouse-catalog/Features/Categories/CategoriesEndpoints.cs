@@ -1,3 +1,4 @@
+using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Ikho.WarehouseCatalog.Features.Categories;
@@ -17,9 +18,11 @@ public static class CategoriesEndpoints
         group.MapPost("/", async Task<Results<Created<CategoryResponse>, Conflict<string>>> (
             CreateCategoryRequest request,
             CategoriesService service,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
-            var category = await service.CreateAsync(request, cancellationToken);
+            var correlationId = httpContext.GetCorrelationId();
+            var category = await service.CreateAsync(request, correlationId, cancellationToken);
 
             return category is null
                 ? TypedResults.Conflict($"Category code '{request.Code}' is already in use.")
@@ -30,9 +33,11 @@ public static class CategoriesEndpoints
             Guid id,
             UpdateCategoryRequest request,
             CategoriesService service,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
-            var category = await service.UpdateAsync(id, request, cancellationToken);
+            var correlationId = httpContext.GetCorrelationId();
+            var category = await service.UpdateAsync(id, request, correlationId, cancellationToken);
             return category is null ? TypedResults.NotFound() : TypedResults.Ok(category);
         });
 

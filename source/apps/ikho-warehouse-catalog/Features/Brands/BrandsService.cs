@@ -1,13 +1,19 @@
+using System.Text.Json;
+using Ikho.SchemaManagement.Contracts.WarehouseCatalog.Events.V1;
+using Ikho.SharedLibrary.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ikho.WarehouseCatalog.Features.Brands;
 
-/// <summary>Business logic for creating and updating brands.</summary>
-public sealed class BrandsService(IBrandRepository repository)
+/// <summary>
+/// Business logic for creating and updating brands. Publishes <c>BrandCreated</c> on creation
+/// and <c>BrandUpdated</c> when name or active status changes, via the transactional outbox.
+/// </summary>
+public sealed class BrandsService(IBrandRepository repository, IOutboxWriter outbox)
 {
     /// <summary>Creates a new brand. Returns <see langword="null"/> if the code is already in use.</summary>
     public async Task<BrandResponse?> CreateAsync(
-        CreateBrandRequest request, CancellationToken cancellationToken)
+        CreateBrandRequest request, string? correlationId, CancellationToken cancellationToken)
     {
         if (await repository.CodeExistsAsync(request.Code, cancellationToken))
         {
@@ -16,6 +22,16 @@ public sealed class BrandsService(IBrandRepository repository)
 
         var brand = new Domain.Brand { Code = request.Code, Name = request.Name };
         repository.Add(brand);
+
+        var @event = new BrandCreated
+        {
+            eventId = Guid.NewGuid().ToString(),
+            brandId = brand.Id.ToString(),
+            code = brand.Code,
+            name = brand.Name,
+            createdOn = DateTimeOffset.UtcNow.ToString("O"),
+        };
+        outbox.Enqueue(nameof(BrandCreated), JsonSerializer.Serialize(@event), correlationId);
 
         try
         {
@@ -29,9 +45,12 @@ public sealed class BrandsService(IBrandRepository repository)
         return BrandResponse.FromEntity(brand);
     }
 
-    /// <summary>Updates a brand. Returns <see langword="null"/> if not found.</summary>
+    /// <summary>
+    /// Updates a brand, publishing <c>BrandUpdated</c> only when a field actually changes.
+    /// Returns <see langword="null"/> if not found.
+    /// </summary>
     public async Task<BrandResponse?> UpdateAsync(
-        Guid id, UpdateBrandRequest request, CancellationToken cancellationToken)
+        Guid id, UpdateBrandRequest request, string? correlationId, CancellationToken cancellationToken)
     {
         var brand = await repository.GetByIdAsync(id, cancellationToken);
         if (brand is null)
@@ -39,9 +58,24 @@ public sealed class BrandsService(IBrandRepository repository)
             return null;
         }
 
-        brand.Name = request.Name;
-        brand.IsActive = request.IsActive;
-        await repository.SaveChangesAsync(cancellationToken);
+        if (brand.Name != request.Name || brand.IsActive != request.IsActive)
+        {
+            brand.Name = request.Name;
+            brand.IsActive = request.IsActive;
+
+            var @event = new BrandUpdated
+            {
+                eventId = Guid.NewGuid().ToString(),
+                brandId = brand.Id.ToString(),
+                code = brand.Code,
+                name = brand.Name,
+                isActive = brand.IsActive,
+                updatedOn = DateTimeOffset.UtcNow.ToString("O"),
+            };
+            outbox.Enqueue(nameof(BrandUpdated), JsonSerializer.Serialize(@event), correlationId);
+
+            await repository.SaveChangesAsync(cancellationToken);
+        }
 
         return BrandResponse.FromEntity(brand);
     }

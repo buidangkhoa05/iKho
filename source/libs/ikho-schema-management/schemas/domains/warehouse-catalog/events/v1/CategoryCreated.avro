@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "CategoryCreated",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseCatalog.Events.V1",
+  "fields": [
+    { "name": "eventId",    "type": "string" },
+    { "name": "categoryId", "type": "string" },
+    { "name": "code",       "type": "string" },
+    { "name": "name",       "type": "string" },
+    { "name": "createdOn",  "type": "string" }
+  ]
+}

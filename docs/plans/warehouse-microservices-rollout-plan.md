@@ -204,7 +204,7 @@ Use this checklist to track execution progress across the full warehouse rollout
 - [x] Implement `Ikho.WarehouseCatalog`
 - [x] Implement `Ikho.WarehousePartner`
 - [x] Publish initial master-data events
-- [ ] Validate downstream snapshot requirements
+- [x] Validate downstream snapshot requirements
 
 ### Core Stock Platform
 
