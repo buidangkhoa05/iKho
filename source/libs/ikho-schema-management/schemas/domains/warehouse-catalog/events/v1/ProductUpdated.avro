@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "ProductUpdated",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseCatalog.Events.V1",
+  "fields": [
+    { "name": "eventId",    "type": "string" },
+    { "name": "productId",  "type": "string" },
+    { "name": "sku",        "type": "string" },
+    { "name": "name",       "type": "string" },
+    { "name": "categoryId", "type": "string" },
+    { "name": "brandId",    "type": "string" },
+    { "name": "updatedOn",  "type": "string" }
+  ]
+}

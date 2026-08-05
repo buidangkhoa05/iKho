@@ -8,8 +8,9 @@ namespace Ikho.WarehouseCatalog.Features.Products;
 
 /// <summary>
 /// Business logic for creating, updating, and reading products, and managing their barcodes.
-/// Publishes <c>ProductCreated</c> and <c>ProductStatusChanged</c> via the transactional
-/// outbox on creation and status change respectively.
+/// Publishes <c>ProductCreated</c> on creation, <c>ProductUpdated</c> on detail changes,
+/// <c>ProductTrackingPolicyChanged</c> on lot/serial policy changes, and
+/// <c>ProductStatusChanged</c> on activation toggles, all via the transactional outbox.
 /// </summary>
 public sealed class ProductsService(IProductRepository repository, IOutboxWriter outbox)
 {
@@ -66,16 +67,27 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
     }
 
     /// <summary>
-    /// Updates an existing product's details. Returns <see langword="null"/> if not found.
+    /// Updates an existing product's details, publishing <c>ProductUpdated</c> when descriptive
+    /// fields change and <c>ProductTrackingPolicyChanged</c> when lot/serial tracking flags
+    /// change. Returns <see langword="null"/> if not found.
     /// </summary>
     public async Task<ProductResponse?> UpdateAsync(
-        Guid id, UpdateProductRequest request, CancellationToken cancellationToken)
+        Guid id, UpdateProductRequest request, string? correlationId, CancellationToken cancellationToken)
     {
         var product = await repository.GetByIdAsync(id, cancellationToken);
         if (product is null)
         {
             return null;
         }
+
+        var detailsChanged = product.Name != request.Name
+            || product.Description != request.Description
+            || product.CategoryId != request.CategoryId
+            || product.BrandId != request.BrandId
+            || product.DefaultUomId != request.DefaultUomId;
+
+        var trackingPolicyChanged = product.IsLotControlled != request.IsLotControlled
+            || product.IsSerialControlled != request.IsSerialControlled;
 
         product.Name = request.Name;
         product.Description = request.Description;
@@ -85,7 +97,39 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
         product.IsLotControlled = request.IsLotControlled;
         product.IsSerialControlled = request.IsSerialControlled;
 
-        await repository.SaveChangesAsync(cancellationToken);
+        if (detailsChanged)
+        {
+            var @event = new ProductUpdated
+            {
+                eventId = Guid.NewGuid().ToString(),
+                productId = product.Id.ToString(),
+                sku = product.Sku,
+                name = product.Name,
+                categoryId = product.CategoryId?.ToString() ?? string.Empty,
+                brandId = product.BrandId?.ToString() ?? string.Empty,
+                updatedOn = DateTimeOffset.UtcNow.ToString("O"),
+            };
+            outbox.Enqueue(nameof(ProductUpdated), JsonSerializer.Serialize(@event), correlationId);
+        }
+
+        if (trackingPolicyChanged)
+        {
+            var @event = new ProductTrackingPolicyChanged
+            {
+                eventId = Guid.NewGuid().ToString(),
+                productId = product.Id.ToString(),
+                sku = product.Sku,
+                isLotControlled = product.IsLotControlled,
+                isSerialControlled = product.IsSerialControlled,
+                changedOn = DateTimeOffset.UtcNow.ToString("O"),
+            };
+            outbox.Enqueue(nameof(ProductTrackingPolicyChanged), JsonSerializer.Serialize(@event), correlationId);
+        }
+
+        if (detailsChanged || trackingPolicyChanged)
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+        }
 
         return ProductResponse.FromEntity(product);
     }

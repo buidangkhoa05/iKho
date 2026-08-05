@@ -34,9 +34,11 @@ public static class ProductsEndpoints
             Guid id,
             UpdateProductRequest request,
             ProductsService service,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
-            var product = await service.UpdateAsync(id, request, cancellationToken);
+            var correlationId = httpContext.GetCorrelationId();
+            var product = await service.UpdateAsync(id, request, correlationId, cancellationToken);
             return product is null ? TypedResults.NotFound() : TypedResults.Ok(product);
         });
 
