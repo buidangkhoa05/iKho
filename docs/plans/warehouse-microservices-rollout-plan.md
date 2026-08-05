@@ -208,11 +208,11 @@ Use this checklist to track execution progress across the full warehouse rollout
 
 ### Core Stock Platform
 
-- [ ] Implement `Ikho.WarehouseInventory`
-- [ ] Finalize lot tracking rules
-- [ ] Finalize serial tracking rules
-- [ ] Implement reservation and release flow
-- [ ] Validate stock ledger invariants
+- [x] Implement `Ikho.WarehouseInventory`
+- [x] Finalize lot tracking rules
+- [x] Finalize serial tracking rules
+- [x] Implement reservation and release flow
+- [x] Validate stock ledger invariants
 
 ### Operational Services
 
