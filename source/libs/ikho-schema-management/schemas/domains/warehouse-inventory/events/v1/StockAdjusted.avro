@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "StockAdjusted",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1",
+  "fields": [
+    { "name": "eventId",        "type": "string" },
+    { "name": "stockItemId",    "type": "string" },
+    { "name": "productId",      "type": "string" },
+    { "name": "warehouseId",    "type": "string" },
+    { "name": "quantityDelta",  "type": "string" },
+    { "name": "reasonCode",     "type": "string" },
+    { "name": "adjustedOn",     "type": "string" }
+  ]
+}
