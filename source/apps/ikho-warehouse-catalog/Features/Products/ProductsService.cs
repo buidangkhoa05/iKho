@@ -51,7 +51,7 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
             isSerialControlled = product.IsSerialControlled,
             createdOn = product.CreatedOnUtc.ToString("O"),
         };
-        outbox.Enqueue(nameof(ProductCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(ProductCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {
@@ -109,7 +109,7 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
                 brandId = product.BrandId?.ToString() ?? string.Empty,
                 updatedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(ProductUpdated), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(ProductUpdated), JsonSerializer.Serialize(@event), correlationId));
         }
 
         if (trackingPolicyChanged)
@@ -123,7 +123,7 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
                 isSerialControlled = product.IsSerialControlled,
                 changedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(ProductTrackingPolicyChanged), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(ProductTrackingPolicyChanged), JsonSerializer.Serialize(@event), correlationId));
         }
 
         if (detailsChanged || trackingPolicyChanged)
@@ -159,7 +159,7 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
                 isActive = product.IsActive,
                 changedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(ProductStatusChanged), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(ProductStatusChanged), JsonSerializer.Serialize(@event), correlationId));
 
             await repository.SaveChangesAsync(cancellationToken);
         }

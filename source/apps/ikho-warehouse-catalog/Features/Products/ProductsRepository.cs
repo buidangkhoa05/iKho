@@ -1,3 +1,4 @@
+using Ikho.SharedLibrary.Outbox;
 using Ikho.WarehouseCatalog.Domain;
 using Ikho.WarehouseCatalog.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,12 @@ public interface IProductRepository
 
     /// <summary>Tracks a new barcode for insertion.</summary>
     void Add(Barcode barcode);
+
+    /// <summary>
+    /// Tracks a new outbox message for insertion so it commits atomically with the business
+    /// write on the next <see cref="SaveChangesAsync"/> call.
+    /// </summary>
+    void Add(OutboxMessage message);
 
     /// <summary>Persists tracked changes to the database.</summary>
     Task SaveChangesAsync(CancellationToken cancellationToken);
@@ -64,6 +71,9 @@ public sealed class ProductRepository(CatalogDbContext dbContext) : IProductRepo
 
     /// <inheritdoc />
     public void Add(Barcode barcode) => dbContext.Barcodes.Add(barcode);
+
+    /// <inheritdoc />
+    public void Add(OutboxMessage message) => dbContext.OutboxMessages.Add(message);
 
     /// <inheritdoc />
     public Task SaveChangesAsync(CancellationToken cancellationToken) =>

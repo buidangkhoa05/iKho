@@ -114,7 +114,7 @@ public sealed class LocationsService(ILocationRepository repository, IOutboxWrit
             code = bin.Code,
             createdOn = bin.CreatedOnUtc.ToString("O"),
         };
-        outbox.Enqueue(nameof(BinCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(BinCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {
@@ -211,7 +211,7 @@ public sealed class LocationsService(ILocationRepository repository, IOutboxWrit
                 isActive = bin.IsActive,
                 changedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(BinStatusChanged), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(BinStatusChanged), JsonSerializer.Serialize(@event), correlationId));
         }
 
         await repository.SaveChangesAsync(cancellationToken);

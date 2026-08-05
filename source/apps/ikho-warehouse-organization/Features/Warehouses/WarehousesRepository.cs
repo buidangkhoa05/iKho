@@ -1,3 +1,4 @@
+using Ikho.SharedLibrary.Outbox;
 using Ikho.WarehouseOrganization.Domain;
 using Ikho.WarehouseOrganization.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,12 @@ public interface IWarehouseRepository
     void Add(Warehouse warehouse);
 
     /// <summary>
+    /// Tracks a new outbox message for insertion so it commits atomically with the business
+    /// write on the next <see cref="SaveChangesAsync"/> call.
+    /// </summary>
+    void Add(OutboxMessage message);
+
+    /// <summary>
     /// Persists tracked changes to the database.
     /// </summary>
     Task SaveChangesAsync(CancellationToken cancellationToken);
@@ -80,6 +87,9 @@ public sealed class WarehouseRepository(OrganizationDbContext dbContext) : IWare
 
     /// <inheritdoc />
     public void Add(Warehouse warehouse) => dbContext.Warehouses.Add(warehouse);
+
+    /// <inheritdoc />
+    public void Add(OutboxMessage message) => dbContext.OutboxMessages.Add(message);
 
     /// <inheritdoc />
     public Task SaveChangesAsync(CancellationToken cancellationToken) =>

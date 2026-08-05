@@ -63,7 +63,7 @@ public sealed class WarehousesService(IWarehouseRepository repository, IOutboxWr
             name = warehouse.Name,
             createdOn = warehouse.CreatedOnUtc.ToString("O"),
         };
-        outbox.Enqueue(nameof(WarehouseCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(WarehouseCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {
@@ -120,7 +120,7 @@ public sealed class WarehousesService(IWarehouseRepository repository, IOutboxWr
                 isActive = warehouse.IsActive,
                 changedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(WarehouseStatusChanged), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(WarehouseStatusChanged), JsonSerializer.Serialize(@event), correlationId));
         }
 
         await repository.SaveChangesAsync(cancellationToken);

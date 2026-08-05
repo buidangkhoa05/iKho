@@ -34,7 +34,7 @@ public sealed class CategoriesService(ICategoryRepository repository, IOutboxWri
             name = category.Name,
             createdOn = DateTimeOffset.UtcNow.ToString("O"),
         };
-        outbox.Enqueue(nameof(CategoryCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(CategoryCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {
@@ -75,7 +75,7 @@ public sealed class CategoriesService(ICategoryRepository repository, IOutboxWri
                 isActive = category.IsActive,
                 updatedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(CategoryUpdated), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(CategoryUpdated), JsonSerializer.Serialize(@event), correlationId));
 
             await repository.SaveChangesAsync(cancellationToken);
         }

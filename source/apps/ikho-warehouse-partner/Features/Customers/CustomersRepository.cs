@@ -1,3 +1,4 @@
+using Ikho.SharedLibrary.Outbox;
 using Ikho.WarehousePartner.Domain;
 using Ikho.WarehousePartner.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,12 @@ public interface ICustomerRepository
 
     /// <summary>Tracks a new contact for insertion.</summary>
     void Add(Contact contact);
+
+    /// <summary>
+    /// Tracks a new outbox message for insertion so it commits atomically with the business
+    /// write on the next <see cref="SaveChangesAsync"/> call.
+    /// </summary>
+    void Add(OutboxMessage message);
 
     /// <summary>Persists tracked changes to the database.</summary>
     Task SaveChangesAsync(CancellationToken cancellationToken);
@@ -63,6 +70,9 @@ public sealed class CustomerRepository(PartnerDbContext dbContext) : ICustomerRe
 
     /// <inheritdoc />
     public void Add(Contact contact) => dbContext.Contacts.Add(contact);
+
+    /// <inheritdoc />
+    public void Add(OutboxMessage message) => dbContext.OutboxMessages.Add(message);
 
     /// <inheritdoc />
     public Task SaveChangesAsync(CancellationToken cancellationToken) =>

@@ -40,7 +40,7 @@ public sealed class CustomersService(ICustomerRepository repository, IOutboxWrit
             name = customer.Name,
             createdOn = customer.CreatedOnUtc.ToString("O"),
         };
-        outbox.Enqueue(nameof(CustomerCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(CustomerCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {
@@ -81,7 +81,7 @@ public sealed class CustomersService(ICustomerRepository repository, IOutboxWrit
                 name = customer.Name,
                 updatedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(CustomerUpdated), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(CustomerUpdated), JsonSerializer.Serialize(@event), correlationId));
 
             await repository.SaveChangesAsync(cancellationToken);
         }
@@ -114,7 +114,7 @@ public sealed class CustomersService(ICustomerRepository repository, IOutboxWrit
                 isActive = customer.IsActive,
                 changedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(PartnerStatusChanged), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(PartnerStatusChanged), JsonSerializer.Serialize(@event), correlationId));
 
             await repository.SaveChangesAsync(cancellationToken);
         }

@@ -39,7 +39,7 @@ public sealed class CompaniesService(ICompanyRepository repository, IOutboxWrite
             name = company.Name,
             createdOn = company.CreatedOnUtc.ToString("O"),
         };
-        outbox.Enqueue(nameof(CompanyCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(CompanyCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {

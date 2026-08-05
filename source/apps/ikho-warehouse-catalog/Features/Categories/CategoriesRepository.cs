@@ -1,3 +1,4 @@
+using Ikho.SharedLibrary.Outbox;
 using Ikho.WarehouseCatalog.Domain;
 using Ikho.WarehouseCatalog.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,12 @@ public interface ICategoryRepository
 
     /// <summary>Tracks a new category for insertion.</summary>
     void Add(Category category);
+
+    /// <summary>
+    /// Tracks a new outbox message for insertion so it commits atomically with the business
+    /// write on the next <see cref="SaveChangesAsync"/> call.
+    /// </summary>
+    void Add(OutboxMessage message);
 
     /// <summary>Persists tracked changes to the database.</summary>
     Task SaveChangesAsync(CancellationToken cancellationToken);
@@ -40,6 +47,9 @@ public sealed class CategoryRepository(CatalogDbContext dbContext) : ICategoryRe
 
     /// <inheritdoc />
     public void Add(Category category) => dbContext.Categories.Add(category);
+
+    /// <inheritdoc />
+    public void Add(OutboxMessage message) => dbContext.OutboxMessages.Add(message);
 
     /// <inheritdoc />
     public Task SaveChangesAsync(CancellationToken cancellationToken) =>

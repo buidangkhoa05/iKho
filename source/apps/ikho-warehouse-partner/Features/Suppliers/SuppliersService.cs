@@ -40,7 +40,7 @@ public sealed class SuppliersService(ISupplierRepository repository, IOutboxWrit
             name = supplier.Name,
             createdOn = supplier.CreatedOnUtc.ToString("O"),
         };
-        outbox.Enqueue(nameof(SupplierCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(SupplierCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {
@@ -81,7 +81,7 @@ public sealed class SuppliersService(ISupplierRepository repository, IOutboxWrit
                 name = supplier.Name,
                 updatedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(SupplierUpdated), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(SupplierUpdated), JsonSerializer.Serialize(@event), correlationId));
 
             await repository.SaveChangesAsync(cancellationToken);
         }
@@ -114,7 +114,7 @@ public sealed class SuppliersService(ISupplierRepository repository, IOutboxWrit
                 isActive = supplier.IsActive,
                 changedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(PartnerStatusChanged), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(PartnerStatusChanged), JsonSerializer.Serialize(@event), correlationId));
 
             await repository.SaveChangesAsync(cancellationToken);
         }

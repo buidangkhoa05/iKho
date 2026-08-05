@@ -31,7 +31,7 @@ public sealed class BrandsService(IBrandRepository repository, IOutboxWriter out
             name = brand.Name,
             createdOn = DateTimeOffset.UtcNow.ToString("O"),
         };
-        outbox.Enqueue(nameof(BrandCreated), JsonSerializer.Serialize(@event), correlationId);
+        repository.Add(outbox.Enqueue(nameof(BrandCreated), JsonSerializer.Serialize(@event), correlationId));
 
         try
         {
@@ -72,7 +72,7 @@ public sealed class BrandsService(IBrandRepository repository, IOutboxWriter out
                 isActive = brand.IsActive,
                 updatedOn = DateTimeOffset.UtcNow.ToString("O"),
             };
-            outbox.Enqueue(nameof(BrandUpdated), JsonSerializer.Serialize(@event), correlationId);
+            repository.Add(outbox.Enqueue(nameof(BrandUpdated), JsonSerializer.Serialize(@event), correlationId));
 
             await repository.SaveChangesAsync(cancellationToken);
         }
