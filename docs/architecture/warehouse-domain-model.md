@@ -49,14 +49,15 @@ Key invariants:
 - `Category`
 - `Brand`
 - `UnitOfMeasure`
-- `ProductVariant`
-- `ProductAttributeDefinition`
-- `ProductAttributeValue`
 - `Barcode`
+
+`ProductVariant`, `ProductAttributeDefinition`, and `ProductAttributeValue` were part of the
+original aspirational scope but were not built in the implemented rollout — deferred, not
+abandoned; add them here if/when variant modeling becomes a real requirement.
 
 Key invariants:
 
-1. A product owns its barcode and variant definitions.
+1. A product owns its barcode.
 2. Product classification is managed through category and brand references.
 3. Tracking strategy flags such as lot-controlled or serial-controlled should be published from Catalog and consumed by Inventory.
 
@@ -82,8 +83,9 @@ Key invariants:
 - `SerialNumber`
 - `StockReservation`
 - `InventoryAdjustment`
-- `CycleCount`
-- `CycleCountLine`
+
+`CycleCount`/`CycleCountLine` were part of the original aspirational scope but were not built in
+the implemented rollout — deferred, not abandoned.
 
 Key invariants:
 
@@ -95,10 +97,12 @@ Key invariants:
 
 - `PurchaseOrder`
 - `PurchaseOrderLine`
-- `AdvancedShippingNotice`
 - `Receipt`
 - `ReceiptLine`
 - `PutawayTask`
+
+`AdvancedShippingNotice` was part of the original aspirational scope but was not built in the
+implemented rollout — deferred, not abandoned.
 
 Key invariants:
 
@@ -110,11 +114,13 @@ Key invariants:
 - `SalesOrder`
 - `SalesOrderLine`
 - `Allocation`
-- `PickWave`
-- `PickTask`
-- `PackingOrder`
-- `Package`
 - `Shipment`
+- `ShipmentLine`
+
+`PickWave`/`PickTask`/`PackingOrder`/`Package` were part of the original aspirational scope but
+were not built in the implemented rollout — the implemented flow dispatches a `Shipment`
+directly from confirmed `Allocation`s, with no separate picking/packing workflow. Deferred, not
+abandoned.
 
 Key invariants:
 
@@ -170,7 +176,6 @@ erDiagram
 
     Category ||--o{ Product : classifies
     Brand ||--o{ Product : brands
-    Product ||--o{ ProductVariant : varies
     Product ||--o{ Barcode : identifies
     UnitOfMeasure ||--o{ Product : defaults
 
@@ -183,10 +188,8 @@ erDiagram
     Customer ||--o{ SalesOrder : places
     SalesOrder ||--o{ SalesOrderLine : contains
     SalesOrderLine ||--o{ Allocation : reserves
-    Allocation ||--o{ PickTask : drives
-    PickWave ||--o{ PickTask : groups
-    PackingOrder ||--o{ Package : produces
-    Shipment ||--o{ Package : ships
+    Allocation ||--o{ ShipmentLine : ships_as
+    Shipment ||--o{ ShipmentLine : contains
 
     Product ||--o{ StockItem : tracked_as
     Warehouse ||--o{ StockItem : stored_in
@@ -225,8 +228,6 @@ flowchart LR
     Inb --> Report[Reporting]
     Inv --> Report
     Out --> Report
-    Ret --> Report
-    Billing --> Report
 ```
 
 Interpretation of this map:
@@ -234,7 +235,12 @@ Interpretation of this map:
 1. Organization, Catalog, and Partner provide reference data to operational services.
 2. Inventory is the stock system of record and is depended on by both Inbound and Outbound.
 3. Returns feeds Inventory after disposition decisions are complete.
-4. Reporting consumes events from all operational services.
+4. Reporting consumes events from Inventory, Inbound, and Outbound only, as implemented — Returns
+   and Billing are not yet projected into Reporting (see the "Additional dashboard projections as
+   needed" scope note in the Reporting service plan).
+5. Billing's dependency on Outbound (and Inbound, for return-driven credit notes) is a
+   caller-supplied reference at issuance time (`SourceReferenceType`/`SourceReferenceId`), not an
+   event subscription — Billing has no Kafka consumers as implemented.
 
 ## Aggregate Boundaries And Interaction Rules
 

@@ -73,13 +73,13 @@ so behavior can change per environment without code changes.
 To add a new backend service: add a new route + cluster pair, pointing `Match.Path` at the
 new service's path prefix and `Destinations` at its base address.
 
-For the planned warehouse microservices split, route naming aligns to the capability-oriented
-service names. Placeholder routes and clusters for all nine planned services are already
-present in [appsettings.json](../../source/apps/ikho-api-gateway/appsettings.json), pointing at
-sequential local ports (`5151`–`5159`, in rollout-plan capability order: Organization, Catalog,
-Partner, Inventory, Inbound, Outbound, Returns, Billing, Reporting). These destinations are
-unreachable until each service actually exists — update the `Address` once a service is
-running. Pattern:
+For the warehouse microservices split, route naming aligns to the capability-oriented service
+names. Routes and clusters for all nine warehouse services are present in
+[appsettings.json](../../source/apps/ikho-api-gateway/appsettings.json), pointing at sequential
+local ports (`5151`–`5159`, in rollout-plan capability order: Organization, Catalog, Partner,
+Inventory, Inbound, Outbound, Returns, Billing, Reporting). All nine services are implemented
+and live as of the warehouse-microservices rollout plan's completion — these are not
+placeholders. Pattern:
 
 ```jsonc
 "ReverseProxy": {
@@ -154,29 +154,28 @@ required. Run it with `pnpm nx serve Ikho.ApiGateway` (or `dotnet run` from the 
   routes.
 - Structured logging providers / telemetry (Serilog, Application Insights).
 - Containerization (Dockerfile) and production deployment/CI wiring.
-- Multiple backend clusters — only `Ikho.SharedLibrary` exists today.
 - Response caching / request aggregation.
 
-## Planned Gateway Growth For Warehouse Microservices
+## Gateway Growth For Warehouse Microservices
 
-The gateway is the natural expansion point for the warehouse microservices program because it already centralizes routing and cross-cutting concerns. As the warehouse services are introduced, this document should remain the reference for:
+The gateway is the expansion point for the warehouse microservices program because it already centralizes routing and cross-cutting concerns. This document remains the reference for:
 
 1. route naming conventions
 2. cluster naming conventions
 3. environment-specific destination management
 4. any service-specific auth, rate-limiting, or routing exceptions
 
-The planned downstream services are:
+All nine warehouse services are implemented and routed:
 
-1. `Ikho.WarehouseOrganization`
-2. `Ikho.WarehouseCatalog`
-3. `Ikho.WarehousePartner`
-4. `Ikho.WarehouseInventory`
-5. `Ikho.WarehouseInbound`
-6. `Ikho.WarehouseOutbound`
-7. `Ikho.WarehouseReturns`
-8. `Ikho.WarehouseBilling`
-9. `Ikho.WarehouseReporting`
+1. `Ikho.WarehouseOrganization` — `:5151`
+2. `Ikho.WarehouseCatalog` — `:5152`
+3. `Ikho.WarehousePartner` — `:5153`
+4. `Ikho.WarehouseInventory` — `:5154`
+5. `Ikho.WarehouseInbound` — `:5155`
+6. `Ikho.WarehouseOutbound` — `:5156`
+7. `Ikho.WarehouseReturns` — `:5157`
+8. `Ikho.WarehouseBilling` — `:5158`
+9. `Ikho.WarehouseReporting` — `:5159`
 
 Related planning docs:
 

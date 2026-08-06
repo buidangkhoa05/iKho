@@ -239,11 +239,11 @@ Use this checklist to track execution progress across the full warehouse rollout
 
 ### Final Readiness
 
-- [ ] Verify each entity has a single owning service
-- [ ] Verify no cross-service foreign keys or direct DB joins exist
-- [ ] Verify gateway routes match service ownership boundaries
-- [ ] Verify core integrations are evented or explicitly synchronous by design
-- [ ] Verify architecture documents still match implemented topology
+- [x] Verify each entity has a single owning service
+- [x] Verify no cross-service foreign keys or direct DB joins exist
+- [x] Verify gateway routes match service ownership boundaries
+- [x] Verify core integrations are evented or explicitly synchronous by design
+- [x] Verify architecture documents still match implemented topology
 
 ## Open Questions
 

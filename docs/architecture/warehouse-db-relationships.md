@@ -26,9 +26,9 @@ Warehouse systems are relationship-heavy, but microservices do not work well whe
 | `Ikho.WarehouseOrganization` | Physical structure and warehouse master data | Company, Warehouse, Zone, Aisle, Bin, Dock |
 | `Ikho.WarehouseCatalog` | Product master and classification data | Product, Category, Brand, UOM, Variant, Barcode |
 | `Ikho.WarehousePartner` | Supplier and customer master data | Supplier, Customer, Address, Contact |
-| `Ikho.WarehouseInventory` | Stock truth and movement history | Stock balance, ledger, lot, serial, reservation, count |
-| `Ikho.WarehouseInbound` | Inbound workflow and receiving records | Purchase order, ASN, receipt, putaway task |
-| `Ikho.WarehouseOutbound` | Outbound workflow and shipping records | Sales order, allocation, pick, pack, shipment |
+| `Ikho.WarehouseInventory` | Stock truth and movement history | Stock balance, ledger, lot, serial, reservation |
+| `Ikho.WarehouseInbound` | Inbound workflow and receiving records | Purchase order, receipt, putaway task |
+| `Ikho.WarehouseOutbound` | Outbound workflow and shipping records | Sales order, allocation, shipment |
 | `Ikho.WarehouseReturns` | Reverse logistics and return resolution | Return order, inspection, disposition |
 | `Ikho.WarehouseBilling` | Financial snapshots and documents | Invoice, credit note, payment |
 | `Ikho.WarehouseReporting` | Cross-service projections and KPIs | Read models and aggregates |
@@ -41,8 +41,8 @@ Warehouse systems are relationship-heavy, but microservices do not work well whe
 | Warehouse | Organization | Inventory, Inbound, Outbound, Returns, Reporting | ID + snapshot |
 | Bin | Organization | Inventory, Inbound, Outbound, Reporting | ID + validation API |
 | Product | Catalog | Inventory, Inbound, Outbound, Returns, Billing, Reporting | ID + SKU + snapshot |
-| Category | Catalog | Reporting | Event projection |
-| Brand | Catalog | Reporting | Event projection |
+| Category | Catalog | *(none as implemented)* | Not yet consumed — `CategoryCreated`/`CategoryUpdated` are published but no service subscribes |
+| Brand | Catalog | *(none as implemented)* | Not yet consumed — `BrandCreated`/`BrandUpdated` are published but no service subscribes |
 | Supplier | Partner | Inbound, Returns, Billing, Reporting | ID + snapshot |
 | Customer | Partner | Outbound, Returns, Billing, Reporting | ID + snapshot |
 | StockBalance | Inventory | Outbound, Reporting | API + event projection |
@@ -55,7 +55,7 @@ Warehouse systems are relationship-heavy, but microservices do not work well whe
 | SalesOrder | Outbound | Billing, Reporting | ID + snapshot + events |
 | Shipment | Outbound | Billing, Returns, Reporting | ID + snapshot + events |
 | ReturnOrder | Returns | Inventory, Billing, Reporting | ID + snapshot + events |
-| Invoice | Billing | Reporting | Event projection |
+| Invoice | Billing | *(none as implemented)* | Not yet consumed — `InvoiceIssued` is published but no service subscribes (Reporting does not yet project Billing) |
 
 ## Reference Patterns
 
@@ -93,9 +93,12 @@ Use event-driven projections when the consumer needs queryable local data but do
 
 Examples:
 
-1. Reporting projects product, shipment, and invoice facts.
-2. Inventory projects selected product metadata needed for stock control.
-3. Outbound projects available stock summaries for allocation decisions if direct synchronous dependence becomes too expensive.
+1. Reporting projects inventory-position, inbound-status, and outbound-status facts from
+   Inventory/Inbound/Outbound events (implemented). Product and invoice facts are not yet
+   projected — Catalog and Billing publish events but nothing subscribes to them yet.
+2. Outbound could project available-stock summaries for allocation decisions if direct
+   synchronous dependence on Inventory becomes too expensive — not needed at current scale, so
+   not implemented; Outbound calls Inventory's reservation API synchronously today.
 
 ## Logical Relationships By Service
 
@@ -126,15 +129,16 @@ Owns:
 2. `Category`
 3. `Brand`
 4. `UnitOfMeasure`
-5. `ProductVariant`
-6. `Barcode`
+5. `Barcode`
+
+`ProductVariant` was part of the original aspirational scope but was not built in the
+implemented rollout.
 
 Internal logical relationships:
 
 1. `Category` 1:N `Product`
 2. `Brand` 1:N `Product`
-3. `Product` 1:N `ProductVariant`
-4. `Product` 1:N `Barcode`
+3. `Product` 1:N `Barcode`
 
 ### Partner Database
 
@@ -163,16 +167,16 @@ Owns:
 5. `SerialNumber`
 6. `StockReservation`
 7. `InventoryAdjustment`
-8. `CycleCount`
-9. `CycleCountLine`
+
+`CycleCount`/`CycleCountLine` were part of the original aspirational scope but were not built in
+the implemented rollout.
 
 Internal logical relationships:
 
 1. `StockItem` 1:N `StockLedgerEntry`
 2. `StockItem` 1:N `StockReservation`
-3. `CycleCount` 1:N `CycleCountLine`
-4. `Lot` 1:N `StockItem`
-5. `SerialNumber` 1:1 `StockItem` for serialized units
+3. `Lot` 1:N `StockItem`
+4. `SerialNumber` 1:1 `StockItem` for serialized units
 
 ### Inbound Database
 
@@ -180,10 +184,12 @@ Owns:
 
 1. `PurchaseOrder`
 2. `PurchaseOrderLine`
-3. `AdvancedShippingNotice`
-4. `Receipt`
-5. `ReceiptLine`
-6. `PutawayTask`
+3. `Receipt`
+4. `ReceiptLine`
+5. `PutawayTask`
+
+`AdvancedShippingNotice` was part of the original aspirational scope but was not built in the
+implemented rollout.
 
 Internal logical relationships:
 
@@ -199,19 +205,19 @@ Owns:
 1. `SalesOrder`
 2. `SalesOrderLine`
 3. `Allocation`
-4. `PickWave`
-5. `PickTask`
-6. `PackingOrder`
-7. `Package`
-8. `Shipment`
+4. `Shipment`
+5. `ShipmentLine`
+
+`PickWave`/`PickTask`/`PackingOrder`/`Package` were part of the original aspirational scope but
+were not built in the implemented rollout — a `Shipment` is dispatched directly from confirmed
+`Allocation`s, with no separate picking/packing workflow.
 
 Internal logical relationships:
 
 1. `SalesOrder` 1:N `SalesOrderLine`
 2. `SalesOrderLine` 1:N `Allocation`
-3. `PickWave` 1:N `PickTask`
-4. `PackingOrder` 1:N `Package`
-5. `Shipment` 1:N `Package`
+3. `Shipment` 1:N `ShipmentLine`
+4. `Allocation` 1:N `ShipmentLine`
 
 ### Returns Database
 
@@ -243,7 +249,7 @@ Internal logical relationships:
 
 1. `Invoice` 1:N `InvoiceLine`
 2. `Invoice` 1:N `Payment`
-3. `CreditNote` N:1 `Invoice`
+3. `CreditNote` 1:N `CreditNoteLine`
 
 ### Reporting Database
 
@@ -261,8 +267,8 @@ Reporting may create relationships across projected read models because it is no
 
 | Consumer | Needs Data From | Purpose | Preferred Mechanism |
 |---|---|---|---|
-| Inventory | Catalog | Product tracking policy, SKU metadata | Event projection + fallback API |
-| Inventory | Organization | Warehouse and bin validation | API + local cache |
+| Inventory | Catalog | Product tracking policy, SKU metadata | Synchronous API call at receipt/quarantine time (no event projection or cache — every call re-validates) |
+| Inventory | Organization | Warehouse and bin validation | Synchronous API call at receipt/quarantine time (no local cache) |
 | Inbound | Partner | Supplier validation and snapshots | API at creation time |
 | Inbound | Catalog | Product validation and snapshots | API at creation time |
 | Inbound | Organization | Receiving location validation | API at command time |
@@ -270,11 +276,14 @@ Reporting may create relationships across projected read models because it is no
 | Outbound | Partner | Customer validation and snapshots | API at creation time |
 | Outbound | Catalog | Product validation and snapshots | API at creation time |
 | Outbound | Inventory | Availability, reservation, release | Synchronous API + events |
-| Returns | Outbound | Shipment context for returns | Snapshot + event projection |
-| Returns | Inventory | Restock or quarantine effects | Commands/events |
-| Billing | Inbound | Financial receipt facts | Event projection |
-| Billing | Outbound | Shipment and order facts | Event projection |
-| Reporting | All services | Analytics and operational dashboards | Events only |
+| Returns | Inventory | Restock or quarantine effects | Synchronous command (`POST /receipts`, `/receipts/quarantine`) |
+| Billing | *(caller-supplied)* | Financial receipt/shipment/return facts | `SourceReferenceType`/`SourceReferenceId` fields supplied by the caller at issuance time — Billing has no Kafka consumers and no Inbound/Outbound/Returns client |
+| Reporting | Inventory, Inbound, Outbound | Analytics and operational dashboards | Kafka event consumers (10 wired as implemented) — Returns and Billing are not yet projected |
+
+Note: `Returns` also depends on `Organization`, `Partner`, and `Catalog` for creation-time
+validation (same "API at creation time" pattern as Inbound/Outbound), and on `Outbound` only
+insofar as a caller may supply a `ShipmentId` as `SourceReferenceType`/`SourceReferenceId` when
+creating a return order — there is no live query back into Outbound.
 
 ## Example Snapshot Strategy
 
