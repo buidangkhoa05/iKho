@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "PutawayTaskCompleted",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseInbound.Events.V1",
+  "fields": [
+    { "name": "eventId",       "type": "string" },
+    { "name": "putawayTaskId", "type": "string" },
+    { "name": "productId",     "type": "string" },
+    { "name": "binId",         "type": "string" },
+    { "name": "quantity",      "type": "string" },
+    { "name": "completedOn",   "type": "string" }
+  ]
+}
