@@ -33,6 +33,19 @@ public enum ReleaseStockOutcome
     NotActive,
 }
 
+/// <summary>Distinguishes why a fulfill attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
+public enum FulfillStockOutcome
+{
+    /// <summary>The reservation was fulfilled successfully.</summary>
+    Fulfilled,
+
+    /// <summary>The referenced reservation does not exist.</summary>
+    NotFound,
+
+    /// <summary>The reservation exists but is not currently <see cref="ReservationStatus.Active"/>.</summary>
+    NotActive,
+}
+
 /// <summary>
 /// Business logic for reserving and releasing stock on behalf of outbound execution.
 /// Reservation auto-selects a single stock item with enough available quantity
@@ -185,5 +198,97 @@ public sealed class StockReservationsService(IStockReservationsRepository reposi
         await repository.SaveChangesAsync(cancellationToken);
 
         return (ReleaseStockOutcome.Released, StockReservationResponse.FromEntity(reservation));
+    }
+
+    /// <summary>
+    /// Converts an active reservation into an actual stock decrement on behalf of outbound
+    /// shipment execution. Unlike <see cref="ReleaseAsync"/> (which only moves quantity back from
+    /// reserved into available), fulfilling a reservation removes the quantity from on-hand
+    /// entirely, since the stock has physically left the warehouse.
+    /// </summary>
+    public async Task<(FulfillStockOutcome Outcome, StockReservationResponse? Reservation)> FulfillAsync(
+        Guid reservationId, string? correlationId, CancellationToken cancellationToken)
+    {
+        var reservation = await repository.GetReservationAsync(reservationId, cancellationToken);
+        if (reservation is null)
+        {
+            return (FulfillStockOutcome.NotFound, null);
+        }
+
+        if (reservation.Status != ReservationStatus.Active)
+        {
+            return (FulfillStockOutcome.NotActive, null);
+        }
+
+        var stockItem = await repository.GetStockItemAsync(reservation.StockItemId, cancellationToken);
+        if (stockItem is null)
+        {
+            // A fulfill only ever follows a valid, active reservation, which itself requires the
+            // stock item it points at to exist — if it is gone by the time we get here, something
+            // else in the system corrupted the ledger.
+            throw new InvalidOperationException(
+                $"Stock item '{reservation.StockItemId}' referenced by reservation '{reservation.Id}' no longer exists.");
+        }
+
+        if (stockItem.OnHandQuantity - reservation.Quantity < 0m || stockItem.ReservedQuantity - reservation.Quantity < 0m)
+        {
+            // This should never actually happen — a fulfill only follows a valid reservation,
+            // which already guaranteed enough on-hand/reserved quantity existed. If it does,
+            // that indicates a ledger bug elsewhere rather than a legitimate business conflict.
+            throw new InvalidOperationException(
+                $"Fulfilling reservation '{reservation.Id}' would drive stock item '{stockItem.Id}' negative.");
+        }
+
+        stockItem.OnHandQuantity -= reservation.Quantity;
+        stockItem.ReservedQuantity -= reservation.Quantity;
+        stockItem.UpdatedOnUtc = DateTimeOffset.UtcNow;
+
+        var balance = await repository.GetStockBalanceAsync(reservation.ProductId, reservation.WarehouseId, cancellationToken);
+        if (balance is not null)
+        {
+            if (balance.OnHandQuantity - reservation.Quantity < 0m || balance.ReservedQuantity - reservation.Quantity < 0m)
+            {
+                throw new InvalidOperationException(
+                    $"Fulfilling reservation '{reservation.Id}' would drive the stock balance for product '{reservation.ProductId}' " +
+                    $"in warehouse '{reservation.WarehouseId}' negative.");
+            }
+
+            balance.OnHandQuantity -= reservation.Quantity;
+            balance.ReservedQuantity -= reservation.Quantity;
+            balance.UpdatedOnUtc = DateTimeOffset.UtcNow;
+        }
+
+        reservation.Status = ReservationStatus.Fulfilled;
+
+        repository.Add(new StockLedgerEntry
+        {
+            StockItemId = stockItem.Id,
+            ProductId = stockItem.ProductId,
+            WarehouseId = stockItem.WarehouseId,
+            BinId = stockItem.BinId,
+            LotId = stockItem.LotId,
+            SerialNumberId = stockItem.SerialNumberId,
+            MovementType = StockMovementType.Shipment,
+            QuantityDelta = -reservation.Quantity,
+            ReferenceType = "StockReservation",
+            ReferenceId = reservation.Id.ToString(),
+            CorrelationId = correlationId,
+        });
+
+        var @event = new StockShipped
+        {
+            eventId = Guid.NewGuid().ToString(),
+            reservationId = reservation.Id.ToString(),
+            productId = reservation.ProductId.ToString(),
+            warehouseId = reservation.WarehouseId.ToString(),
+            stockItemId = stockItem.Id.ToString(),
+            quantity = reservation.Quantity.ToString(CultureInfo.InvariantCulture),
+            shippedOn = DateTimeOffset.UtcNow.ToString("O"),
+        };
+        repository.Add(outbox.Enqueue(nameof(StockShipped), JsonSerializer.Serialize(@event), correlationId));
+
+        await repository.SaveChangesAsync(cancellationToken);
+
+        return (FulfillStockOutcome.Fulfilled, StockReservationResponse.FromEntity(reservation));
     }
 }

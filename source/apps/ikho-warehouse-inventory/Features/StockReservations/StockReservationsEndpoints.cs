@@ -51,6 +51,23 @@ public static class StockReservationsEndpoints
             };
         });
 
+        group.MapPost("/{id:guid}/fulfill", async Task<Results<Ok<StockReservationResponse>, NotFound<string>, Conflict<string>>> (
+            Guid id,
+            StockReservationsService service,
+            HttpContext httpContext,
+            CancellationToken cancellationToken) =>
+        {
+            var correlationId = httpContext.GetCorrelationId();
+            var (outcome, reservation) = await service.FulfillAsync(id, correlationId, cancellationToken);
+
+            return outcome switch
+            {
+                FulfillStockOutcome.NotFound => TypedResults.NotFound($"Reservation '{id}' was not found."),
+                FulfillStockOutcome.NotActive => TypedResults.Conflict($"Reservation '{id}' is not active."),
+                _ => TypedResults.Ok(reservation),
+            };
+        });
+
         return app;
     }
 }
