@@ -32,13 +32,13 @@ Browser → ikho-ui (Angular SPA)
     ┌───────────────────────────────────┐
     │  Ikho.WarehouseOrganization :5151 │
     │  Ikho.WarehouseCatalog      :5152 │
-    │  Ikho.WarehousePartner      :5153 │  ← planned
-    │  Ikho.WarehouseInventory    :5154 │  ← planned
-    │  Ikho.WarehouseInbound      :5155 │  ← planned
-    │  Ikho.WarehouseOutbound     :5156 │  ← planned
-    │  Ikho.WarehouseReturns      :5157 │  ← planned
-    │  Ikho.WarehouseBilling      :5158 │  ← planned
-    │  Ikho.WarehouseReporting    :5159 │  ← planned
+    │  Ikho.WarehousePartner      :5153 │
+    │  Ikho.WarehouseInventory    :5154 │
+    │  Ikho.WarehouseInbound      :5155 │
+    │  Ikho.WarehouseOutbound     :5156 │
+    │  Ikho.WarehouseReturns      :5157 │
+    │  Ikho.WarehouseBilling      :5158 │
+    │  Ikho.WarehouseReporting    :5159 │
     └───────────────────────────────────┘
 ```
 
@@ -139,6 +139,31 @@ pnpm nx serve ikho-ui
 
 The app is available at `http://localhost:4200`. The Angular dev server proxies all `/api/*` requests to the gateway at `:5080`.
 
+### Alternative: run the whole stack with Docker Compose
+
+Instead of steps 3-5 above, [`source/docker-compose.yml`](./source/docker-compose.yml) builds and
+runs every container in the diagram above - postgres, kafka, all nine warehouse services, the
+gateway, and the UI - in one command:
+
+```sh
+cd source
+docker compose up --build
+```
+
+- UI: `http://localhost:4200`
+- API Gateway (docs at `/docs`): `http://localhost:5080`
+- Each warehouse service is also reachable directly on its own port (see the
+  [architecture doc](./docs/architecture/README.md#2-container-diagram)) for debugging.
+
+```sh
+docker compose up --build -d   # detached
+docker compose down            # stop (keeps postgres/kafka volumes)
+docker compose down -v         # stop and reset volumes
+```
+
+`docker-compose.platform.yml` still exists separately for infra-only local dev (just Kafka +
+PostgreSQL, for running individual services with `pnpm nx serve`).
+
 ## Project Structure
 
 ```
@@ -148,10 +173,20 @@ iKho/
 │   └── plans/                 ← Service rollout and implementation plans
 └── source/                    ← Nx monorepo (pnpm workspace)
     ├── apps/
-    │   ├── ikho-ui/           ← Angular 19 SPA
-    │   ├── ikho-api-gateway/  ← .NET 10 YARP gateway (:5080)
-    │   ├── ikho-warehouse-organization/  ← Organization service (:5151)
-    │   └── ikho-warehouse-catalog/       ← Catalog service (:5152)
+    │   ├── ikho-ui/                       ← Angular 19 SPA
+    │   ├── ikho-api-gateway/              ← .NET 10 YARP gateway (:5080)
+    │   ├── ikho-warehouse-organization/   ← Organization service (:5151)
+    │   ├── ikho-warehouse-catalog/        ← Catalog service (:5152)
+    │   ├── ikho-warehouse-partner/        ← Partner service (:5153)
+    │   ├── ikho-warehouse-inventory/      ← Inventory service (:5154)
+    │   ├── ikho-warehouse-inbound/        ← Inbound service (:5155)
+    │   ├── ikho-warehouse-outbound/       ← Outbound service (:5156)
+    │   ├── ikho-warehouse-returns/        ← Returns service (:5157)
+    │   ├── ikho-warehouse-billing/        ← Billing service (:5158)
+    │   └── ikho-warehouse-reporting/      ← Reporting service (:5159)
+    ├── docker/                            ← Shared Dockerfile + postgres init script
+    ├── docker-compose.yml                 ← Whole stack in containers
+    ├── docker-compose.platform.yml        ← Infra only (kafka + postgres), for `nx serve`
     └── libs/
         ├── ikho-shared-library/      ← Cross-cutting concerns (outbox, Kafka, idempotency)
         ├── ikho-schema-management/   ← Build-time Avro contract codegen
@@ -173,11 +208,10 @@ Features/{Feature}/
 All commands run from the `source` folder.
 
 ```sh
-# Serve
+# Serve (each warehouse-* service follows the same pattern on its own port, see table above)
 pnpm nx serve ikho-ui                      # Angular dev server at :4200
 pnpm nx serve IkhoApiGateway               # API gateway at :5080
 pnpm nx serve IkhoWarehouseOrganization    # Organization service at :5151
-pnpm nx serve IkhoWarehouseCatalog         # Catalog service at :5152
 
 # Build
 pnpm nx build ikho-ui                      # Angular production build
@@ -189,6 +223,10 @@ pnpm nx test ikho-ui                       # Angular unit tests (vitest)
 
 # Schema generation
 pnpm nx run IkhoSchemaManagement:generate  # Regenerate C# contracts from Avro schemas
+
+# Docker (every app/lib has a docker-build target; docker-compose.yml drives all of them together)
+pnpm nx docker-build IkhoWarehouseOrganization   # Build just this service's image
+pnpm nx run-many -t docker-build                 # Build every image
 
 # Workspace
 pnpm nx graph                              # Visualise project dependency graph

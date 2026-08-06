@@ -55,37 +55,38 @@ C4Container
         Container(schema, "Ikho.SchemaManagement", ".NET library + codegen CLI", "Generates C# contracts from JSON Schema/Avro definitions, referenced by Ikho.SharedLibrary at build time")
         Container(orgsvc, "Ikho.WarehouseOrganization", ".NET 10 Minimal API", "Warehouse structure service owning companies, warehouses, bins, and docks")
         Container(catalogsvc, "Ikho.WarehouseCatalog", ".NET 10 Minimal API", "Product master-data service for products, categories, brands, UOMs, and barcodes")
-        Container(partnersvc, "Ikho.WarehousePartner", ".NET 10 Minimal API", "Planned supplier and customer master-data service")
-        Container(inventorysvc, "Ikho.WarehouseInventory", ".NET 10 Minimal API", "Planned stock system of record owning ledger, lots, serials, and reservations")
-        Container(inboundsvc, "Ikho.WarehouseInbound", ".NET 10 Minimal API", "Planned receiving and putaway workflow service")
-        Container(outboundsvc, "Ikho.WarehouseOutbound", ".NET 10 Minimal API", "Planned allocation, picking, packing, and shipping workflow service")
-        Container(returnssvc, "Ikho.WarehouseReturns", ".NET 10 Minimal API", "Planned reverse-logistics and disposition service")
-        Container(billingsvc, "Ikho.WarehouseBilling", ".NET 10 Minimal API", "Planned billing and financial snapshot service")
-        Container(reportingsvc, "Ikho.WarehouseReporting", ".NET 10 Minimal API or worker", "Planned projection/read-model service for dashboards and analytics")
+        Container(partnersvc, "Ikho.WarehousePartner", ".NET 10 Minimal API", "Supplier and customer master-data service")
+        Container(inventorysvc, "Ikho.WarehouseInventory", ".NET 10 Minimal API", "Stock system of record owning ledger, lots, serials, and reservations")
+        Container(inboundsvc, "Ikho.WarehouseInbound", ".NET 10 Minimal API", "Receiving and putaway workflow service")
+        Container(outboundsvc, "Ikho.WarehouseOutbound", ".NET 10 Minimal API", "Allocation, picking, packing, and shipping workflow service")
+        Container(returnssvc, "Ikho.WarehouseReturns", ".NET 10 Minimal API", "Reverse-logistics and disposition service")
+        Container(billingsvc, "Ikho.WarehouseBilling", ".NET 10 Minimal API", "Billing and financial snapshot service")
+        Container(reportingsvc, "Ikho.WarehouseReporting", ".NET 10 Minimal API", "Kafka-driven projection/read-model service for dashboards and analytics")
     }
 
     Rel(user, ui, "Uses", "HTTPS")
     Rel(ui, sharedui, "Imports components from", "TS import")
     Rel(ui, gateway, "Calls /api/*", "HTTPS/JSON (dev: via proxy.conf.json)")
-    Rel(gateway, api, "Forwards /api/* to shared-library-cluster", "HTTP/JSON")
+    Rel(gateway, api, "Forwards /api/* to shared-library-cluster (catch-all fallback)", "HTTP/JSON")
     Rel(api, schema, "References generated contracts from", "Project reference")
     Rel(gateway, orgsvc, "/api/warehouse/organization/*", "HTTP/JSON")
     Rel(gateway, catalogsvc, "/api/warehouse/catalog/*", "HTTP/JSON")
-    Rel(gateway, partnersvc, "Planned /api/warehouse/partner/*", "HTTP/JSON")
-    Rel(gateway, inventorysvc, "Planned /api/warehouse/inventory/*", "HTTP/JSON")
-    Rel(gateway, inboundsvc, "Planned /api/warehouse/inbound/*", "HTTP/JSON")
-    Rel(gateway, outboundsvc, "Planned /api/warehouse/outbound/*", "HTTP/JSON")
-    Rel(gateway, returnssvc, "Planned /api/warehouse/returns/*", "HTTP/JSON")
-    Rel(gateway, billingsvc, "Planned /api/warehouse/billing/*", "HTTP/JSON")
+    Rel(gateway, partnersvc, "/api/warehouse/partner/*", "HTTP/JSON")
+    Rel(gateway, inventorysvc, "/api/warehouse/inventory/*", "HTTP/JSON")
+    Rel(gateway, inboundsvc, "/api/warehouse/inbound/*", "HTTP/JSON")
+    Rel(gateway, outboundsvc, "/api/warehouse/outbound/*", "HTTP/JSON")
+    Rel(gateway, returnssvc, "/api/warehouse/returns/*", "HTTP/JSON")
+    Rel(gateway, billingsvc, "/api/warehouse/billing/*", "HTTP/JSON")
+    Rel(gateway, reportingsvc, "/api/warehouse/reporting/*", "HTTP/JSON")
     Rel(schema, orgsvc, "Contract reference", "Project reference")
     Rel(schema, catalogsvc, "Contract reference", "Project reference")
-    Rel(schema, partnersvc, "Planned contract reference", "Project reference")
-    Rel(schema, inventorysvc, "Planned contract reference", "Project reference")
-    Rel(schema, inboundsvc, "Planned contract reference", "Project reference")
-    Rel(schema, outboundsvc, "Planned contract reference", "Project reference")
-    Rel(schema, returnssvc, "Planned contract reference", "Project reference")
-    Rel(schema, billingsvc, "Planned contract reference", "Project reference")
-    Rel(schema, reportingsvc, "Planned contract reference", "Project reference")
+    Rel(schema, partnersvc, "Contract reference", "Project reference")
+    Rel(schema, inventorysvc, "Contract reference", "Project reference")
+    Rel(schema, inboundsvc, "Contract reference", "Project reference")
+    Rel(schema, outboundsvc, "Contract reference", "Project reference")
+    Rel(schema, returnssvc, "Contract reference", "Project reference")
+    Rel(schema, billingsvc, "Contract reference", "Project reference")
+    Rel(schema, reportingsvc, "Contract reference", "Project reference")
 ```
 
 | Container | Path | Port(s) |
@@ -97,13 +98,27 @@ C4Container
 | `Ikho.SchemaManagement` | [source/libs/ikho-schema-management](../../source/libs/ikho-schema-management) | — (build-time codegen, not a running service) |
 | `Ikho.WarehouseOrganization` | [source/apps/ikho-warehouse-organization](../../source/apps/ikho-warehouse-organization) | 5151 |
 | `Ikho.WarehouseCatalog` | [source/apps/ikho-warehouse-catalog](../../source/apps/ikho-warehouse-catalog) | 5152 |
-| `Ikho.WarehousePartner` | Planned | TBD |
-| `Ikho.WarehouseInventory` | Planned | TBD |
-| `Ikho.WarehouseInbound` | Planned | TBD |
-| `Ikho.WarehouseOutbound` | Planned | TBD |
-| `Ikho.WarehouseReturns` | Planned | TBD |
-| `Ikho.WarehouseBilling` | Planned | TBD |
-| `Ikho.WarehouseReporting` | Planned | TBD |
+| `Ikho.WarehousePartner` | [source/apps/ikho-warehouse-partner](../../source/apps/ikho-warehouse-partner) | 5153 |
+| `Ikho.WarehouseInventory` | [source/apps/ikho-warehouse-inventory](../../source/apps/ikho-warehouse-inventory) | 5154 |
+| `Ikho.WarehouseInbound` | [source/apps/ikho-warehouse-inbound](../../source/apps/ikho-warehouse-inbound) | 5155 |
+| `Ikho.WarehouseOutbound` | [source/apps/ikho-warehouse-outbound](../../source/apps/ikho-warehouse-outbound) | 5156 |
+| `Ikho.WarehouseReturns` | [source/apps/ikho-warehouse-returns](../../source/apps/ikho-warehouse-returns) | 5157 |
+| `Ikho.WarehouseBilling` | [source/apps/ikho-warehouse-billing](../../source/apps/ikho-warehouse-billing) | 5158 |
+| `Ikho.WarehouseReporting` | [source/apps/ikho-warehouse-reporting](../../source/apps/ikho-warehouse-reporting) | 5159 |
+
+### Running the containers
+
+Every container above (postgres, kafka, and all services listed) can be run in Docker via
+[`source/docker-compose.yml`](../../source/docker-compose.yml):
+
+```sh
+cd source
+docker compose up --build
+```
+
+For infra-only local dev (running individual services with `pnpm nx serve`), use
+[`source/docker-compose.platform.yml`](../../source/docker-compose.platform.yml) instead - it
+starts just Kafka and PostgreSQL.
 
 ## 3. Component Diagrams
 

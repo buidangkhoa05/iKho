@@ -22,10 +22,19 @@ source/apps/ikho-warehouse-{capability}/
   appsettings.json                # Database, MessageBroker, Cors, Jwt sections
   appsettings.Development.json
   Properties/launchSettings.json
+  project.json                    # Nx docker-build target (see "Local development infrastructure")
   Features/{Feature}/             # vertical slice per feature (endpoint, service, repository, DTOs)
   Domain/                         # shared domain/value types
   Shared/                         # cross-feature concerns local to this service
 ```
+
+`project.json` only needs to declare the `docker-build` target — every other Nx target
+(`build`, `serve`, `test`, ...) is inferred automatically from the `.csproj` by the
+`@nx/dotnet` plugin. Don't add a plain `appsettings*.json` or `project.json` file to
+`Ikho.SharedLibrary` without checking [its `.csproj`](../../source/libs/ikho-shared-library/Ikho.SharedLibrary.csproj)
+and [`Directory.Build.targets`](../../source/Directory.Build.targets) first — both files rely
+on those exclusions to avoid an `NETSDK1152` publish conflict between the library and every
+service that references it.
 
 ## `Program.cs` bootstrap
 
@@ -142,15 +151,33 @@ docker compose -f docker-compose.platform.yml up -d
 ```
 
 Each service should create its own database inside the shared PostgreSQL instance
-(database-per-service still applies — only the server process is shared locally).
+(database-per-service still applies — only the server process is shared locally). New
+databases need a matching entry in
+[`docker/postgres/init-databases.sql`](../../source/docker/postgres/init-databases.sql) so the
+full-stack compose file (below) provisions them too.
+
+To run the new service itself in a container alongside everything else, use
+[`source/docker-compose.yml`](../../source/docker-compose.yml) instead — it builds every
+app/lib via the shared [`docker/dotnet.Dockerfile`](../../source/docker/dotnet.Dockerfile)
+(parameterized by `PROJECT_PATH`/`ASSEMBLY_NAME`, no new Dockerfile needed per service). Add
+the new service as a compose service following the pattern of the existing `warehouse-*`
+entries: `Database__ConnectionString`/`MessageBroker__BootstrapServers` env overrides pointing
+at `postgres`/`kafka:29092`, a `depends_on` health gate, and — if it calls other services — the
+matching `Services__*` env overrides pointing at their container hostnames on port 8080. Also
+add a `docker-build` Nx target to its `project.json` (see any existing `warehouse-*`
+`project.json` for the pattern) and a cluster/route entry in the gateway's
+`ReverseProxy__Clusters__*` env overrides.
 
 ## Gateway routing
 
 See [api-gateway.md](./api-gateway.md#reverse-proxy-routing-yarp) for the `/api/warehouse/{capability}/*`
-route/cluster naming convention. Placeholder routes and clusters for all nine planned
-warehouse services already exist in
-[appsettings.json](../../source/apps/ikho-api-gateway/appsettings.json); update the
-destination address once a service is actually running.
+route/cluster naming convention. Routes and clusters for all nine warehouse services already
+exist in [appsettings.json](../../source/apps/ikho-api-gateway/appsettings.json), pointing at
+each service's `localhost` dev port. When running the gateway via
+[`docker-compose.yml`](../../source/docker-compose.yml), those destination addresses are
+overridden per-container with `ReverseProxy__Clusters__{id}__Destinations__destination1__Address`
+environment variables instead (container hostname, port 8080) — see the `api-gateway` service
+there for the full list.
 
 ## Out of scope
 

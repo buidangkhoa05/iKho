@@ -51,6 +51,19 @@ The UI runs on `http://localhost:4200`.
 
 Angular dev server proxies `/api/*` to `http://localhost:5143`, so frontend calls can use `/api/...` paths directly.
 
+## Run everything with Docker
+
+`docker-compose.yml` builds and runs the whole workspace - postgres, kafka, every .NET
+app/lib, and the Angular UI - in containers, as an alternative to running each `pnpm nx serve`
+individually:
+
+```sh
+docker compose up --build
+```
+
+UI at `http://localhost:4200`, API gateway at `http://localhost:5080`. `docker-compose.platform.yml`
+still exists separately for infra-only local dev (just kafka + postgres).
+
 ## Common Commands
 
 ```sh
@@ -60,6 +73,8 @@ pnpm nx build IkhoSchemaManagement
 pnpm nx build IkhoSharedLibrary
 pnpm nx test ikho-ui
 pnpm nx run-many -t build
+pnpm nx docker-build IkhoSharedLibrary
+pnpm nx run-many -t docker-build
 pnpm nx graph
 pnpm nx show projects
 pnpm nx show project IkhoSharedLibrary
