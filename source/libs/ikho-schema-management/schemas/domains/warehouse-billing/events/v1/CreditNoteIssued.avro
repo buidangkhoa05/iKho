@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "CreditNoteIssued",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseBilling.Events.V1",
+  "fields": [
+    { "name": "eventId",             "type": "string" },
+    { "name": "creditNoteId",        "type": "string" },
+    { "name": "customerId",          "type": "string" },
+    { "name": "sourceReferenceType", "type": "string" },
+    { "name": "sourceReferenceId",   "type": "string" },
+    { "name": "totalAmount",         "type": "string" },
+    { "name": "status",              "type": "string" },
+    { "name": "issuedOn",            "type": "string" }
+  ]
+}
