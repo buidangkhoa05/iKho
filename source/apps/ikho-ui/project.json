@@ -87,6 +87,17 @@
         "staticFilePath": "dist/apps/ikho-ui/browser",
         "spa": true
       }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker build -f apps/ikho-ui/Dockerfile -t ikho/ui:local ."
+      },
+      "metadata": {
+        "description": "Build the Docker image for this app",
+        "technologies": ["docker"]
+      }
     }
   }
 }

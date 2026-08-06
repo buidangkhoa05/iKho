@@ -1,0 +1,17 @@
+{
+  "name": "Ikho.ApiGateway",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker build -f docker/dotnet.Dockerfile --build-arg PROJECT_PATH=apps/ikho-api-gateway/Ikho.ApiGateway.csproj --build-arg ASSEMBLY_NAME=Ikho.ApiGateway -t ikho/api-gateway:local ."
+      },
+      "metadata": {
+        "description": "Build the Docker image for this service",
+        "technologies": ["docker"]
+      }
+    }
+  }
+}

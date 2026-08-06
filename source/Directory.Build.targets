@@ -1,0 +1,12 @@
+<Project>
+
+  <ItemGroup>
+    <!-- Nx project metadata, not part of any app. Sdk.Web's default Content glob
+         would otherwise copy it into publish output, colliding with the same
+         file from any other referenced project (NETSDK1152). Must live in
+         Directory.Build.targets (imported after Sdk default items are globbed),
+         not Directory.Build.props (imported before), or there's nothing to remove yet. -->
+    <Content Remove="project.json" />
+  </ItemGroup>
+
+</Project>

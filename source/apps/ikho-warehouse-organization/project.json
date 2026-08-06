@@ -1,0 +1,17 @@
+{
+  "name": "Ikho.WarehouseOrganization",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker build -f docker/dotnet.Dockerfile --build-arg PROJECT_PATH=apps/ikho-warehouse-organization/Ikho.WarehouseOrganization.csproj --build-arg ASSEMBLY_NAME=Ikho.WarehouseOrganization -t ikho/warehouse-organization:local ."
+      },
+      "metadata": {
+        "description": "Build the Docker image for this service",
+        "technologies": ["docker"]
+      }
+    }
+  }
+}

@@ -11,6 +11,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Sdk.Web's default Content glob copies appsettings*.json into the publish
+         output of every project that references this one, colliding with the
+         referencing project's own appsettings*.json at the same relative path
+         (NETSDK1152). This library's own config is only meaningful when it runs
+         standalone, so keep it out of consumers' publish output. -->
+    <Content Update="appsettings*.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="2.6.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
