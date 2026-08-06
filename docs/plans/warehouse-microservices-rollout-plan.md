@@ -231,11 +231,11 @@ Use this checklist to track execution progress across the full warehouse rollout
 
 ### Reporting And Contracts
 
-- [ ] Create v1 warehouse API schemas
-- [ ] Create v1 warehouse event schemas
-- [ ] Generate contracts from warehouse schemas
-- [ ] Implement `Ikho.WarehouseReporting`
-- [ ] Build first operational read models
+- [ ] Create v1 warehouse API schemas (not done as JSON schemas per `10-contracts-and-events-implementation.md`; every service uses plain C# request/response records instead — a consistent deviation across all 8 services, not unique to Reporting)
+- [x] Create v1 warehouse event schemas
+- [x] Generate contracts from warehouse schemas
+- [x] Implement `Ikho.WarehouseReporting`
+- [x] Build first operational read models
 
 ### Final Readiness
 
