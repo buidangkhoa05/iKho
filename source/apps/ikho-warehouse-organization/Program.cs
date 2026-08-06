@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehouseOrganization.Features.Companies;
 using Ikho.WarehouseOrganization.Features.Locations;
 using Ikho.WarehouseOrganization.Features.Warehouses;
@@ -11,6 +12,7 @@ builder.Services.AddDbContext<OrganizationDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<OrganizationDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<CompaniesService>();
@@ -22,6 +24,7 @@ builder.Services.AddScoped<LocationsService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/organization");
 
 app.MapCompaniesEndpoints();
 app.MapWarehousesEndpoints();

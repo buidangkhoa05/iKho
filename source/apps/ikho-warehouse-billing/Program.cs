@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehouseBilling.Features.CreditNotes;
 using Ikho.WarehouseBilling.Features.Invoices;
 using Ikho.WarehouseBilling.Features.Payments;
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<BillingDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<BillingDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddHttpClient<ICatalogApiClient, CatalogApiClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["Services:Catalog"]!));
@@ -28,6 +30,7 @@ builder.Services.AddScoped<PaymentsService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/billing");
 
 app.MapInvoicesEndpoints();
 app.MapCreditNotesEndpoints();

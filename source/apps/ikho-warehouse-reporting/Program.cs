@@ -2,6 +2,7 @@ using Ikho.SchemaManagement.Contracts.WarehouseInbound.Events.V1;
 using Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1;
 using Ikho.SchemaManagement.Contracts.WarehouseOutbound.Events.V1;
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.SharedLibrary.Events;
 using Ikho.WarehouseReporting.Features.FulfillmentKpis;
 using Ikho.WarehouseReporting.Features.InboundStatus;
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<ReportingDbContext>(options =>
 // store the Kafka consumers below rely on. Reporting never enqueues outbox messages - see
 // the remarks on ReportingDbContext.
 builder.Services.AddServiceDefaults<ReportingDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddScoped<IInventoryPositionRepository, InventoryPositionRepository>();
 builder.Services.AddScoped<InventoryPositionService>();
@@ -63,6 +65,7 @@ builder.Services.AddKafkaConsumer<ReportingDbContext, ShipmentDispatched, Shipme
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/reporting");
 
 app.MapInventoryPositionEndpoints();
 app.MapInboundStatusEndpoints();

@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehouseReturns.Features.Dispositions;
 using Ikho.WarehouseReturns.Features.Inspections;
 using Ikho.WarehouseReturns.Features.ReturnOrders;
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<ReturnsDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<ReturnsDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddHttpClient<ICatalogApiClient, CatalogApiClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["Services:Catalog"]!));
@@ -35,6 +37,7 @@ builder.Services.AddScoped<DispositionsService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/returns");
 
 app.MapReturnOrdersEndpoints();
 app.MapReturnReceiptsEndpoints();

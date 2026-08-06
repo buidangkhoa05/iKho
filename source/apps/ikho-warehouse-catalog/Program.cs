@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehouseCatalog.Features.Brands;
 using Ikho.WarehouseCatalog.Features.Categories;
 using Ikho.WarehouseCatalog.Features.Products;
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<CatalogDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductsService>();
@@ -25,6 +27,7 @@ builder.Services.AddScoped<UnitsOfMeasureService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/catalog");
 
 app.MapProductsEndpoints();
 app.MapCategoriesEndpoints();

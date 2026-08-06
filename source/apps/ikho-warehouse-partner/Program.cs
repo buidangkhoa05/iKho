@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehousePartner.Features.Customers;
 using Ikho.WarehousePartner.Features.Suppliers;
 using Ikho.WarehousePartner.Shared;
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<PartnerDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<PartnerDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<SuppliersService>();
@@ -19,6 +21,7 @@ builder.Services.AddScoped<CustomersService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/partner");
 
 app.MapSuppliersEndpoints();
 app.MapCustomersEndpoints();

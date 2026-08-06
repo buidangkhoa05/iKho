@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehouseInventory.Features.StockAdjustments;
 using Ikho.WarehouseInventory.Features.StockBalances;
 using Ikho.WarehouseInventory.Features.StockReceipts;
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<InventoryDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddHttpClient<ICatalogApiClient, CatalogApiClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["Services:Catalog"]!));
@@ -31,6 +33,7 @@ builder.Services.AddScoped<StockBalancesService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/inventory");
 
 app.MapStockReceiptsEndpoints();
 app.MapStockAdjustmentsEndpoints();

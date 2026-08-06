@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehouseInbound.Features.PurchaseOrders;
 using Ikho.WarehouseInbound.Features.Receipts;
 using Ikho.WarehouseInbound.Shared;
@@ -11,6 +12,7 @@ builder.Services.AddDbContext<InboundDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<InboundDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddHttpClient<ICatalogApiClient, CatalogApiClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["Services:Catalog"]!));
@@ -29,6 +31,7 @@ builder.Services.AddScoped<ReceiptsService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/inbound");
 
 app.MapPurchaseOrdersEndpoints();
 app.MapReceiptsEndpoints();

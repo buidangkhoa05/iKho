@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.SharedLibrary.ApiDocs;
 using Ikho.WarehouseOutbound.Features.Allocations;
 using Ikho.WarehouseOutbound.Features.SalesOrders;
 using Ikho.WarehouseOutbound.Features.Shipments;
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<OutboundDbContext>(options =>
     options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddServiceDefaults<OutboundDbContext>(builder.Configuration);
+builder.Services.AddServiceApiDocs();
 
 builder.Services.AddHttpClient<ICatalogApiClient, CatalogApiClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["Services:Catalog"]!));
@@ -32,6 +34,7 @@ builder.Services.AddScoped<ShipmentsService>();
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
+app.MapServiceApiDocs("/api/warehouse/outbound");
 
 app.MapSalesOrdersEndpoints();
 app.MapAllocationsEndpoints();
