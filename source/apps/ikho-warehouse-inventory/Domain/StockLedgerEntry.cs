@@ -14,6 +14,9 @@ public enum StockMovementType
 
     /// <summary>A previously active reservation was released back to available. Does not change on-hand.</summary>
     Release,
+
+    /// <summary>A previously active reservation was fulfilled and physically shipped out. Decrements on-hand.</summary>
+    Shipment,
 }
 
 /// <summary>

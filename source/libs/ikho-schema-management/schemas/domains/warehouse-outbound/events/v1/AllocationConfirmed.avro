@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "AllocationConfirmed",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseOutbound.Events.V1",
+  "fields": [
+    { "name": "eventId",       "type": "string" },
+    { "name": "salesOrderId",  "type": "string" },
+    { "name": "allocationId",  "type": "string" },
+    { "name": "productId",     "type": "string" },
+    { "name": "warehouseId",   "type": "string" },
+    { "name": "quantity",      "type": "string" },
+    { "name": "confirmedOn",   "type": "string" }
+  ]
+}

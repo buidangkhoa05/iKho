@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "StockShipped",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1",
+  "fields": [
+    { "name": "eventId",       "type": "string" },
+    { "name": "reservationId", "type": "string" },
+    { "name": "productId",     "type": "string" },
+    { "name": "warehouseId",   "type": "string" },
+    { "name": "stockItemId",   "type": "string" },
+    { "name": "quantity",      "type": "string" },
+    { "name": "shippedOn",     "type": "string" }
+  ]
+}

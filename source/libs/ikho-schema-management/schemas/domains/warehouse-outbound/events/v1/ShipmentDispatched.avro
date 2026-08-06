@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "ShipmentDispatched",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseOutbound.Events.V1",
+  "fields": [
+    { "name": "eventId",       "type": "string" },
+    { "name": "shipmentId",    "type": "string" },
+    { "name": "salesOrderId",  "type": "string" },
+    { "name": "warehouseId",   "type": "string" },
+    { "name": "dispatchedOn",  "type": "string" }
+  ]
+}
