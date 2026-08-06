@@ -216,11 +216,11 @@ Use this checklist to track execution progress across the full warehouse rollout
 
 ### Operational Services
 
-- [ ] Implement `Ikho.WarehouseInbound`
-- [ ] Integrate inbound receipt flow with Inventory
-- [ ] Implement `Ikho.WarehouseOutbound`
-- [ ] Integrate outbound allocation flow with Inventory
-- [ ] Validate shipment and putaway event contracts
+- [x] Implement `Ikho.WarehouseInbound`
+- [x] Integrate inbound receipt flow with Inventory
+- [x] Implement `Ikho.WarehouseOutbound`
+- [x] Integrate outbound allocation flow with Inventory
+- [x] Validate shipment and putaway event contracts
 
 ### Secondary Services
 
