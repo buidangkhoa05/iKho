@@ -224,10 +224,10 @@ Use this checklist to track execution progress across the full warehouse rollout
 
 ### Secondary Services
 
-- [ ] Implement `Ikho.WarehouseReturns`
-- [ ] Integrate return disposition flow with Inventory
-- [ ] Implement `Ikho.WarehouseBilling`
-- [ ] Confirm billing source-of-truth boundary
+- [x] Implement `Ikho.WarehouseReturns`
+- [x] Integrate return disposition flow with Inventory
+- [x] Implement `Ikho.WarehouseBilling`
+- [x] Confirm billing source-of-truth boundary
 
 ### Reporting And Contracts
 
