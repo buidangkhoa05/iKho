@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "ReceiptCompleted",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseInbound.Events.V1",
+  "fields": [
+    { "name": "eventId",         "type": "string" },
+    { "name": "receiptId",       "type": "string" },
+    { "name": "purchaseOrderId", "type": "string" },
+    { "name": "warehouseId",     "type": "string" },
+    { "name": "receivedOn",      "type": "string" }
+  ]
+}
