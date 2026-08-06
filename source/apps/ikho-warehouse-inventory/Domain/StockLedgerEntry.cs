@@ -17,6 +17,9 @@ public enum StockMovementType
 
     /// <summary>A previously active reservation was fulfilled and physically shipped out. Decrements on-hand.</summary>
     Shipment,
+
+    /// <summary>Stock arrived into quarantine (e.g. a Returns disposition) rather than sellable on-hand stock.</summary>
+    QuarantineReceipt,
 }
 
 /// <summary>

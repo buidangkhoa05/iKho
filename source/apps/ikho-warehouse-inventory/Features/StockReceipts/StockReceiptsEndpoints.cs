@@ -35,6 +35,29 @@ public static class StockReceiptsEndpoints
             };
         });
 
+        group.MapPost("/quarantine", async Task<Results<Created<StockItemResponse>, NotFound<string>, Conflict<string>, BadRequest<string>>> (
+            ReceiveStockRequest request,
+            StockReceiptsService service,
+            HttpContext httpContext,
+            CancellationToken cancellationToken) =>
+        {
+            var correlationId = httpContext.GetCorrelationId();
+            var (outcome, stockItem, error) = await service.ReceiveQuarantineAsync(request, correlationId, cancellationToken);
+
+            return outcome switch
+            {
+                ReceiveStockOutcome.ProductNotFound =>
+                    TypedResults.NotFound(error ?? $"Product '{request.ProductId}' was not found or is inactive."),
+                ReceiveStockOutcome.BinNotFound =>
+                    TypedResults.NotFound(error ?? $"Bin '{request.BinId}' was not found."),
+                ReceiveStockOutcome.BinInvalid =>
+                    TypedResults.Conflict(error ?? $"Bin '{request.BinId}' is not currently usable."),
+                ReceiveStockOutcome.ValidationFailed =>
+                    TypedResults.BadRequest(error ?? "The quarantine receipt request is invalid."),
+                _ => TypedResults.Created($"/api/warehouse/inventory/stock-items/{stockItem!.Id}", stockItem),
+            };
+        });
+
         return app;
     }
 }

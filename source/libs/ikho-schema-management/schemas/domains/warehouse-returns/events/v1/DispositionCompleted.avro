@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "DispositionCompleted",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseReturns.Events.V1",
+  "fields": [
+    { "name": "eventId",               "type": "string" },
+    { "name": "dispositionId",         "type": "string" },
+    { "name": "returnOrderId",         "type": "string" },
+    { "name": "returnOrderLineId",     "type": "string" },
+    { "name": "outcome",               "type": "string" },
+    { "name": "inventoryReferenceId",  "type": "string" },
+    { "name": "executedOn",            "type": "string" }
+  ]
+}

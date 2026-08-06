@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "ReturnReceived",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseReturns.Events.V1",
+  "fields": [
+    { "name": "eventId",         "type": "string" },
+    { "name": "returnReceiptId", "type": "string" },
+    { "name": "returnOrderId",   "type": "string" },
+    { "name": "warehouseId",     "type": "string" },
+    { "name": "receivedOn",      "type": "string" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "StockQuarantined",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1",
+  "fields": [
+    { "name": "eventId",       "type": "string" },
+    { "name": "productId",     "type": "string" },
+    { "name": "warehouseId",   "type": "string" },
+    { "name": "binId",         "type": "string" },
+    { "name": "quantity",      "type": "string" },
+    { "name": "lotNumber",     "type": "string" },
+    { "name": "quarantinedOn", "type": "string" }
+  ]
+}

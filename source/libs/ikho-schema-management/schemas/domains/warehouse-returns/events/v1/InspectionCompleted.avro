@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "InspectionCompleted",
+  "namespace": "Ikho.SchemaManagement.Contracts.WarehouseReturns.Events.V1",
+  "fields": [
+    { "name": "eventId",           "type": "string" },
+    { "name": "inspectionId",      "type": "string" },
+    { "name": "returnOrderId",     "type": "string" },
+    { "name": "returnOrderLineId", "type": "string" },
+    { "name": "result",            "type": "string" },
+    { "name": "inspectedOn",       "type": "string" }
+  ]
+}
