@@ -27,4 +27,11 @@ public sealed class MessageBrokerOptions
     /// so topics stay namespaced per owning service.
     /// </summary>
     public string TopicPrefix { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Kafka consumer group id used by <c>KafkaConsumerBackgroundService{TDbContext,TEvent}</c>.
+    /// Services that only publish (never consume) can leave this unset. When blank, consumers
+    /// fall back to <see cref="ClientId"/> as the group id.
+    /// </summary>
+    public string GroupId { get; set; } = string.Empty;
 }
