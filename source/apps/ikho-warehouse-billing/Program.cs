@@ -1,5 +1,6 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
+using Ikho.SharedLibrary.Options;
 using Ikho.Warehouse.Billing.Features.CreditNotes;
 using Ikho.Warehouse.Billing.Features.Invoices;
 using Ikho.Warehouse.Billing.Features.Payments;
@@ -9,8 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var databaseOptions = builder.Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
 builder.Services.AddDbContext<BillingDbContext>(options =>
-    options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
+    options.UseNpgsql(databaseOptions.ConnectionString));
 
 builder.Services.AddServiceDefaults<BillingDbContext>(builder.Configuration);
 builder.Services.AddServiceApiDocs();

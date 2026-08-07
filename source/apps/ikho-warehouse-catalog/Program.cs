@@ -1,5 +1,6 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
+using Ikho.SharedLibrary.Options;
 using Ikho.Warehouse.Catalog.Features.Brands;
 using Ikho.Warehouse.Catalog.Features.Categories;
 using Ikho.Warehouse.Catalog.Features.Products;
@@ -9,8 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var databaseOptions = builder.Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
 builder.Services.AddDbContext<CatalogDbContext>(options =>
-    options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
+    options.UseNpgsql(databaseOptions.ConnectionString));
 
 builder.Services.AddServiceDefaults<CatalogDbContext>(builder.Configuration);
 builder.Services.AddServiceApiDocs();

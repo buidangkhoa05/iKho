@@ -1,5 +1,6 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
+using Ikho.SharedLibrary.Options;
 using Ikho.Warehouse.Partner.Features.Customers;
 using Ikho.Warehouse.Partner.Features.Suppliers;
 using Ikho.Warehouse.Partner.Shared;
@@ -7,8 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var databaseOptions = builder.Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
 builder.Services.AddDbContext<PartnerDbContext>(options =>
-    options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
+    options.UseNpgsql(databaseOptions.ConnectionString));
 
 builder.Services.AddServiceDefaults<PartnerDbContext>(builder.Configuration);
 builder.Services.AddServiceApiDocs();

@@ -4,6 +4,7 @@ using Ikho.SchemaManagement.Contracts.WarehouseOutbound.Events.V1;
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
 using Ikho.SharedLibrary.Events;
+using Ikho.SharedLibrary.Options;
 using Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 using Ikho.Warehouse.Reporting.Features.InboundStatus;
 using Ikho.Warehouse.Reporting.Features.InboundStatus.Handlers;
@@ -16,8 +17,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var databaseOptions = builder.Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
 builder.Services.AddDbContext<ReportingDbContext>(options =>
-    options.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
+    options.UseNpgsql(databaseOptions.ConnectionString));
 
 // Wires health checks, the (unused-by-this-service) outbox publisher, and the idempotency
 // store the Kafka consumers below rely on. Reporting never enqueues outbox messages - see
