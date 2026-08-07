@@ -1,4 +1,4 @@
-namespace Ikho.WarehousePartner.Domain;
+namespace Ikho.Warehouse.Partner.Domain;
 
 /// <summary>
 /// A postal address belonging to exactly one <see cref="Supplier"/> or <see cref="Customer"/>

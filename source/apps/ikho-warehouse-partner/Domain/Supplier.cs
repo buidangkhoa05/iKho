@@ -1,4 +1,4 @@
-namespace Ikho.WarehousePartner.Domain;
+namespace Ikho.Warehouse.Partner.Domain;
 
 /// <summary>
 /// The supplier aggregate — a vendor that ships goods to the warehouse. Operational services

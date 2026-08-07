@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseOrganization.Features.Companies;
+namespace Ikho.Warehouse.Organization.Features.Companies;
 
 /// <summary>
 /// Minimal API endpoint mappings for the Companies feature.

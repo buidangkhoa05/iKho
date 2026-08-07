@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOrganization.Domain;
+namespace Ikho.Warehouse.Organization.Domain;
 
 /// <summary>
 /// A storage bin within an <see cref="Aisle"/> — the leaf node of the location hierarchy that

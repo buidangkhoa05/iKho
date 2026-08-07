@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInventory.Domain;
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Domain;
+using Ikho.Warehouse.Inventory.Shared;
 
-namespace Ikho.WarehouseInventory.Features.StockAdjustments;
+namespace Ikho.Warehouse.Inventory.Features.StockAdjustments;
 
 /// <summary>Distinguishes why an adjustment attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum AdjustStockOutcome

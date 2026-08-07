@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehouseInbound.Features.PurchaseOrders;
-using Ikho.WarehouseInbound.Features.Receipts;
-using Ikho.WarehouseInbound.Shared;
-using Ikho.WarehouseInbound.Shared.Clients;
+using Ikho.Warehouse.Inbound.Features.PurchaseOrders;
+using Ikho.Warehouse.Inbound.Features.Receipts;
+using Ikho.Warehouse.Inbound.Shared;
+using Ikho.Warehouse.Inbound.Shared.Clients;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

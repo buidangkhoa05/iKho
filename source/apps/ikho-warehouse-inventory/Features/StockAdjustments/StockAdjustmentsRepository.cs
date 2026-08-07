@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInventory.Domain;
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Domain;
+using Ikho.Warehouse.Inventory.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInventory.Features.StockAdjustments;
+namespace Ikho.Warehouse.Inventory.Features.StockAdjustments;
 
 /// <summary>Data access for the stock-adjustment flow: stock items, balances, adjustments, and the ledger.</summary>
 public interface IStockAdjustmentsRepository

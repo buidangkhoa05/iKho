@@ -1,11 +1,11 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehouseInventory.Features.StockAdjustments;
-using Ikho.WarehouseInventory.Features.StockBalances;
-using Ikho.WarehouseInventory.Features.StockReceipts;
-using Ikho.WarehouseInventory.Features.StockReservations;
-using Ikho.WarehouseInventory.Shared;
-using Ikho.WarehouseInventory.Shared.Clients;
+using Ikho.Warehouse.Inventory.Features.StockAdjustments;
+using Ikho.Warehouse.Inventory.Features.StockBalances;
+using Ikho.Warehouse.Inventory.Features.StockReceipts;
+using Ikho.Warehouse.Inventory.Features.StockReservations;
+using Ikho.Warehouse.Inventory.Shared;
+using Ikho.Warehouse.Inventory.Shared.Clients;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

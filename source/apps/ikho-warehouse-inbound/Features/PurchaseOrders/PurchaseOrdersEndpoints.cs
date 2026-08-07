@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseInbound.Features.PurchaseOrders;
+namespace Ikho.Warehouse.Inbound.Features.PurchaseOrders;
 
 /// <summary>Minimal API endpoint mappings for the PurchaseOrders feature.</summary>
 public static class PurchaseOrdersEndpoints

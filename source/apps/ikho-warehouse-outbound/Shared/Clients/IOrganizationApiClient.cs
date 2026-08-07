@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Shared.Clients;
+namespace Ikho.Warehouse.Outbound.Shared.Clients;
 
 /// <summary>The subset of the Organization service's warehouse data that Outbound needs.</summary>
 public sealed record OrganizationWarehouseInfo(Guid Id, Guid CompanyId, string Code, string Name, bool IsActive);

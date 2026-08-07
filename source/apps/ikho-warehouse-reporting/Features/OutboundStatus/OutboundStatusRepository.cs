@@ -1,8 +1,8 @@
-using Ikho.WarehouseReporting.Domain;
-using Ikho.WarehouseReporting.Shared;
+using Ikho.Warehouse.Reporting.Domain;
+using Ikho.Warehouse.Reporting.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseReporting.Features.OutboundStatus;
+namespace Ikho.Warehouse.Reporting.Features.OutboundStatus;
 
 /// <summary>Data access for the outbound-status read model, used by both the query endpoints and the projection handlers.</summary>
 public interface IOutboundStatusRepository

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Features.SalesOrders;
+namespace Ikho.Warehouse.Outbound.Features.SalesOrders;
 
 /// <summary>Request body for a single line within a <see cref="CreateSalesOrderRequest"/>.</summary>
 public sealed record SalesOrderLineRequest(Guid ProductId, decimal Quantity);

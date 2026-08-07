@@ -1,4 +1,4 @@
-namespace Ikho.WarehousePartner.Domain;
+namespace Ikho.Warehouse.Partner.Domain;
 
 /// <summary>
 /// A contact person belonging to exactly one <see cref="Supplier"/> or <see cref="Customer"/>

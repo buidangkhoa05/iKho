@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Domain;
+namespace Ikho.Warehouse.Inventory.Domain;
 
 /// <summary>The lifecycle state of a <see cref="StockReservation"/>.</summary>
 public enum ReservationStatus

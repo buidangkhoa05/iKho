@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Features.StockReservations;
+namespace Ikho.Warehouse.Inventory.Features.StockReservations;
 
 /// <summary>
 /// Request body to reserve stock for an outbound process. The reservation must resolve to a

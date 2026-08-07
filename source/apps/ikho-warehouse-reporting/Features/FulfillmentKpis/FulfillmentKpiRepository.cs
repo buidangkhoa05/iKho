@@ -1,8 +1,8 @@
-using Ikho.WarehouseReporting.Domain;
-using Ikho.WarehouseReporting.Shared;
+using Ikho.Warehouse.Reporting.Domain;
+using Ikho.Warehouse.Reporting.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseReporting.Features.FulfillmentKpis;
+namespace Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 
 /// <summary>Data access for the daily fulfillment-KPI read model, used by both the query endpoints and the projection handlers.</summary>
 public interface IFulfillmentKpiRepository

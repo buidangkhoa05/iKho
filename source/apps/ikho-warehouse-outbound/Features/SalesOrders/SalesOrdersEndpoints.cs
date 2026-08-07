@@ -1,7 +1,7 @@
-using Ikho.WarehouseOutbound.Shared;
+using Ikho.Warehouse.Outbound.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseOutbound.Features.SalesOrders;
+namespace Ikho.Warehouse.Outbound.Features.SalesOrders;
 
 /// <summary>Minimal API endpoint mappings for the SalesOrders feature.</summary>
 public static class SalesOrdersEndpoints

@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.SchemaManagement.Contracts.WarehouseOrganization.Events.V1;
-using Ikho.WarehouseOrganization.Domain;
+using Ikho.Warehouse.Organization.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOrganization.Features.Locations;
+namespace Ikho.Warehouse.Organization.Features.Locations;
 
 /// <summary>
 /// Result of a location creation attempt, distinguishing failure reasons so endpoints can

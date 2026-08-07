@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Domain;
+namespace Ikho.Warehouse.Catalog.Domain;
 
 /// <summary>
 /// A scannable barcode (EAN-13, UPC, QR, etc.) that resolves to a product.

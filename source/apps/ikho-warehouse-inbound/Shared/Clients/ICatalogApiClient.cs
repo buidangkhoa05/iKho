@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Shared.Clients;
+namespace Ikho.Warehouse.Inbound.Shared.Clients;
 
 /// <summary>
 /// The subset of the Catalog service's product data that Inbound needs to validate purchase-order

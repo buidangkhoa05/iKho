@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Domain;
+namespace Ikho.Warehouse.Inventory.Domain;
 
 /// <summary>
 /// Audit-trail record of a manual correction to a <see cref="StockItem"/>'s on-hand quantity.

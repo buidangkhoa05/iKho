@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Domain;
+namespace Ikho.Warehouse.Billing.Domain;
 
 /// <summary>Lifecycle status of an <see cref="Invoice"/>.</summary>
 public enum InvoiceStatus

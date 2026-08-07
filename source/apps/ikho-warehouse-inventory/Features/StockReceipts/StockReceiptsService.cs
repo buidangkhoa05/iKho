@@ -2,11 +2,11 @@ using System.Globalization;
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInventory.Domain;
-using Ikho.WarehouseInventory.Shared;
-using Ikho.WarehouseInventory.Shared.Clients;
+using Ikho.Warehouse.Inventory.Domain;
+using Ikho.Warehouse.Inventory.Shared;
+using Ikho.Warehouse.Inventory.Shared.Clients;
 
-namespace Ikho.WarehouseInventory.Features.StockReceipts;
+namespace Ikho.Warehouse.Inventory.Features.StockReceipts;
 
 /// <summary>Distinguishes why a receipt attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum ReceiveStockOutcome

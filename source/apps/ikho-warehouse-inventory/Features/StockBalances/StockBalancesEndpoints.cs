@@ -1,7 +1,7 @@
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseInventory.Features.StockBalances;
+namespace Ikho.Warehouse.Inventory.Features.StockBalances;
 
 /// <summary>Minimal API endpoint mappings for the StockBalances (read-only query) feature.</summary>
 public static class StockBalancesEndpoints

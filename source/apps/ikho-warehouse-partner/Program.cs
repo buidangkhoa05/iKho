@@ -1,8 +1,8 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehousePartner.Features.Customers;
-using Ikho.WarehousePartner.Features.Suppliers;
-using Ikho.WarehousePartner.Shared;
+using Ikho.Warehouse.Partner.Features.Customers;
+using Ikho.Warehouse.Partner.Features.Suppliers;
+using Ikho.Warehouse.Partner.Shared;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

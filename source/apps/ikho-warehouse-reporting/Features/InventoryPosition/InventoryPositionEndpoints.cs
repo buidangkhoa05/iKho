@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseReporting.Features.InventoryPosition;
+namespace Ikho.Warehouse.Reporting.Features.InventoryPosition;
 
 /// <summary>Minimal API endpoint mappings for the InventoryPosition (read-only query) feature.</summary>
 public static class InventoryPositionEndpoints

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReturns.Domain;
+namespace Ikho.Warehouse.Returns.Domain;
 
 /// <summary>Distinguishes whether a <see cref="ReturnOrder"/> originates from a customer or a supplier.</summary>
 public enum ReturnOrderType

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Features.Invoices;
+namespace Ikho.Warehouse.Billing.Features.Invoices;
 
 /// <summary>Request body for a single line on a new invoice.</summary>
 public sealed record InvoiceLineRequest(Guid ProductId, decimal Quantity, decimal UnitPrice);

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Domain;
+namespace Ikho.Warehouse.Billing.Domain;
 
 /// <summary>
 /// A single credited product line on a <see cref="CreditNote"/>. Snapshots the product's code and

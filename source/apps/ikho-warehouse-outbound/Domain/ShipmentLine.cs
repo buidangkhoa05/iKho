@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Domain;
+namespace Ikho.Warehouse.Outbound.Domain;
 
 /// <summary>A single fulfilled <see cref="Allocation"/> within a <see cref="Shipment"/>.</summary>
 public sealed class ShipmentLine

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Shared.Clients;
+namespace Ikho.Warehouse.Billing.Shared.Clients;
 
 /// <summary>
 /// The subset of the Catalog service's product data that Billing needs to validate invoice and

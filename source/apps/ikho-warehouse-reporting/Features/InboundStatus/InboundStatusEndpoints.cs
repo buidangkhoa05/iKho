@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseReporting.Features.InboundStatus;
+namespace Ikho.Warehouse.Reporting.Features.InboundStatus;
 
 /// <summary>Minimal API endpoint mappings for the InboundStatus (read-only query) feature.</summary>
 public static class InboundStatusEndpoints

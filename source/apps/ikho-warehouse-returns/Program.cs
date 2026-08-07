@@ -1,11 +1,11 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehouseReturns.Features.Dispositions;
-using Ikho.WarehouseReturns.Features.Inspections;
-using Ikho.WarehouseReturns.Features.ReturnOrders;
-using Ikho.WarehouseReturns.Features.ReturnReceipts;
-using Ikho.WarehouseReturns.Shared;
-using Ikho.WarehouseReturns.Shared.Clients;
+using Ikho.Warehouse.Returns.Features.Dispositions;
+using Ikho.Warehouse.Returns.Features.Inspections;
+using Ikho.Warehouse.Returns.Features.ReturnOrders;
+using Ikho.Warehouse.Returns.Features.ReturnReceipts;
+using Ikho.Warehouse.Returns.Shared;
+using Ikho.Warehouse.Returns.Shared.Clients;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

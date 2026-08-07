@@ -1,6 +1,6 @@
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Shared;
 
-namespace Ikho.WarehouseInventory.Features.StockBalances;
+namespace Ikho.Warehouse.Inventory.Features.StockBalances;
 
 /// <summary>
 /// Read-only query logic over stock balances, stock items, and the stock ledger. This feature

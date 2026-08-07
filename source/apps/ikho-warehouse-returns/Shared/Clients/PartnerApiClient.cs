@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Ikho.WarehouseReturns.Shared.Clients;
+namespace Ikho.Warehouse.Returns.Shared.Clients;
 
 /// <inheritdoc cref="IPartnerApiClient" />
 public sealed class PartnerApiClient(HttpClient httpClient) : IPartnerApiClient
@@ -40,8 +40,8 @@ public sealed class PartnerApiClient(HttpClient httpClient) : IPartnerApiClient
 
     /// <summary>
     /// Local mirror of only the fields Returns needs from Partner's
-    /// <c>Ikho.WarehousePartner.Features.Customers.CustomerResponse</c> and
-    /// <c>Ikho.WarehousePartner.Features.Suppliers.SupplierResponse</c> — both share the same
+    /// <c>Ikho.Warehouse.Partner.Features.Customers.CustomerResponse</c> and
+    /// <c>Ikho.Warehouse.Partner.Features.Suppliers.SupplierResponse</c> — both share the same
     /// shape for the fields Returns cares about.
     /// </summary>
     private sealed record PartnerPartyResponseShape(Guid Id, bool IsActive);

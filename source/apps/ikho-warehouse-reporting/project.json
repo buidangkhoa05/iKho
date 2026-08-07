@@ -1,12 +1,12 @@
 {
-  "name": "Ikho.WarehouseReporting",
+  "name": "Ikho.Warehouse.Reporting",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "docker-build": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker build -f docker/dotnet.Dockerfile --build-arg PROJECT_PATH=apps/ikho-warehouse-reporting/Ikho.WarehouseReporting.csproj --build-arg ASSEMBLY_NAME=Ikho.WarehouseReporting -t ikho/warehouse-reporting:local ."
+        "command": "docker build -f docker/dotnet.Dockerfile --build-arg PROJECT_PATH=apps/ikho-warehouse-reporting/Ikho.Warehouse.Reporting.csproj --build-arg ASSEMBLY_NAME=Ikho.Warehouse.Reporting -t ikho/warehouse-reporting:local ."
       },
       "metadata": {
         "description": "Build the Docker image for this service",

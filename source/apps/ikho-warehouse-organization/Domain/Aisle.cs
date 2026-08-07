@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOrganization.Domain;
+namespace Ikho.Warehouse.Organization.Domain;
 
 /// <summary>
 /// An aisle within a <see cref="Zone"/>. Groups bins for wayfinding and pick-path planning.

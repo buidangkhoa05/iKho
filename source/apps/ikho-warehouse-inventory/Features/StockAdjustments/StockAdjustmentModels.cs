@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Features.StockAdjustments;
+namespace Ikho.Warehouse.Inventory.Features.StockAdjustments;
 
 /// <summary>Request body to apply a manual correction to a stock item's on-hand quantity.</summary>
 public sealed record AdjustStockRequest(Guid StockItemId, decimal QuantityDelta, string ReasonCode, string Notes);

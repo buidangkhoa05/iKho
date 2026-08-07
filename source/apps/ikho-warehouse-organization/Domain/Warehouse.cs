@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOrganization.Domain;
+namespace Ikho.Warehouse.Organization.Domain;
 
 /// <summary>
 /// A physical warehouse belonging to exactly one <see cref="Company"/>. Owns zones, aisles,

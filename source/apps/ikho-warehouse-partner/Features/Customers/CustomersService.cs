@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehousePartner.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehousePartner.Domain;
+using Ikho.Warehouse.Partner.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehousePartner.Features.Customers;
+namespace Ikho.Warehouse.Partner.Features.Customers;
 
 /// <summary>
 /// Business logic for creating, updating, and reading customers, and managing their addresses

@@ -1,4 +1,4 @@
-namespace Ikho.WarehousePartner.Domain;
+namespace Ikho.Warehouse.Partner.Domain;
 
 /// <summary>
 /// The customer aggregate — a party that receives goods from the warehouse. Operational services

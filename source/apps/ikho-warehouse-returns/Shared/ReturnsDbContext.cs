@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseReturns.Domain;
+using Ikho.Warehouse.Returns.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseReturns.Shared;
+namespace Ikho.Warehouse.Returns.Shared;
 
 /// <summary>
 /// EF Core database context for the Returns service. Implements

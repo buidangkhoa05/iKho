@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.UnitsOfMeasure;
+namespace Ikho.Warehouse.Catalog.Features.UnitsOfMeasure;
 
 /// <summary>Business logic for creating and updating units of measure.</summary>
 public sealed class UnitsOfMeasureService(IUomRepository repository)

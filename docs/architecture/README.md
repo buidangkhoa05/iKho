@@ -53,15 +53,15 @@ C4Container
         Container(gateway, "Ikho.ApiGateway", ".NET 10 / YARP", "Single entry point: routing, CORS, JWT auth scaffolding, rate limiting, correlation IDs, request logging")
         Container(api, "Ikho.SharedLibrary", ".NET 10 Minimal API", "Backend REST API (Vertical Slice Architecture)")
         Container(schema, "Ikho.SchemaManagement", ".NET library + codegen CLI", "Generates C# contracts from JSON Schema/Avro definitions, referenced by Ikho.SharedLibrary at build time")
-        Container(orgsvc, "Ikho.WarehouseOrganization", ".NET 10 Minimal API", "Warehouse structure service owning companies, warehouses, bins, and docks")
-        Container(catalogsvc, "Ikho.WarehouseCatalog", ".NET 10 Minimal API", "Product master-data service for products, categories, brands, UOMs, and barcodes")
-        Container(partnersvc, "Ikho.WarehousePartner", ".NET 10 Minimal API", "Supplier and customer master-data service")
-        Container(inventorysvc, "Ikho.WarehouseInventory", ".NET 10 Minimal API", "Stock system of record owning ledger, lots, serials, and reservations")
-        Container(inboundsvc, "Ikho.WarehouseInbound", ".NET 10 Minimal API", "Receiving and putaway workflow service")
-        Container(outboundsvc, "Ikho.WarehouseOutbound", ".NET 10 Minimal API", "Allocation, picking, packing, and shipping workflow service")
-        Container(returnssvc, "Ikho.WarehouseReturns", ".NET 10 Minimal API", "Reverse-logistics and disposition service")
-        Container(billingsvc, "Ikho.WarehouseBilling", ".NET 10 Minimal API", "Billing and financial snapshot service")
-        Container(reportingsvc, "Ikho.WarehouseReporting", ".NET 10 Minimal API", "Kafka-driven projection/read-model service for dashboards and analytics")
+        Container(orgsvc, "Ikho.Warehouse.Organization", ".NET 10 Minimal API", "Warehouse structure service owning companies, warehouses, bins, and docks")
+        Container(catalogsvc, "Ikho.Warehouse.Catalog", ".NET 10 Minimal API", "Product master-data service for products, categories, brands, UOMs, and barcodes")
+        Container(partnersvc, "Ikho.Warehouse.Partner", ".NET 10 Minimal API", "Supplier and customer master-data service")
+        Container(inventorysvc, "Ikho.Warehouse.Inventory", ".NET 10 Minimal API", "Stock system of record owning ledger, lots, serials, and reservations")
+        Container(inboundsvc, "Ikho.Warehouse.Inbound", ".NET 10 Minimal API", "Receiving and putaway workflow service")
+        Container(outboundsvc, "Ikho.Warehouse.Outbound", ".NET 10 Minimal API", "Allocation, picking, packing, and shipping workflow service")
+        Container(returnssvc, "Ikho.Warehouse.Returns", ".NET 10 Minimal API", "Reverse-logistics and disposition service")
+        Container(billingsvc, "Ikho.Warehouse.Billing", ".NET 10 Minimal API", "Billing and financial snapshot service")
+        Container(reportingsvc, "Ikho.Warehouse.Reporting", ".NET 10 Minimal API", "Kafka-driven projection/read-model service for dashboards and analytics")
     }
 
     Rel(user, ui, "Uses", "HTTPS")
@@ -96,15 +96,15 @@ C4Container
 | `Ikho.ApiGateway` | [source/apps/ikho-api-gateway](../../source/apps/ikho-api-gateway) | 5080 / 7080 |
 | `Ikho.SharedLibrary` | [source/libs/ikho-shared-library](../../source/libs/ikho-shared-library) | 5143 / 7270 |
 | `Ikho.SchemaManagement` | [source/libs/ikho-schema-management](../../source/libs/ikho-schema-management) | — (build-time codegen, not a running service) |
-| `Ikho.WarehouseOrganization` | [source/apps/ikho-warehouse-organization](../../source/apps/ikho-warehouse-organization) | 5151 |
-| `Ikho.WarehouseCatalog` | [source/apps/ikho-warehouse-catalog](../../source/apps/ikho-warehouse-catalog) | 5152 |
-| `Ikho.WarehousePartner` | [source/apps/ikho-warehouse-partner](../../source/apps/ikho-warehouse-partner) | 5153 |
-| `Ikho.WarehouseInventory` | [source/apps/ikho-warehouse-inventory](../../source/apps/ikho-warehouse-inventory) | 5154 |
-| `Ikho.WarehouseInbound` | [source/apps/ikho-warehouse-inbound](../../source/apps/ikho-warehouse-inbound) | 5155 |
-| `Ikho.WarehouseOutbound` | [source/apps/ikho-warehouse-outbound](../../source/apps/ikho-warehouse-outbound) | 5156 |
-| `Ikho.WarehouseReturns` | [source/apps/ikho-warehouse-returns](../../source/apps/ikho-warehouse-returns) | 5157 |
-| `Ikho.WarehouseBilling` | [source/apps/ikho-warehouse-billing](../../source/apps/ikho-warehouse-billing) | 5158 |
-| `Ikho.WarehouseReporting` | [source/apps/ikho-warehouse-reporting](../../source/apps/ikho-warehouse-reporting) | 5159 |
+| `Ikho.Warehouse.Organization` | [source/apps/ikho-warehouse-organization](../../source/apps/ikho-warehouse-organization) | 5151 |
+| `Ikho.Warehouse.Catalog` | [source/apps/ikho-warehouse-catalog](../../source/apps/ikho-warehouse-catalog) | 5152 |
+| `Ikho.Warehouse.Partner` | [source/apps/ikho-warehouse-partner](../../source/apps/ikho-warehouse-partner) | 5153 |
+| `Ikho.Warehouse.Inventory` | [source/apps/ikho-warehouse-inventory](../../source/apps/ikho-warehouse-inventory) | 5154 |
+| `Ikho.Warehouse.Inbound` | [source/apps/ikho-warehouse-inbound](../../source/apps/ikho-warehouse-inbound) | 5155 |
+| `Ikho.Warehouse.Outbound` | [source/apps/ikho-warehouse-outbound](../../source/apps/ikho-warehouse-outbound) | 5156 |
+| `Ikho.Warehouse.Returns` | [source/apps/ikho-warehouse-returns](../../source/apps/ikho-warehouse-returns) | 5157 |
+| `Ikho.Warehouse.Billing` | [source/apps/ikho-warehouse-billing](../../source/apps/ikho-warehouse-billing) | 5158 |
+| `Ikho.Warehouse.Reporting` | [source/apps/ikho-warehouse-reporting](../../source/apps/ikho-warehouse-reporting) | 5159 |
 
 ### Running the containers
 

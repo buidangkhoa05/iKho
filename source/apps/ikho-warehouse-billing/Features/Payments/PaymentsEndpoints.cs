@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseBilling.Features.Payments;
+namespace Ikho.Warehouse.Billing.Features.Payments;
 
 /// <summary>Minimal API endpoint mappings for the Payments feature.</summary>
 public static class PaymentsEndpoints

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Shared.Clients;
+namespace Ikho.Warehouse.Inventory.Shared.Clients;
 
 /// <summary>
 /// The subset of the Catalog service's product data that Inventory needs to validate stock

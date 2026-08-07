@@ -1,8 +1,8 @@
 using Ikho.SharedLibrary;
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseInventory.Features.StockAdjustments;
+namespace Ikho.Warehouse.Inventory.Features.StockAdjustments;
 
 /// <summary>Minimal API endpoint mappings for the StockAdjustments feature.</summary>
 public static class StockAdjustmentsEndpoints

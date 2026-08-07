@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReturns.Domain;
+namespace Ikho.Warehouse.Returns.Domain;
 
 /// <summary>Outcome of physically inspecting a returned <see cref="ReturnOrderLine"/>.</summary>
 public enum InspectionResult

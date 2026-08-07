@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Domain;
+namespace Ikho.Warehouse.Reporting.Domain;
 
 /// <summary>
 /// One row per UTC calendar day, accumulating simple fulfillment counters across the whole

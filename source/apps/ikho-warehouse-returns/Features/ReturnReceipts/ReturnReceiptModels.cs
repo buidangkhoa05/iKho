@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReturns.Features.ReturnReceipts;
+namespace Ikho.Warehouse.Returns.Features.ReturnReceipts;
 
 /// <summary>Request body to record a return receipt against a return order.</summary>
 public sealed record CreateReturnReceiptRequest(string? Notes);

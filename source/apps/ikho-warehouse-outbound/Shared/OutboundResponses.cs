@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Shared;
+namespace Ikho.Warehouse.Outbound.Shared;
 
 /// <summary>Response DTO for a <see cref="Domain.SalesOrderLine"/>.</summary>
 public sealed record SalesOrderLineResponse(

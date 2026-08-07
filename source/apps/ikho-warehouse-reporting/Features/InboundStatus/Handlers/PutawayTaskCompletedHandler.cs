@@ -1,8 +1,8 @@
 using Ikho.SchemaManagement.Contracts.WarehouseInbound.Events.V1;
 using Ikho.SharedLibrary.Events;
-using Ikho.WarehouseReporting.Domain;
+using Ikho.Warehouse.Reporting.Domain;
 
-namespace Ikho.WarehouseReporting.Features.InboundStatus.Handlers;
+namespace Ikho.Warehouse.Reporting.Features.InboundStatus.Handlers;
 
 /// <summary>
 /// Projects the Inbound service's <c>PutawayTaskCompleted</c> event onto the inbound-status read

@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseOrganization.Domain;
+using Ikho.Warehouse.Organization.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOrganization.Shared;
+namespace Ikho.Warehouse.Organization.Shared;
 
 /// <summary>
 /// EF Core database context for the Organization service. Implements
@@ -22,7 +22,7 @@ public sealed class OrganizationDbContext(DbContextOptions<OrganizationDbContext
     /// <summary>
     /// Warehouses owned by a company.
     /// </summary>
-    public DbSet<Warehouse> Warehouses => Set<Warehouse>();
+    public DbSet<Domain.Warehouse> Warehouses => Set<Domain.Warehouse>();
 
     /// <summary>
     /// Zones owned by a warehouse.
@@ -64,7 +64,7 @@ public sealed class OrganizationDbContext(DbContextOptions<OrganizationDbContext
             entity.HasIndex(c => c.Code).IsUnique();
         });
 
-        modelBuilder.Entity<Warehouse>(entity =>
+        modelBuilder.Entity<Domain.Warehouse>(entity =>
         {
             entity.HasKey(w => w.Id);
             entity.Property(w => w.Code).IsRequired().HasMaxLength(32);

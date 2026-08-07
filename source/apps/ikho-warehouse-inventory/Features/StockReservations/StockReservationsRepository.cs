@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInventory.Domain;
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Domain;
+using Ikho.Warehouse.Inventory.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInventory.Features.StockReservations;
+namespace Ikho.Warehouse.Inventory.Features.StockReservations;
 
 /// <summary>Data access for the stock-reservation flow: stock item selection, balances, reservations, and the ledger.</summary>
 public interface IStockReservationsRepository

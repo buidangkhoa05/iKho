@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Domain;
+namespace Ikho.Warehouse.Inventory.Domain;
 
 /// <summary>
 /// Materialized rollup of stock quantities per <c>(ProductId, WarehouseId)</c>, maintained

@@ -2,9 +2,9 @@ using System.Globalization;
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseBilling.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseBilling.Domain;
+using Ikho.Warehouse.Billing.Domain;
 
-namespace Ikho.WarehouseBilling.Features.Payments;
+namespace Ikho.Warehouse.Billing.Features.Payments;
 
 /// <summary>Distinguishes why a payment-recording attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum RecordPaymentOutcome

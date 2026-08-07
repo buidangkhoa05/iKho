@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Domain;
+namespace Ikho.Warehouse.Reporting.Domain;
 
 /// <summary>
 /// Denormalized rollup of a product's stock position within a single warehouse, keyed by

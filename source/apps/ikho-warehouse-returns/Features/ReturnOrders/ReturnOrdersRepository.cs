@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseReturns.Domain;
-using Ikho.WarehouseReturns.Shared;
+using Ikho.Warehouse.Returns.Domain;
+using Ikho.Warehouse.Returns.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseReturns.Features.ReturnOrders;
+namespace Ikho.Warehouse.Returns.Features.ReturnOrders;
 
 /// <summary>Data access for the ReturnOrders feature.</summary>
 public interface IReturnOrdersRepository

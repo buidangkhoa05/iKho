@@ -23,15 +23,15 @@ Warehouse systems are relationship-heavy, but microservices do not work well whe
 
 | Service | Database Purpose | Typical Storage |
 |---|---|---|
-| `Ikho.WarehouseOrganization` | Physical structure and warehouse master data | Company, Warehouse, Zone, Aisle, Bin, Dock |
-| `Ikho.WarehouseCatalog` | Product master and classification data | Product, Category, Brand, UOM, Variant, Barcode |
-| `Ikho.WarehousePartner` | Supplier and customer master data | Supplier, Customer, Address, Contact |
-| `Ikho.WarehouseInventory` | Stock truth and movement history | Stock balance, ledger, lot, serial, reservation |
-| `Ikho.WarehouseInbound` | Inbound workflow and receiving records | Purchase order, receipt, putaway task |
-| `Ikho.WarehouseOutbound` | Outbound workflow and shipping records | Sales order, allocation, shipment |
-| `Ikho.WarehouseReturns` | Reverse logistics and return resolution | Return order, inspection, disposition |
-| `Ikho.WarehouseBilling` | Financial snapshots and documents | Invoice, credit note, payment |
-| `Ikho.WarehouseReporting` | Cross-service projections and KPIs | Read models and aggregates |
+| `Ikho.Warehouse.Organization` | Physical structure and warehouse master data | Company, Warehouse, Zone, Aisle, Bin, Dock |
+| `Ikho.Warehouse.Catalog` | Product master and classification data | Product, Category, Brand, UOM, Variant, Barcode |
+| `Ikho.Warehouse.Partner` | Supplier and customer master data | Supplier, Customer, Address, Contact |
+| `Ikho.Warehouse.Inventory` | Stock truth and movement history | Stock balance, ledger, lot, serial, reservation |
+| `Ikho.Warehouse.Inbound` | Inbound workflow and receiving records | Purchase order, receipt, putaway task |
+| `Ikho.Warehouse.Outbound` | Outbound workflow and shipping records | Sales order, allocation, shipment |
+| `Ikho.Warehouse.Returns` | Reverse logistics and return resolution | Return order, inspection, disposition |
+| `Ikho.Warehouse.Billing` | Financial snapshots and documents | Invoice, credit note, payment |
+| `Ikho.Warehouse.Reporting` | Cross-service projections and KPIs | Read models and aggregates |
 
 ## Ownership Matrix
 

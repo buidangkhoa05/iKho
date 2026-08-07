@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseCatalog.Domain;
-using Ikho.WarehouseCatalog.Shared;
+using Ikho.Warehouse.Catalog.Domain;
+using Ikho.Warehouse.Catalog.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.Categories;
+namespace Ikho.Warehouse.Catalog.Features.Categories;
 
 /// <summary>Data access for <see cref="Category"/>.</summary>
 public interface ICategoryRepository

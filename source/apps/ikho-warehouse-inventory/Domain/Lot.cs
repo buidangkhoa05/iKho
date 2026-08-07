@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Domain;
+namespace Ikho.Warehouse.Inventory.Domain;
 
 /// <summary>
 /// A receiving batch of a lot-controlled product, identified by a lot number unique per

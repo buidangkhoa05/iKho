@@ -1,6 +1,6 @@
-using Ikho.WarehouseReturns.Domain;
+using Ikho.Warehouse.Returns.Domain;
 
-namespace Ikho.WarehouseReturns.Features.Inspections;
+namespace Ikho.Warehouse.Returns.Features.Inspections;
 
 /// <summary>Request body to record an inspection outcome for a return order line.</summary>
 public sealed record CreateInspectionRequest(InspectionResult Result, string? Notes);

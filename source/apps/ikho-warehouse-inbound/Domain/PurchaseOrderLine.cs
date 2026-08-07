@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Domain;
+namespace Ikho.Warehouse.Inbound.Domain;
 
 /// <summary>
 /// A single ordered product line on a <see cref="PurchaseOrder"/>. Snapshots the product's SKU

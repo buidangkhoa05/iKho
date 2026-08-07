@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary;
-using Ikho.WarehouseOutbound.Shared;
+using Ikho.Warehouse.Outbound.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseOutbound.Features.Shipments;
+namespace Ikho.Warehouse.Outbound.Features.Shipments;
 
 /// <summary>Minimal API endpoint mappings for the Shipments feature.</summary>
 public static class ShipmentsEndpoints

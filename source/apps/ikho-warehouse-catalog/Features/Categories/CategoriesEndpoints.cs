@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseCatalog.Features.Categories;
+namespace Ikho.Warehouse.Catalog.Features.Categories;
 
 /// <summary>
 /// Minimal API endpoint mappings for the Categories feature.

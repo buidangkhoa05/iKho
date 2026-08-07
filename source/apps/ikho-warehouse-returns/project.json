@@ -1,12 +1,12 @@
 {
-  "name": "Ikho.WarehouseReturns",
+  "name": "Ikho.Warehouse.Returns",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "docker-build": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker build -f docker/dotnet.Dockerfile --build-arg PROJECT_PATH=apps/ikho-warehouse-returns/Ikho.WarehouseReturns.csproj --build-arg ASSEMBLY_NAME=Ikho.WarehouseReturns -t ikho/warehouse-returns:local ."
+        "command": "docker build -f docker/dotnet.Dockerfile --build-arg PROJECT_PATH=apps/ikho-warehouse-returns/Ikho.Warehouse.Returns.csproj --build-arg ASSEMBLY_NAME=Ikho.Warehouse.Returns -t ikho/warehouse-returns:local ."
       },
       "metadata": {
         "description": "Build the Docker image for this service",

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Features.StockReceipts;
+namespace Ikho.Warehouse.Inventory.Features.StockReceipts;
 
 /// <summary>
 /// Request body to receive stock into a bin. <see cref="LotNumber"/> is required when the

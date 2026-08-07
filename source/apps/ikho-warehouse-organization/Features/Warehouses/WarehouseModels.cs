@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOrganization.Features.Warehouses;
+namespace Ikho.Warehouse.Organization.Features.Warehouses;
 
 /// <summary>
 /// Request body to create a new <see cref="Domain.Warehouse"/>.

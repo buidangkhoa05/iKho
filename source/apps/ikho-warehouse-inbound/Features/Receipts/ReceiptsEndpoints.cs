@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseInbound.Features.Receipts;
+namespace Ikho.Warehouse.Inbound.Features.Receipts;
 
 /// <summary>Minimal API endpoint mappings for the Receipts feature.</summary>
 public static class ReceiptsEndpoints

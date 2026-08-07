@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Features.Receipts;
+namespace Ikho.Warehouse.Inbound.Features.Receipts;
 
 /// <summary>Request body for a single line being received against a purchase order line.</summary>
 public sealed record ReceiptLineRequest(

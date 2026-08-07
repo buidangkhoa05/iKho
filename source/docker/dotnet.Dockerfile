@@ -6,8 +6,8 @@
 # the two build args below select which project actually gets published:
 #
 #   docker build -f docker/dotnet.Dockerfile \
-#     --build-arg PROJECT_PATH=apps/ikho-warehouse-organization/Ikho.WarehouseOrganization.csproj \
-#     --build-arg ASSEMBLY_NAME=Ikho.WarehouseOrganization \
+#     --build-arg PROJECT_PATH=apps/ikho-warehouse-organization/Ikho.Warehouse.Organization.csproj \
+#     --build-arg ASSEMBLY_NAME=Ikho.Warehouse.Organization \
 #     -t ikho/warehouse-organization:local .
 #
 # docker-compose.yml drives this for every service; see the per-project

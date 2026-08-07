@@ -8,15 +8,15 @@ The warehouse domain is split into capability-based bounded contexts.
 
 | Bounded Context | Proposed Service | Primary Purpose |
 |---|---|---|
-| Organization | `Ikho.WarehouseOrganization` | Physical operating structure and location hierarchy |
-| Catalog | `Ikho.WarehouseCatalog` | Product master data and classification |
-| Partner | `Ikho.WarehousePartner` | Suppliers, customers, and their contact model |
-| Inventory | `Ikho.WarehouseInventory` | Stock truth and quantity state |
-| Inbound | `Ikho.WarehouseInbound` | Receiving workflow and putaway initiation |
-| Outbound | `Ikho.WarehouseOutbound` | Fulfillment workflow and shipping |
-| Returns | `Ikho.WarehouseReturns` | Reverse logistics and disposition |
-| Billing | `Ikho.WarehouseBilling` | Financial documents derived from warehouse operations |
-| Reporting | `Ikho.WarehouseReporting` | Cross-service read models and analytics |
+| Organization | `Ikho.Warehouse.Organization` | Physical operating structure and location hierarchy |
+| Catalog | `Ikho.Warehouse.Catalog` | Product master data and classification |
+| Partner | `Ikho.Warehouse.Partner` | Suppliers, customers, and their contact model |
+| Inventory | `Ikho.Warehouse.Inventory` | Stock truth and quantity state |
+| Inbound | `Ikho.Warehouse.Inbound` | Receiving workflow and putaway initiation |
+| Outbound | `Ikho.Warehouse.Outbound` | Fulfillment workflow and shipping |
+| Returns | `Ikho.Warehouse.Returns` | Reverse logistics and disposition |
+| Billing | `Ikho.Warehouse.Billing` | Financial documents derived from warehouse operations |
+| Reporting | `Ikho.Warehouse.Reporting` | Cross-service read models and analytics |
 
 ## Domain Principles
 

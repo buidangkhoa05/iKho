@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOrganization.Domain;
+namespace Ikho.Warehouse.Organization.Domain;
 
 /// <summary>
 /// A tenant-level company that owns one or more warehouses. The top of the Organization

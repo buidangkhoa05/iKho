@@ -1,8 +1,8 @@
-using Ikho.WarehouseOutbound.Domain;
-using Ikho.WarehouseOutbound.Shared;
-using Ikho.WarehouseOutbound.Shared.Clients;
+using Ikho.Warehouse.Outbound.Domain;
+using Ikho.Warehouse.Outbound.Shared;
+using Ikho.Warehouse.Outbound.Shared.Clients;
 
-namespace Ikho.WarehouseOutbound.Features.SalesOrders;
+namespace Ikho.Warehouse.Outbound.Features.SalesOrders;
 
 /// <summary>Distinguishes why a sales-order creation attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum CreateSalesOrderOutcome

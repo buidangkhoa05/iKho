@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInventory.Domain;
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Domain;
+using Ikho.Warehouse.Inventory.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInventory.Features.StockReceipts;
+namespace Ikho.Warehouse.Inventory.Features.StockReceipts;
 
 /// <summary>Data access for the stock-receipt flow: lots, serial numbers, stock items, balances, and the ledger.</summary>
 public interface IStockReceiptsRepository

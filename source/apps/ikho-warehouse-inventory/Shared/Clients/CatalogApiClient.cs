@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Ikho.WarehouseInventory.Shared.Clients;
+namespace Ikho.Warehouse.Inventory.Shared.Clients;
 
 /// <inheritdoc cref="ICatalogApiClient" />
 public sealed class CatalogApiClient(HttpClient httpClient) : ICatalogApiClient
@@ -26,7 +26,7 @@ public sealed class CatalogApiClient(HttpClient httpClient) : ICatalogApiClient
 
     /// <summary>
     /// Local mirror of only the fields Inventory needs from Catalog's
-    /// <c>Ikho.WarehouseCatalog.Features.Products.ProductResponse</c>. Deserializing loosely
+    /// <c>Ikho.Warehouse.Catalog.Features.Products.ProductResponse</c>. Deserializing loosely
     /// against a narrow local shape means unrelated fields added to the Catalog response never
     /// break this client.
     /// </summary>

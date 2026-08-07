@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehousePartner.Features.Customers;
+namespace Ikho.Warehouse.Partner.Features.Customers;
 
 /// <summary>
 /// Minimal API endpoint mappings for the Customers feature, including address and contact

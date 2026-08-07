@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Features.Brands;
+namespace Ikho.Warehouse.Catalog.Features.Brands;
 
 /// <summary>Request body to create a new brand.</summary>
 public sealed record CreateBrandRequest(string Code, string Name);

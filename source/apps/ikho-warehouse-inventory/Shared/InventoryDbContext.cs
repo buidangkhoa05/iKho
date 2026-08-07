@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInventory.Domain;
+using Ikho.Warehouse.Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInventory.Shared;
+namespace Ikho.Warehouse.Inventory.Shared;
 
 /// <summary>
 /// EF Core database context for the Inventory service. Implements

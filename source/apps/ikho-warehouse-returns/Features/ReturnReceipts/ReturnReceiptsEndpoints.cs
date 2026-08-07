@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseReturns.Features.ReturnReceipts;
+namespace Ikho.Warehouse.Returns.Features.ReturnReceipts;
 
 /// <summary>Minimal API endpoint mappings for the ReturnReceipts feature.</summary>
 public static class ReturnReceiptsEndpoints

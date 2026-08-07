@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Features.InventoryPosition;
+namespace Ikho.Warehouse.Reporting.Features.InventoryPosition;
 
 /// <summary>
 /// Read-only query logic over the inventory-position read model. This feature's endpoints never

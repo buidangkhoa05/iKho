@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Ikho.WarehouseInbound.Shared.Clients;
+namespace Ikho.Warehouse.Inbound.Shared.Clients;
 
 /// <inheritdoc cref="IInventoryApiClient" />
 public sealed class InventoryApiClient(HttpClient httpClient) : IInventoryApiClient
@@ -46,7 +46,7 @@ public sealed class InventoryApiClient(HttpClient httpClient) : IInventoryApiCli
 
     /// <summary>
     /// Local mirror of Inventory's
-    /// <c>Ikho.WarehouseInventory.Features.StockReceipts.ReceiveStockRequest</c>.
+    /// <c>Ikho.Warehouse.Inventory.Features.StockReceipts.ReceiveStockRequest</c>.
     /// </summary>
     private sealed record ReceiveStockRequestShape(
         Guid ProductId,
@@ -59,7 +59,7 @@ public sealed class InventoryApiClient(HttpClient httpClient) : IInventoryApiCli
 
     /// <summary>
     /// Local mirror of only the fields Inbound needs from Inventory's
-    /// <c>Ikho.WarehouseInventory.Shared.StockItemResponse</c>.
+    /// <c>Ikho.Warehouse.Inventory.Shared.StockItemResponse</c>.
     /// </summary>
     private sealed record StockItemResponseShape(Guid Id, Guid ProductId, Guid WarehouseId, Guid BinId, decimal OnHandQuantity);
 }

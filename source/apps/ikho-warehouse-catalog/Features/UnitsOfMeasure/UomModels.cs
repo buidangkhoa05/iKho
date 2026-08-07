@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Features.UnitsOfMeasure;
+namespace Ikho.Warehouse.Catalog.Features.UnitsOfMeasure;
 
 /// <summary>Request body to create a new unit of measure.</summary>
 public sealed record CreateUomRequest(string Code, string Name);

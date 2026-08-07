@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Shared.Clients;
+namespace Ikho.Warehouse.Inbound.Shared.Clients;
 
 /// <summary>Distinguishes why a call to Inventory's receive-stock command did or did not succeed.</summary>
 public enum InventoryReceiveOutcome

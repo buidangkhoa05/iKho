@@ -1,8 +1,8 @@
-using Ikho.WarehouseInbound.Domain;
-using Ikho.WarehouseInbound.Shared;
+using Ikho.Warehouse.Inbound.Domain;
+using Ikho.Warehouse.Inbound.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInbound.Features.PurchaseOrders;
+namespace Ikho.Warehouse.Inbound.Features.PurchaseOrders;
 
 /// <summary>Data access for the PurchaseOrders feature.</summary>
 public interface IPurchaseOrdersRepository

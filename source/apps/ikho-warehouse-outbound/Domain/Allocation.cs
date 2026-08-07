@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Domain;
+namespace Ikho.Warehouse.Outbound.Domain;
 
 /// <summary>The lifecycle state of an <see cref="Allocation"/>.</summary>
 public enum AllocationStatus

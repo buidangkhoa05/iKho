@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseReturns.Features.ReturnOrders;
+namespace Ikho.Warehouse.Returns.Features.ReturnOrders;
 
 /// <summary>Minimal API endpoint mappings for the ReturnOrders feature.</summary>
 public static class ReturnOrdersEndpoints

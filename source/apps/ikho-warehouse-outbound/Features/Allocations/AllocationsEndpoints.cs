@@ -1,8 +1,8 @@
 using Ikho.SharedLibrary;
-using Ikho.WarehouseOutbound.Shared;
+using Ikho.Warehouse.Outbound.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseOutbound.Features.Allocations;
+namespace Ikho.Warehouse.Outbound.Features.Allocations;
 
 /// <summary>Minimal API endpoint mappings for the Allocations feature.</summary>
 public static class AllocationsEndpoints

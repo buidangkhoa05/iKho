@@ -2,11 +2,11 @@ using System.Globalization;
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseOutbound.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseOutbound.Domain;
-using Ikho.WarehouseOutbound.Shared;
-using Ikho.WarehouseOutbound.Shared.Clients;
+using Ikho.Warehouse.Outbound.Domain;
+using Ikho.Warehouse.Outbound.Shared;
+using Ikho.Warehouse.Outbound.Shared.Clients;
 
-namespace Ikho.WarehouseOutbound.Features.Allocations;
+namespace Ikho.Warehouse.Outbound.Features.Allocations;
 
 /// <summary>Distinguishes why an allocation attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum AllocateSalesOrderOutcome

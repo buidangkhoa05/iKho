@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Features.InboundStatus;
+namespace Ikho.Warehouse.Reporting.Features.InboundStatus;
 
 /// <summary>
 /// Read-only query logic over the inbound-status read model. This feature's endpoints never

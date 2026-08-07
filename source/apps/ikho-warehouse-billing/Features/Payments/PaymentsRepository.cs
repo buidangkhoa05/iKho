@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseBilling.Domain;
-using Ikho.WarehouseBilling.Shared;
+using Ikho.Warehouse.Billing.Domain;
+using Ikho.Warehouse.Billing.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseBilling.Features.Payments;
+namespace Ikho.Warehouse.Billing.Features.Payments;
 
 /// <summary>Data access for the Payments feature: invoices (for validation/mutation) and payments.</summary>
 public interface IPaymentsRepository

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Ikho.WarehouseOutbound.Shared.Clients;
+namespace Ikho.Warehouse.Outbound.Shared.Clients;
 
 /// <inheritdoc cref="IPartnerApiClient" />
 public sealed class PartnerApiClient(HttpClient httpClient) : IPartnerApiClient
@@ -26,7 +26,7 @@ public sealed class PartnerApiClient(HttpClient httpClient) : IPartnerApiClient
 
     /// <summary>
     /// Local mirror of only the fields Outbound needs from Partner's
-    /// <c>Ikho.WarehousePartner.Features.Customers.CustomerResponse</c>.
+    /// <c>Ikho.Warehouse.Partner.Features.Customers.CustomerResponse</c>.
     /// </summary>
     private sealed record PartnerCustomerResponseShape(Guid Id, string Code, string Name, bool IsActive);
 }

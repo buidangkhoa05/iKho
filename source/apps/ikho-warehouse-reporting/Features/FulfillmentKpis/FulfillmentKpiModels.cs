@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Features.FulfillmentKpis;
+namespace Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 
 /// <summary>Response DTO for a <see cref="Domain.FulfillmentKpiReadModel"/>.</summary>
 public sealed record FulfillmentKpiResponse(

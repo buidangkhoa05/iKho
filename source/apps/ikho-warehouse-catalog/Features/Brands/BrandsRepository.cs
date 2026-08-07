@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseCatalog.Domain;
-using Ikho.WarehouseCatalog.Shared;
+using Ikho.Warehouse.Catalog.Domain;
+using Ikho.Warehouse.Catalog.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.Brands;
+namespace Ikho.Warehouse.Catalog.Features.Brands;
 
 /// <summary>Data access for <see cref="Brand"/>.</summary>
 public interface IBrandRepository

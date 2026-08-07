@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Domain;
+namespace Ikho.Warehouse.Inbound.Domain;
 
 /// <summary>
 /// A single received quantity against one <see cref="PurchaseOrderLine"/>, put away into a

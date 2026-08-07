@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseOrganization.Domain;
-using Ikho.WarehouseOrganization.Shared;
+using Ikho.Warehouse.Organization.Domain;
+using Ikho.Warehouse.Organization.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOrganization.Features.Companies;
+namespace Ikho.Warehouse.Organization.Features.Companies;
 
 /// <summary>
 /// Data access for <see cref="Company"/>.

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Shared.Clients;
+namespace Ikho.Warehouse.Inventory.Shared.Clients;
 
 /// <summary>Result of asking the Organization service whether a bin is currently usable.</summary>
 public sealed record BinValidationInfo(bool IsValid, string? Reason)

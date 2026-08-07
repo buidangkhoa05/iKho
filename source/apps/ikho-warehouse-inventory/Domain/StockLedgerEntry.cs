@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Domain;
+namespace Ikho.Warehouse.Inventory.Domain;
 
 /// <summary>The kind of operation that produced a <see cref="StockLedgerEntry"/>.</summary>
 public enum StockMovementType

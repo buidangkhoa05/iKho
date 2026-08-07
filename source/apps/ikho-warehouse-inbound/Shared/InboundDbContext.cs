@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInbound.Domain;
+using Ikho.Warehouse.Inbound.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInbound.Shared;
+namespace Ikho.Warehouse.Inbound.Shared;
 
 /// <summary>
 /// EF Core database context for the Inbound service. Implements

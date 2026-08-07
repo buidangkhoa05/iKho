@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseBilling.Features.CreditNotes;
+namespace Ikho.Warehouse.Billing.Features.CreditNotes;
 
 /// <summary>Minimal API endpoint mappings for the CreditNotes feature.</summary>
 public static class CreditNotesEndpoints

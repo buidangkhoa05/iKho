@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseOutbound.Domain;
-using Ikho.WarehouseOutbound.Shared;
+using Ikho.Warehouse.Outbound.Domain;
+using Ikho.Warehouse.Outbound.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOutbound.Features.Shipments;
+namespace Ikho.Warehouse.Outbound.Features.Shipments;
 
 /// <summary>Data access for the dispatch-shipment flow.</summary>
 public interface IShipmentsRepository

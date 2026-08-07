@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Shared.Clients;
+namespace Ikho.Warehouse.Outbound.Shared.Clients;
 
 /// <summary>
 /// The subset of an Inventory <c>StockReservationResponse</c> that Outbound needs to track an

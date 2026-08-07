@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseReturns.Features.Dispositions;
+namespace Ikho.Warehouse.Returns.Features.Dispositions;
 
 /// <summary>Minimal API endpoint mappings for the Dispositions feature.</summary>
 public static class DispositionsEndpoints

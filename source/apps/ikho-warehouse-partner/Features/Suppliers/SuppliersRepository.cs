@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehousePartner.Domain;
-using Ikho.WarehousePartner.Shared;
+using Ikho.Warehouse.Partner.Domain;
+using Ikho.Warehouse.Partner.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehousePartner.Features.Suppliers;
+namespace Ikho.Warehouse.Partner.Features.Suppliers;
 
 /// <summary>Data access for <see cref="Supplier"/> and its <see cref="Address"/>/<see cref="Contact"/> children.</summary>
 public interface ISupplierRepository

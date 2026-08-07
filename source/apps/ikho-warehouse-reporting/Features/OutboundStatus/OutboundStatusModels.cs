@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Features.OutboundStatus;
+namespace Ikho.Warehouse.Reporting.Features.OutboundStatus;
 
 /// <summary>Response DTO for an <see cref="Domain.OutboundStatusReadModel"/>.</summary>
 public sealed record OutboundStatusResponse(

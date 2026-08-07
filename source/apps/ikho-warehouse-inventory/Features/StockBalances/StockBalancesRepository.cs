@@ -1,8 +1,8 @@
-using Ikho.WarehouseInventory.Domain;
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Domain;
+using Ikho.Warehouse.Inventory.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInventory.Features.StockBalances;
+namespace Ikho.Warehouse.Inventory.Features.StockBalances;
 
 /// <summary>Read-only data access backing the balance, stock-item, and ledger query endpoints.</summary>
 public interface IStockBalancesRepository

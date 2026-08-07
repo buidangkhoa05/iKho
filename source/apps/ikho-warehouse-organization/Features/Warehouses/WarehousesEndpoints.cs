@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseOrganization.Features.Warehouses;
+namespace Ikho.Warehouse.Organization.Features.Warehouses;
 
 /// <summary>
 /// Minimal API endpoint mappings for the Warehouses feature.

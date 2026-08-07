@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseReporting.Features.FulfillmentKpis;
+namespace Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 
 /// <summary>Minimal API endpoint mappings for the FulfillmentKpis (read-only query) feature.</summary>
 public static class FulfillmentKpiEndpoints

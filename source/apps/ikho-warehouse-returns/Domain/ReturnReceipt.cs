@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReturns.Domain;
+namespace Ikho.Warehouse.Returns.Domain;
 
 /// <summary>
 /// Record of the physical arrival of a <see cref="ReturnOrder"/>'s goods at the warehouse. A

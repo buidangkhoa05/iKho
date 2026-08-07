@@ -75,8 +75,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-organization/Ikho.WarehouseOrganization.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseOrganization
+        PROJECT_PATH: apps/ikho-warehouse-organization/Ikho.Warehouse.Organization.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Organization
     container_name: ikho-warehouse-organization
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_organization;Username=ikho;Password=ikho
@@ -100,8 +100,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-catalog/Ikho.WarehouseCatalog.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseCatalog
+        PROJECT_PATH: apps/ikho-warehouse-catalog/Ikho.Warehouse.Catalog.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Catalog
     container_name: ikho-warehouse-catalog
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_catalog;Username=ikho;Password=ikho
@@ -125,8 +125,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-partner/Ikho.WarehousePartner.csproj
-        ASSEMBLY_NAME: Ikho.WarehousePartner
+        PROJECT_PATH: apps/ikho-warehouse-partner/Ikho.Warehouse.Partner.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Partner
     container_name: ikho-warehouse-partner
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_partner;Username=ikho;Password=ikho
@@ -150,8 +150,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-inventory/Ikho.WarehouseInventory.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseInventory
+        PROJECT_PATH: apps/ikho-warehouse-inventory/Ikho.Warehouse.Inventory.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Inventory
     container_name: ikho-warehouse-inventory
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_inventory;Username=ikho;Password=ikho
@@ -181,8 +181,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-inbound/Ikho.WarehouseInbound.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseInbound
+        PROJECT_PATH: apps/ikho-warehouse-inbound/Ikho.Warehouse.Inbound.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Inbound
     container_name: ikho-warehouse-inbound
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_inbound;Username=ikho;Password=ikho
@@ -218,8 +218,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-outbound/Ikho.WarehouseOutbound.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseOutbound
+        PROJECT_PATH: apps/ikho-warehouse-outbound/Ikho.Warehouse.Outbound.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Outbound
     container_name: ikho-warehouse-outbound
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_outbound;Username=ikho;Password=ikho
@@ -255,8 +255,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-returns/Ikho.WarehouseReturns.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseReturns
+        PROJECT_PATH: apps/ikho-warehouse-returns/Ikho.Warehouse.Returns.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Returns
     container_name: ikho-warehouse-returns
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_returns;Username=ikho;Password=ikho
@@ -292,8 +292,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-billing/Ikho.WarehouseBilling.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseBilling
+        PROJECT_PATH: apps/ikho-warehouse-billing/Ikho.Warehouse.Billing.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Billing
     container_name: ikho-warehouse-billing
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_billing;Username=ikho;Password=ikho
@@ -323,8 +323,8 @@ services:
       context: .
       dockerfile: docker/dotnet.Dockerfile
       args:
-        PROJECT_PATH: apps/ikho-warehouse-reporting/Ikho.WarehouseReporting.csproj
-        ASSEMBLY_NAME: Ikho.WarehouseReporting
+        PROJECT_PATH: apps/ikho-warehouse-reporting/Ikho.Warehouse.Reporting.csproj
+        ASSEMBLY_NAME: Ikho.Warehouse.Reporting
     container_name: ikho-warehouse-reporting
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_warehouse_reporting;Username=ikho;Password=ikho

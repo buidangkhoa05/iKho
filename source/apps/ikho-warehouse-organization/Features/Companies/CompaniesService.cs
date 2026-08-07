@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.SchemaManagement.Contracts.WarehouseOrganization.Events.V1;
-using Ikho.WarehouseOrganization.Domain;
+using Ikho.Warehouse.Organization.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOrganization.Features.Companies;
+namespace Ikho.Warehouse.Organization.Features.Companies;
 
 /// <summary>
 /// Business logic for creating, updating, and reading companies. Publishes

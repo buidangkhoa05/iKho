@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehouseOrganization.Features.Companies;
-using Ikho.WarehouseOrganization.Features.Locations;
-using Ikho.WarehouseOrganization.Features.Warehouses;
-using Ikho.WarehouseOrganization.Shared;
+using Ikho.Warehouse.Organization.Features.Companies;
+using Ikho.Warehouse.Organization.Features.Locations;
+using Ikho.Warehouse.Organization.Features.Warehouses;
+using Ikho.Warehouse.Organization.Shared;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

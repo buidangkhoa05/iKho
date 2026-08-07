@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Shared.Clients;
+namespace Ikho.Warehouse.Billing.Shared.Clients;
 
 /// <summary>
 /// The subset of the Partner service's customer data that Billing needs to validate invoices and

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Domain;
+namespace Ikho.Warehouse.Billing.Domain;
 
 /// <summary>
 /// A single billed product line on an <see cref="Invoice"/>. Snapshots the product's code and

@@ -1,6 +1,6 @@
-using Ikho.WarehouseReturns.Domain;
+using Ikho.Warehouse.Returns.Domain;
 
-namespace Ikho.WarehouseReturns.Features.Dispositions;
+namespace Ikho.Warehouse.Returns.Features.Dispositions;
 
 /// <summary>
 /// Request body to record a disposition outcome for a return order line.

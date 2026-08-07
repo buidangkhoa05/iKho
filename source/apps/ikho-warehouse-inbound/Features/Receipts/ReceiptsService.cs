@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseInbound.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInbound.Domain;
-using Ikho.WarehouseInbound.Shared.Clients;
+using Ikho.Warehouse.Inbound.Domain;
+using Ikho.Warehouse.Inbound.Shared.Clients;
 
-namespace Ikho.WarehouseInbound.Features.Receipts;
+namespace Ikho.Warehouse.Inbound.Features.Receipts;
 
 /// <summary>Distinguishes why a receipt-completion attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum CompleteReceiptOutcome

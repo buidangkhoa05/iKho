@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInventory.Shared;
+namespace Ikho.Warehouse.Inventory.Shared;
 
 /// <summary>
 /// Response DTO for a <see cref="Domain.StockItem"/>, including all quantity buckets. Shared

@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehousePartner.Features.Suppliers;
+namespace Ikho.Warehouse.Partner.Features.Suppliers;
 
 /// <summary>
 /// Minimal API endpoint mappings for the Suppliers feature, including address and contact

@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseBilling.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseBilling.Domain;
-using Ikho.WarehouseBilling.Shared.Clients;
+using Ikho.Warehouse.Billing.Domain;
+using Ikho.Warehouse.Billing.Shared.Clients;
 
-namespace Ikho.WarehouseBilling.Features.CreditNotes;
+namespace Ikho.Warehouse.Billing.Features.CreditNotes;
 
 /// <summary>Distinguishes why a credit-note-issuance attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum CreateCreditNoteOutcome

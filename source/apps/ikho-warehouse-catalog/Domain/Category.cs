@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Domain;
+namespace Ikho.Warehouse.Catalog.Domain;
 
 /// <summary>
 /// Product classification category. Products belong to at most one category.

@@ -1,7 +1,7 @@
-using Ikho.WarehouseInbound.Domain;
-using Ikho.WarehouseInbound.Shared.Clients;
+using Ikho.Warehouse.Inbound.Domain;
+using Ikho.Warehouse.Inbound.Shared.Clients;
 
-namespace Ikho.WarehouseInbound.Features.PurchaseOrders;
+namespace Ikho.Warehouse.Inbound.Features.PurchaseOrders;
 
 /// <summary>Distinguishes why a purchase-order creation attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum CreatePurchaseOrderOutcome

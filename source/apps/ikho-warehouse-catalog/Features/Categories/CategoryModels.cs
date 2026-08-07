@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Features.Categories;
+namespace Ikho.Warehouse.Catalog.Features.Categories;
 
 /// <summary>Request body to create a new product category.</summary>
 public sealed record CreateCategoryRequest(string Code, string Name);

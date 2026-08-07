@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Ikho.WarehouseReturns.Shared.Clients;
+namespace Ikho.Warehouse.Returns.Shared.Clients;
 
 /// <inheritdoc cref="IOrganizationApiClient" />
 public sealed class OrganizationApiClient(HttpClient httpClient) : IOrganizationApiClient
@@ -24,7 +24,7 @@ public sealed class OrganizationApiClient(HttpClient httpClient) : IOrganization
 
     /// <summary>
     /// Local mirror of only the fields Returns needs from Organization's
-    /// <c>Ikho.WarehouseOrganization.Features.Warehouses.WarehouseResponse</c>.
+    /// <c>Ikho.Warehouse.Organization.Features.Warehouses.WarehouseResponse</c>.
     /// </summary>
     private sealed record WarehouseResponseShape(Guid Id, bool IsActive);
 }

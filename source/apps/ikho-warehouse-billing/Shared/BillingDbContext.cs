@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseBilling.Domain;
+using Ikho.Warehouse.Billing.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseBilling.Shared;
+namespace Ikho.Warehouse.Billing.Shared;
 
 /// <summary>
 /// EF Core database context for the Billing service. Implements

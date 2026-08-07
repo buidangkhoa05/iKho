@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseReporting.Domain;
+using Ikho.Warehouse.Reporting.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseReporting.Shared;
+namespace Ikho.Warehouse.Reporting.Shared;
 
 /// <summary>
 /// EF Core database context for the Reporting service. Implements <see cref="IHasOutboxMessages"/>

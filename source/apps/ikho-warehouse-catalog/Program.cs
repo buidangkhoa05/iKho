@@ -1,10 +1,10 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehouseCatalog.Features.Brands;
-using Ikho.WarehouseCatalog.Features.Categories;
-using Ikho.WarehouseCatalog.Features.Products;
-using Ikho.WarehouseCatalog.Features.UnitsOfMeasure;
-using Ikho.WarehouseCatalog.Shared;
+using Ikho.Warehouse.Catalog.Features.Brands;
+using Ikho.Warehouse.Catalog.Features.Categories;
+using Ikho.Warehouse.Catalog.Features.Products;
+using Ikho.Warehouse.Catalog.Features.UnitsOfMeasure;
+using Ikho.Warehouse.Catalog.Shared;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

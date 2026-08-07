@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Domain;
+namespace Ikho.Warehouse.Outbound.Domain;
 
 /// <summary>
 /// A single requested product/quantity on a <see cref="SalesOrder"/>. Snapshots the product's SKU

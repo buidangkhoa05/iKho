@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Domain;
+namespace Ikho.Warehouse.Outbound.Domain;
 
 /// <summary>
 /// The lifecycle state of a <see cref="Shipment"/>. Deliberately a single value for this slice —

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReturns.Shared.Clients;
+namespace Ikho.Warehouse.Returns.Shared.Clients;
 
 /// <summary>
 /// The subset of the Catalog service's product data that Returns needs to validate a return

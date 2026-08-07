@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseCatalog.Domain;
-using Ikho.WarehouseCatalog.Shared;
+using Ikho.Warehouse.Catalog.Domain;
+using Ikho.Warehouse.Catalog.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.Products;
+namespace Ikho.Warehouse.Catalog.Features.Products;
 
 /// <summary>Data access for <see cref="Product"/> and its <see cref="Barcode"/> children.</summary>
 public interface IProductRepository

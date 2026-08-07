@@ -1,8 +1,8 @@
 using Ikho.SchemaManagement.Contracts.WarehouseInbound.Events.V1;
 using Ikho.SharedLibrary.Events;
-using Ikho.WarehouseReporting.Features.FulfillmentKpis;
+using Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 
-namespace Ikho.WarehouseReporting.Features.InboundStatus.Handlers;
+namespace Ikho.Warehouse.Reporting.Features.InboundStatus.Handlers;
 
 /// <summary>
 /// Projects the Inbound service's <c>ReceiptCompleted</c> event onto both the inbound-status

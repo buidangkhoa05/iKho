@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOrganization.Domain;
+namespace Ikho.Warehouse.Organization.Domain;
 
 /// <summary>
 /// A zone within a <see cref="Warehouse"/> (e.g. receiving, bulk storage, pick face). Groups

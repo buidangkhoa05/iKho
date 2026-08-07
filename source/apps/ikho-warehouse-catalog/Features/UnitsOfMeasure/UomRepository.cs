@@ -1,8 +1,8 @@
-using Ikho.WarehouseCatalog.Domain;
-using Ikho.WarehouseCatalog.Shared;
+using Ikho.Warehouse.Catalog.Domain;
+using Ikho.Warehouse.Catalog.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.UnitsOfMeasure;
+namespace Ikho.Warehouse.Catalog.Features.UnitsOfMeasure;
 
 /// <summary>Data access for <see cref="UnitOfMeasure"/>.</summary>
 public interface IUomRepository

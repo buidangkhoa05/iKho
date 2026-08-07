@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehousePartner.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehousePartner.Domain;
+using Ikho.Warehouse.Partner.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehousePartner.Features.Suppliers;
+namespace Ikho.Warehouse.Partner.Features.Suppliers;
 
 /// <summary>
 /// Business logic for creating, updating, and reading suppliers, and managing their addresses

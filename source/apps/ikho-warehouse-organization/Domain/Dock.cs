@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOrganization.Domain;
+namespace Ikho.Warehouse.Organization.Domain;
 
 /// <summary>
 /// A shipping/receiving dock attached directly to a <see cref="Warehouse"/> (outside the

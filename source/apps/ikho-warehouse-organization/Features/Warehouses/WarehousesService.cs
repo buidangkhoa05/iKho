@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.SchemaManagement.Contracts.WarehouseOrganization.Events.V1;
-using Ikho.WarehouseOrganization.Domain;
+using Ikho.Warehouse.Organization.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOrganization.Features.Warehouses;
+namespace Ikho.Warehouse.Organization.Features.Warehouses;
 
 /// <summary>
 /// Result of a warehouse creation attempt, distinguishing the different ways it can fail so the
@@ -45,7 +45,7 @@ public sealed class WarehousesService(IWarehouseRepository repository, IOutboxWr
             return (CreateWarehouseOutcome.CodeAlreadyExists, null);
         }
 
-        var warehouse = new Warehouse
+        var warehouse = new Domain.Warehouse
         {
             CompanyId = request.CompanyId,
             Code = request.Code,

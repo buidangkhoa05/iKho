@@ -1,12 +1,12 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseOrganization.Domain;
-using Ikho.WarehouseOrganization.Shared;
+using Ikho.Warehouse.Organization.Domain;
+using Ikho.Warehouse.Organization.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOrganization.Features.Warehouses;
+namespace Ikho.Warehouse.Organization.Features.Warehouses;
 
 /// <summary>
-/// Data access for <see cref="Warehouse"/>, including the company-existence check needed to
+/// Data access for <see cref="Domain.Warehouse"/>, including the company-existence check needed to
 /// validate warehouse creation.
 /// </summary>
 /// <remarks>
@@ -22,13 +22,13 @@ public interface IWarehouseRepository
     /// <summary>
     /// Finds a warehouse by id, or <see langword="null"/> if it does not exist.
     /// </summary>
-    Task<Warehouse?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task<Domain.Warehouse?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Returns all warehouses for <paramref name="companyId"/>, or all warehouses if
     /// <paramref name="companyId"/> is <see langword="null"/>, ordered by code.
     /// </summary>
-    Task<List<Warehouse>> GetAllAsync(Guid? companyId, CancellationToken cancellationToken);
+    Task<List<Domain.Warehouse>> GetAllAsync(Guid? companyId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Returns <see langword="true"/> if a company with <paramref name="companyId"/> exists.
@@ -44,7 +44,7 @@ public interface IWarehouseRepository
     /// <summary>
     /// Tracks a new warehouse for insertion on the next <see cref="SaveChangesAsync"/> call.
     /// </summary>
-    void Add(Warehouse warehouse);
+    void Add(Domain.Warehouse warehouse);
 
     /// <summary>
     /// Tracks a new outbox message for insertion so it commits atomically with the business
@@ -62,11 +62,11 @@ public interface IWarehouseRepository
 public sealed class WarehouseRepository(OrganizationDbContext dbContext) : IWarehouseRepository
 {
     /// <inheritdoc />
-    public Task<Warehouse?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
+    public Task<Domain.Warehouse?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
         dbContext.Warehouses.SingleOrDefaultAsync(w => w.Id == id, cancellationToken);
 
     /// <inheritdoc />
-    public Task<List<Warehouse>> GetAllAsync(Guid? companyId, CancellationToken cancellationToken)
+    public Task<List<Domain.Warehouse>> GetAllAsync(Guid? companyId, CancellationToken cancellationToken)
     {
         var query = dbContext.Warehouses.AsQueryable();
         if (companyId is { } id)
@@ -86,7 +86,7 @@ public sealed class WarehouseRepository(OrganizationDbContext dbContext) : IWare
         dbContext.Warehouses.AnyAsync(w => w.CompanyId == companyId && w.Code == code, cancellationToken);
 
     /// <inheritdoc />
-    public void Add(Warehouse warehouse) => dbContext.Warehouses.Add(warehouse);
+    public void Add(Domain.Warehouse warehouse) => dbContext.Warehouses.Add(warehouse);
 
     /// <inheritdoc />
     public void Add(OutboxMessage message) => dbContext.OutboxMessages.Add(message);

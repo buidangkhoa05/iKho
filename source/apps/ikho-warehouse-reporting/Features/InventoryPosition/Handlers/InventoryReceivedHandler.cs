@@ -2,7 +2,7 @@ using System.Globalization;
 using Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1;
 using Ikho.SharedLibrary.Events;
 
-namespace Ikho.WarehouseReporting.Features.InventoryPosition.Handlers;
+namespace Ikho.Warehouse.Reporting.Features.InventoryPosition.Handlers;
 
 /// <summary>
 /// Projects the Inventory service's <c>InventoryReceived</c> event onto the inventory-position

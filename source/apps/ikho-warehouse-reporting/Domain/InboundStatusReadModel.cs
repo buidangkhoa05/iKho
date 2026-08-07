@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Domain;
+namespace Ikho.Warehouse.Reporting.Domain;
 
 /// <summary>
 /// Denormalized rollup of a purchase order's inbound execution progress, keyed by

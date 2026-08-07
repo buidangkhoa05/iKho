@@ -1,4 +1,4 @@
-namespace Ikho.WarehousePartner.Features.Customers;
+namespace Ikho.Warehouse.Partner.Features.Customers;
 
 /// <summary>Request body to create a new customer.</summary>
 public sealed record CreateCustomerRequest(string Code, string Name, string TaxId);

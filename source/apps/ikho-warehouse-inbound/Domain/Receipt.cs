@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Domain;
+namespace Ikho.Warehouse.Inbound.Domain;
 
 /// <summary>Lifecycle status of a <see cref="Receipt"/>.</summary>
 public enum ReceiptStatus

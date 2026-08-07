@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Features.CreditNotes;
+namespace Ikho.Warehouse.Billing.Features.CreditNotes;
 
 /// <summary>Request body for a single line on a new credit note.</summary>
 public sealed record CreditNoteLineRequest(Guid ProductId, decimal Quantity, decimal UnitPrice);

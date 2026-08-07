@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseOrganization.Features.Locations;
+namespace Ikho.Warehouse.Organization.Features.Locations;
 
 /// <summary>
 /// Minimal API endpoint mappings for the Locations feature (zones, aisles, bins, docks, and

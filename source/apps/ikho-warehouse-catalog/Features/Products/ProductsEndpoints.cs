@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseCatalog.Features.Products;
+namespace Ikho.Warehouse.Catalog.Features.Products;
 
 /// <summary>
 /// Minimal API endpoint mappings for the Products feature, including barcode management.

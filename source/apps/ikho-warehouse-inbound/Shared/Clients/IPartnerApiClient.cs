@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Shared.Clients;
+namespace Ikho.Warehouse.Inbound.Shared.Clients;
 
 /// <summary>
 /// The subset of the Partner service's supplier data that Inbound needs to validate purchase

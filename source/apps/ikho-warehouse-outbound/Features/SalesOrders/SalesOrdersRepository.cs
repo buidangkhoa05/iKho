@@ -1,8 +1,8 @@
-using Ikho.WarehouseOutbound.Domain;
-using Ikho.WarehouseOutbound.Shared;
+using Ikho.Warehouse.Outbound.Domain;
+using Ikho.Warehouse.Outbound.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOutbound.Features.SalesOrders;
+namespace Ikho.Warehouse.Outbound.Features.SalesOrders;
 
 /// <summary>Data access for the sales-order create/read flow.</summary>
 public interface ISalesOrdersRepository

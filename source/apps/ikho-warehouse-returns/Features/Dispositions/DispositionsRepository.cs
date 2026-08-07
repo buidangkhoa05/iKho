@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseReturns.Domain;
-using Ikho.WarehouseReturns.Shared;
+using Ikho.Warehouse.Returns.Domain;
+using Ikho.Warehouse.Returns.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseReturns.Features.Dispositions;
+namespace Ikho.Warehouse.Returns.Features.Dispositions;
 
 /// <summary>Data access for the Dispositions feature.</summary>
 public interface IDispositionsRepository

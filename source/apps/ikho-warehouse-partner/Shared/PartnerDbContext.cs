@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehousePartner.Domain;
+using Ikho.Warehouse.Partner.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehousePartner.Shared;
+namespace Ikho.Warehouse.Partner.Shared;
 
 /// <summary>
 /// EF Core database context for the Partner service. Implements

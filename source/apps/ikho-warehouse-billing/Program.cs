@@ -1,10 +1,10 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehouseBilling.Features.CreditNotes;
-using Ikho.WarehouseBilling.Features.Invoices;
-using Ikho.WarehouseBilling.Features.Payments;
-using Ikho.WarehouseBilling.Shared;
-using Ikho.WarehouseBilling.Shared.Clients;
+using Ikho.Warehouse.Billing.Features.CreditNotes;
+using Ikho.Warehouse.Billing.Features.Invoices;
+using Ikho.Warehouse.Billing.Features.Payments;
+using Ikho.Warehouse.Billing.Shared;
+using Ikho.Warehouse.Billing.Shared.Clients;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

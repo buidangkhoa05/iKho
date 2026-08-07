@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Features.InventoryPosition;
+namespace Ikho.Warehouse.Reporting.Features.InventoryPosition;
 
 /// <summary>Response DTO for an <see cref="Domain.InventoryPositionReadModel"/>.</summary>
 public sealed record InventoryPositionResponse(

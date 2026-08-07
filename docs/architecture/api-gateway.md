@@ -167,15 +167,15 @@ The gateway is the expansion point for the warehouse microservices program becau
 
 All nine warehouse services are implemented and routed:
 
-1. `Ikho.WarehouseOrganization` — `:5151`
-2. `Ikho.WarehouseCatalog` — `:5152`
-3. `Ikho.WarehousePartner` — `:5153`
-4. `Ikho.WarehouseInventory` — `:5154`
-5. `Ikho.WarehouseInbound` — `:5155`
-6. `Ikho.WarehouseOutbound` — `:5156`
-7. `Ikho.WarehouseReturns` — `:5157`
-8. `Ikho.WarehouseBilling` — `:5158`
-9. `Ikho.WarehouseReporting` — `:5159`
+1. `Ikho.Warehouse.Organization` — `:5151`
+2. `Ikho.Warehouse.Catalog` — `:5152`
+3. `Ikho.Warehouse.Partner` — `:5153`
+4. `Ikho.Warehouse.Inventory` — `:5154`
+5. `Ikho.Warehouse.Inbound` — `:5155`
+6. `Ikho.Warehouse.Outbound` — `:5156`
+7. `Ikho.Warehouse.Returns` — `:5157`
+8. `Ikho.Warehouse.Billing` — `:5158`
+9. `Ikho.Warehouse.Reporting` — `:5159`
 
 Related planning docs:
 

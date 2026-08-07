@@ -1,9 +1,9 @@
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseReturns.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseReturns.Domain;
+using Ikho.Warehouse.Returns.Domain;
 
-namespace Ikho.WarehouseReturns.Features.ReturnReceipts;
+namespace Ikho.Warehouse.Returns.Features.ReturnReceipts;
 
 /// <summary>Distinguishes why a return-receipt attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum CreateReturnReceiptOutcome

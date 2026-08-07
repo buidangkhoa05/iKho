@@ -1,8 +1,8 @@
 using Ikho.SharedLibrary;
-using Ikho.WarehouseInventory.Shared;
+using Ikho.Warehouse.Inventory.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseInventory.Features.StockReservations;
+namespace Ikho.Warehouse.Inventory.Features.StockReservations;
 
 /// <summary>Minimal API endpoint mappings for the StockReservations feature.</summary>
 public static class StockReservationsEndpoints

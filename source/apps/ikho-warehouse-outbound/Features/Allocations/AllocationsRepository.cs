@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseOutbound.Domain;
-using Ikho.WarehouseOutbound.Shared;
+using Ikho.Warehouse.Outbound.Domain;
+using Ikho.Warehouse.Outbound.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseOutbound.Features.Allocations;
+namespace Ikho.Warehouse.Outbound.Features.Allocations;
 
 /// <summary>Data access for the allocate-sales-order-lines flow.</summary>
 public interface IAllocationsRepository

@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseCatalog.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseCatalog.Domain;
+using Ikho.Warehouse.Catalog.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.Products;
+namespace Ikho.Warehouse.Catalog.Features.Products;
 
 /// <summary>
 /// Business logic for creating, updating, and reading products, and managing their barcodes.

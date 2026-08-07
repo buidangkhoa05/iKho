@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Domain;
+namespace Ikho.Warehouse.Catalog.Domain;
 
 /// <summary>
 /// Product brand or manufacturer. Products belong to at most one brand.

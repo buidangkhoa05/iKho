@@ -3,7 +3,7 @@ using Ikho.SchemaManagement.Contracts.WarehouseCatalog.Events.V1;
 using Ikho.SharedLibrary.Outbox;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.Categories;
+namespace Ikho.Warehouse.Catalog.Features.Categories;
 
 /// <summary>
 /// Business logic for creating and updating product categories. Publishes <c>CategoryCreated</c>

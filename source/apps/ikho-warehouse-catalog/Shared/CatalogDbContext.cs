@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Idempotency;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseCatalog.Domain;
+using Ikho.Warehouse.Catalog.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Shared;
+namespace Ikho.Warehouse.Catalog.Shared;
 
 /// <summary>
 /// EF Core database context for the Catalog service. Implements

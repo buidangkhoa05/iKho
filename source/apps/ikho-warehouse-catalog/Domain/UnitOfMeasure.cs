@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Domain;
+namespace Ikho.Warehouse.Catalog.Domain;
 
 /// <summary>
 /// Unit of measure (UOM) used for stock quantities (e.g. <c>EA</c>, <c>KG</c>, <c>CTN</c>).

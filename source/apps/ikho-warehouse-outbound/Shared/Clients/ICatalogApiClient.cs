@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseOutbound.Shared.Clients;
+namespace Ikho.Warehouse.Outbound.Shared.Clients;
 
 /// <summary>
 /// The subset of the Catalog service's product data that Outbound needs to validate and snapshot

@@ -1,4 +1,4 @@
-namespace Ikho.WarehousePartner.Features.Suppliers;
+namespace Ikho.Warehouse.Partner.Features.Suppliers;
 
 /// <summary>Request body to create a new supplier.</summary>
 public sealed record CreateSupplierRequest(string Code, string Name, string TaxId);

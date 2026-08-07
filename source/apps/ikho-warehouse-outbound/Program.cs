@@ -1,10 +1,10 @@
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
-using Ikho.WarehouseOutbound.Features.Allocations;
-using Ikho.WarehouseOutbound.Features.SalesOrders;
-using Ikho.WarehouseOutbound.Features.Shipments;
-using Ikho.WarehouseOutbound.Shared;
-using Ikho.WarehouseOutbound.Shared.Clients;
+using Ikho.Warehouse.Outbound.Features.Allocations;
+using Ikho.Warehouse.Outbound.Features.SalesOrders;
+using Ikho.Warehouse.Outbound.Features.Shipments;
+using Ikho.Warehouse.Outbound.Shared;
+using Ikho.Warehouse.Outbound.Shared.Clients;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Ikho.WarehouseInbound.Shared.Clients;
+namespace Ikho.Warehouse.Inbound.Shared.Clients;
 
 /// <inheritdoc cref="IPartnerApiClient" />
 public sealed class PartnerApiClient(HttpClient httpClient) : IPartnerApiClient
@@ -26,7 +26,7 @@ public sealed class PartnerApiClient(HttpClient httpClient) : IPartnerApiClient
 
     /// <summary>
     /// Local mirror of only the fields Inbound needs from Partner's
-    /// <c>Ikho.WarehousePartner.Features.Suppliers.SupplierResponse</c>. Deserializing loosely
+    /// <c>Ikho.Warehouse.Partner.Features.Suppliers.SupplierResponse</c>. Deserializing loosely
     /// against a narrow local shape means unrelated fields added to the Partner response never
     /// break this client.
     /// </summary>

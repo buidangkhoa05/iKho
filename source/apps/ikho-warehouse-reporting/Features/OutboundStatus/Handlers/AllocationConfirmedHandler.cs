@@ -1,8 +1,8 @@
 using Ikho.SchemaManagement.Contracts.WarehouseOutbound.Events.V1;
 using Ikho.SharedLibrary.Events;
-using Ikho.WarehouseReporting.Features.FulfillmentKpis;
+using Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 
-namespace Ikho.WarehouseReporting.Features.OutboundStatus.Handlers;
+namespace Ikho.Warehouse.Reporting.Features.OutboundStatus.Handlers;
 
 /// <summary>
 /// Projects the Outbound service's <c>AllocationConfirmed</c> event onto both the

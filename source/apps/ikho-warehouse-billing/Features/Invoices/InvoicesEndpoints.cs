@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseBilling.Features.Invoices;
+namespace Ikho.Warehouse.Billing.Features.Invoices;
 
 /// <summary>Minimal API endpoint mappings for the Invoices feature.</summary>
 public static class InvoicesEndpoints

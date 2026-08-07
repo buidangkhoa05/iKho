@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseReturns.Features.Inspections;
+namespace Ikho.Warehouse.Returns.Features.Inspections;
 
 /// <summary>Minimal API endpoint mappings for the Inspections feature.</summary>
 public static class InspectionsEndpoints

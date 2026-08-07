@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseReturns.Domain;
-using Ikho.WarehouseReturns.Shared;
+using Ikho.Warehouse.Returns.Domain;
+using Ikho.Warehouse.Returns.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseReturns.Features.Inspections;
+namespace Ikho.Warehouse.Returns.Features.Inspections;
 
 /// <summary>Data access for the Inspections feature.</summary>
 public interface IInspectionsRepository

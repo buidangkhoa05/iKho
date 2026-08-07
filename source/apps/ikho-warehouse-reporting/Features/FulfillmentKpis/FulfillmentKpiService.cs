@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReporting.Features.FulfillmentKpis;
+namespace Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 
 /// <summary>
 /// Read-only query logic over the daily fulfillment-KPI read model. This feature's endpoints

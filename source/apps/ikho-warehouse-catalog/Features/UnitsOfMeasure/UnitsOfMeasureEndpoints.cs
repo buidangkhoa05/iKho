@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseCatalog.Features.UnitsOfMeasure;
+namespace Ikho.Warehouse.Catalog.Features.UnitsOfMeasure;
 
 /// <summary>Minimal API endpoint mappings for the Units of Measure feature.</summary>
 public static class UnitsOfMeasureEndpoints

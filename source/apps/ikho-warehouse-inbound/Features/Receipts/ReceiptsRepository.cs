@@ -1,9 +1,9 @@
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseInbound.Domain;
-using Ikho.WarehouseInbound.Shared;
+using Ikho.Warehouse.Inbound.Domain;
+using Ikho.Warehouse.Inbound.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseInbound.Features.Receipts;
+namespace Ikho.Warehouse.Inbound.Features.Receipts;
 
 /// <summary>Data access for the Receipts feature: purchase orders (for validation/mutation), receipts, and putaway tasks.</summary>
 public interface IReceiptsRepository

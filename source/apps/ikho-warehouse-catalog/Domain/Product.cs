@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Domain;
+namespace Ikho.Warehouse.Catalog.Domain;
 
 /// <summary>
 /// The product aggregate — the central entity of the Catalog service. Operational services

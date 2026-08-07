@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReturns.Shared.Clients;
+namespace Ikho.Warehouse.Returns.Shared.Clients;
 
 /// <summary>The subset of the Organization service's warehouse data that Returns needs.</summary>
 public sealed record OrganizationWarehouseInfo(Guid Id, bool IsActive);

@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseReturns.Events.V1;
 using Ikho.SharedLibrary.Outbox;
-using Ikho.WarehouseReturns.Domain;
-using Ikho.WarehouseReturns.Shared.Clients;
+using Ikho.Warehouse.Returns.Domain;
+using Ikho.Warehouse.Returns.Shared.Clients;
 
-namespace Ikho.WarehouseReturns.Features.ReturnOrders;
+namespace Ikho.Warehouse.Returns.Features.ReturnOrders;
 
 /// <summary>Distinguishes why a return-order creation attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
 public enum CreateReturnOrderOutcome

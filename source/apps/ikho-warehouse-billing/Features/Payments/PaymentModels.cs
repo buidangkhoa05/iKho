@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseBilling.Features.Payments;
+namespace Ikho.Warehouse.Billing.Features.Payments;
 
 /// <summary>Request body to record a payment against an invoice.</summary>
 public sealed record CreatePaymentRequest(decimal Amount, string Method, string? ReferenceNote);

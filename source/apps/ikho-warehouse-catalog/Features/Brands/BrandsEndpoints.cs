@@ -1,7 +1,7 @@
 using Ikho.SharedLibrary;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Ikho.WarehouseCatalog.Features.Brands;
+namespace Ikho.Warehouse.Catalog.Features.Brands;
 
 /// <summary>Minimal API endpoint mappings for the Brands feature.</summary>
 public static class BrandsEndpoints

@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseReturns.Domain;
+namespace Ikho.Warehouse.Returns.Domain;
 
 /// <summary>The final handling decision made for a returned <see cref="ReturnOrderLine"/>.</summary>
 public enum DispositionOutcome

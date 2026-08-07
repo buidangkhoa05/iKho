@@ -3,7 +3,7 @@ using Ikho.SchemaManagement.Contracts.WarehouseCatalog.Events.V1;
 using Ikho.SharedLibrary.Outbox;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ikho.WarehouseCatalog.Features.Brands;
+namespace Ikho.Warehouse.Catalog.Features.Brands;
 
 /// <summary>
 /// Business logic for creating and updating brands. Publishes <c>BrandCreated</c> on creation

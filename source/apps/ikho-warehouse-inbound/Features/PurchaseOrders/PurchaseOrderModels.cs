@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseInbound.Features.PurchaseOrders;
+namespace Ikho.Warehouse.Inbound.Features.PurchaseOrders;
 
 /// <summary>Request body for a single line on a new purchase order.</summary>
 public sealed record PurchaseOrderLineRequest(Guid ProductId, decimal Quantity);

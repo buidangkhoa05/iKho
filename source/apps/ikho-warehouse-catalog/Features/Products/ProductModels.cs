@@ -1,4 +1,4 @@
-namespace Ikho.WarehouseCatalog.Features.Products;
+namespace Ikho.Warehouse.Catalog.Features.Products;
 
 /// <summary>Request body to create a new product.</summary>
 public sealed record CreateProductRequest(

@@ -1,6 +1,6 @@
-using Ikho.WarehouseReturns.Domain;
+using Ikho.Warehouse.Returns.Domain;
 
-namespace Ikho.WarehouseReturns.Features.ReturnOrders;
+namespace Ikho.Warehouse.Returns.Features.ReturnOrders;
 
 /// <summary>Request body for a single line on a new return order.</summary>
 public sealed record ReturnOrderLineRequest(Guid ProductId, decimal Quantity, string ReasonCode);
