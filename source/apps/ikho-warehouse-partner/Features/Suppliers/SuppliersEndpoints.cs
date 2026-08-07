@@ -1,4 +1,5 @@
 using Ikho.SharedLibrary;
+using Ikho.Warehouse.Partner.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Ikho.Warehouse.Partner.Features.Suppliers;
@@ -17,21 +18,24 @@ public static class SuppliersEndpoints
     {
         var group = app.MapGroup("/api/warehouse/partner/suppliers").WithTags("Suppliers");
 
-        group.MapPost("/", async Task<Results<Created<SupplierResponse>, Conflict<string>>> (
+        group.MapPost("/", async Task<Results<Created<SupplierResponse>, Conflict<string>, BadRequest<string>>> (
             CreateSupplierRequest request,
             SuppliersService service,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
-            var supplier = await service.CreateAsync(request, correlationId, cancellationToken);
+            var (outcome, supplier) = await service.CreateAsync(request, correlationId, cancellationToken);
 
-            return supplier is null
-                ? TypedResults.Conflict($"Supplier code '{request.Code}' is already in use.")
-                : TypedResults.Created($"/api/warehouse/partner/suppliers/{supplier.Id}", supplier);
+            return outcome switch
+            {
+                CreateSupplierOutcome.ValidationFailed => TypedResults.BadRequest("Code, Name, and TaxId are required."),
+                CreateSupplierOutcome.CodeAlreadyExists => TypedResults.Conflict($"Supplier code '{request.Code}' is already in use."),
+                _ => TypedResults.Created($"/api/warehouse/partner/suppliers/{supplier!.Id}", supplier),
+            };
         });
 
-        group.MapPut("/{id:guid}", async Task<Results<Ok<SupplierResponse>, NotFound>> (
+        group.MapPut("/{id:guid}", async Task<Results<Ok<SupplierResponse>, NotFound, BadRequest<string>>> (
             Guid id,
             UpdateSupplierRequest request,
             SuppliersService service,
@@ -39,8 +43,14 @@ public static class SuppliersEndpoints
             CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
-            var supplier = await service.UpdateAsync(id, request, correlationId, cancellationToken);
-            return supplier is null ? TypedResults.NotFound() : TypedResults.Ok(supplier);
+            var (outcome, supplier) = await service.UpdateAsync(id, request, correlationId, cancellationToken);
+
+            return outcome switch
+            {
+                UpdateSupplierOutcome.NotFound => TypedResults.NotFound(),
+                UpdateSupplierOutcome.ValidationFailed => TypedResults.BadRequest("Name and TaxId are required."),
+                _ => TypedResults.Ok(supplier!),
+            };
         });
 
         group.MapPatch("/{id:guid}/status", async Task<Results<Ok<SupplierResponse>, NotFound>> (

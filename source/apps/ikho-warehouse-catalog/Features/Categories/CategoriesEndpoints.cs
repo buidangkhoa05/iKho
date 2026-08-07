@@ -15,21 +15,24 @@ public static class CategoriesEndpoints
     {
         var group = app.MapGroup("/api/warehouse/catalog/categories").WithTags("Categories");
 
-        group.MapPost("/", async Task<Results<Created<CategoryResponse>, Conflict<string>>> (
+        group.MapPost("/", async Task<Results<Created<CategoryResponse>, Conflict<string>, BadRequest<string>>> (
             CreateCategoryRequest request,
             CategoriesService service,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
-            var category = await service.CreateAsync(request, correlationId, cancellationToken);
+            var (outcome, category) = await service.CreateAsync(request, correlationId, cancellationToken);
 
-            return category is null
-                ? TypedResults.Conflict($"Category code '{request.Code}' is already in use.")
-                : TypedResults.Created($"/api/warehouse/catalog/categories/{category.Id}", category);
+            return outcome switch
+            {
+                CreateCategoryOutcome.ValidationFailed => TypedResults.BadRequest("Code and Name are required."),
+                CreateCategoryOutcome.CodeAlreadyExists => TypedResults.Conflict($"Category code '{request.Code}' is already in use."),
+                _ => TypedResults.Created($"/api/warehouse/catalog/categories/{category!.Id}", category),
+            };
         });
 
-        group.MapPut("/{id:guid}", async Task<Results<Ok<CategoryResponse>, NotFound>> (
+        group.MapPut("/{id:guid}", async Task<Results<Ok<CategoryResponse>, NotFound, BadRequest<string>>> (
             Guid id,
             UpdateCategoryRequest request,
             CategoriesService service,
@@ -37,8 +40,14 @@ public static class CategoriesEndpoints
             CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
-            var category = await service.UpdateAsync(id, request, correlationId, cancellationToken);
-            return category is null ? TypedResults.NotFound() : TypedResults.Ok(category);
+            var (outcome, category) = await service.UpdateAsync(id, request, correlationId, cancellationToken);
+
+            return outcome switch
+            {
+                UpdateCategoryOutcome.NotFound => TypedResults.NotFound(),
+                UpdateCategoryOutcome.ValidationFailed => TypedResults.BadRequest("Name is required."),
+                _ => TypedResults.Ok(category!),
+            };
         });
 
         group.MapGet("/{id:guid}", async Task<Results<Ok<CategoryResponse>, NotFound>> (

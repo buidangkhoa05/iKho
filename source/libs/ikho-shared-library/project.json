@@ -1,17 +1,4 @@
 {
   "name": "Ikho.SharedLibrary",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "targets": {
-    "docker-build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "docker build -f docker/dotnet.Dockerfile --build-arg PROJECT_PATH=libs/ikho-shared-library/Ikho.SharedLibrary.csproj --build-arg ASSEMBLY_NAME=Ikho.SharedLibrary -t ikho/shared-library:local ."
-      },
-      "metadata": {
-        "description": "Build the Docker image for this service",
-        "technologies": ["docker"]
-      }
-    }
-  }
+  "$schema": "../../node_modules/nx/schemas/project-schema.json"
 }

@@ -13,6 +13,9 @@ public enum AdjustStockOutcome
     /// <summary>The adjustment was recorded successfully.</summary>
     Created,
 
+    /// <summary>The request failed local validation (a blank reason code).</summary>
+    ValidationFailed,
+
     /// <summary>The referenced stock item does not exist.</summary>
     StockItemNotFound,
 
@@ -33,6 +36,11 @@ public sealed class StockAdjustmentsService(IStockAdjustmentsRepository reposito
     public async Task<(AdjustStockOutcome Outcome, StockItemResponse? StockItem)> AdjustAsync(
         AdjustStockRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.ReasonCode))
+        {
+            return (AdjustStockOutcome.ValidationFailed, null);
+        }
+
         var stockItem = await repository.GetStockItemAsync(request.StockItemId, cancellationToken);
         if (stockItem is null)
         {

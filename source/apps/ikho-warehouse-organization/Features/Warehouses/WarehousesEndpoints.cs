@@ -16,7 +16,7 @@ public static class WarehousesEndpoints
     {
         var group = app.MapGroup("/api/warehouse/organization/warehouses").WithTags("Warehouses");
 
-        group.MapPost("/", async Task<Results<Created<WarehouseResponse>, NotFound<string>, Conflict<string>>> (
+        group.MapPost("/", async Task<Results<Created<WarehouseResponse>, NotFound<string>, Conflict<string>, BadRequest<string>>> (
             CreateWarehouseRequest request,
             WarehousesService service,
             HttpContext httpContext,
@@ -27,6 +27,8 @@ public static class WarehousesEndpoints
 
             return outcome switch
             {
+                CreateWarehouseOutcome.ValidationFailed =>
+                    TypedResults.BadRequest("Code and Name are required."),
                 CreateWarehouseOutcome.CompanyNotFound =>
                     TypedResults.NotFound($"Company '{request.CompanyId}' does not exist."),
                 CreateWarehouseOutcome.CodeAlreadyExists =>

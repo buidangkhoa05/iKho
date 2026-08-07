@@ -30,6 +30,8 @@ public static class StockReservationsEndpoints
                         $"No single stock item for product '{request.ProductId}' in warehouse '{request.WarehouseId}' has enough available quantity."),
                 ReserveStockOutcome.ValidationFailed =>
                     TypedResults.BadRequest("Quantity must be greater than zero."),
+                ReserveStockOutcome.ConcurrencyConflict =>
+                    TypedResults.Conflict("The stock item was concurrently modified; retry the reservation."),
                 _ => TypedResults.Created($"/api/warehouse/inventory/reservations/{reservation!.Id}", reservation),
             };
         });
@@ -47,6 +49,8 @@ public static class StockReservationsEndpoints
             {
                 ReleaseStockOutcome.NotFound => TypedResults.NotFound($"Reservation '{id}' was not found."),
                 ReleaseStockOutcome.NotActive => TypedResults.Conflict($"Reservation '{id}' is not active."),
+                ReleaseStockOutcome.ConcurrencyConflict =>
+                    TypedResults.Conflict("The stock item was concurrently modified; retry the release."),
                 _ => TypedResults.Ok(reservation),
             };
         });
@@ -64,6 +68,8 @@ public static class StockReservationsEndpoints
             {
                 FulfillStockOutcome.NotFound => TypedResults.NotFound($"Reservation '{id}' was not found."),
                 FulfillStockOutcome.NotActive => TypedResults.Conflict($"Reservation '{id}' is not active."),
+                FulfillStockOutcome.ConcurrencyConflict =>
+                    TypedResults.Conflict("The stock item was concurrently modified; retry the fulfillment."),
                 _ => TypedResults.Ok(reservation),
             };
         });

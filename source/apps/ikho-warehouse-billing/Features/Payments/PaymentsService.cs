@@ -3,6 +3,7 @@ using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehouseBilling.Events.V1;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.Warehouse.Billing.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ikho.Warehouse.Billing.Features.Payments;
 
@@ -23,6 +24,9 @@ public enum RecordPaymentOutcome
 
     /// <summary>Recording this payment would push cumulative recorded payments over the invoice's total amount.</summary>
     ExceedsTotalAmount,
+
+    /// <summary>Another request concurrently recorded a payment against the same invoice; retry.</summary>
+    ConcurrencyConflict,
 }
 
 /// <summary>
@@ -78,6 +82,11 @@ public sealed class PaymentsService(IPaymentsRepository repository, IOutboxWrite
 
         invoice.Status = cumulative == invoice.TotalAmount ? InvoiceStatus.Paid : InvoiceStatus.PartiallyPaid;
 
+        // Status may end up equal to its prior value (e.g. PartiallyPaid -> PartiallyPaid), which
+        // would otherwise leave EF's change tracker treating the invoice as unmodified and skip
+        // the concurrency check entirely — see MarkForConcurrencyCheck's remarks.
+        repository.MarkForConcurrencyCheck(invoice);
+
         repository.Add(payment);
 
         var paymentStatusChanged = new PaymentStatusChanged
@@ -92,7 +101,15 @@ public sealed class PaymentsService(IPaymentsRepository repository, IOutboxWrite
         };
         repository.Add(outbox.Enqueue(nameof(PaymentStatusChanged), JsonSerializer.Serialize(paymentStatusChanged), correlationId));
 
-        await repository.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return (RecordPaymentOutcome.ConcurrencyConflict, null,
+                $"Invoice '{invoiceId}' was concurrently modified by another payment; retry.");
+        }
 
         return (RecordPaymentOutcome.Recorded, PaymentResponse.FromEntity(payment), null);
     }

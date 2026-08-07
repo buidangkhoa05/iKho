@@ -63,6 +63,14 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
             // fully prevent duplicates when LotId/SerialNumberId are both null. Application code
             // must always look up the matching row before creating a new one.
             entity.HasIndex(x => new { x.ProductId, x.WarehouseId, x.BinId, x.LotId, x.SerialNumberId }).IsUnique();
+
+            // Optimistic concurrency: this row is read-then-mutated by several features
+            // (reservations, receipts, adjustments) without app-level locking, so concurrent
+            // requests against the same stock item must fail loudly (DbUpdateConcurrencyException)
+            // rather than silently lose one side's update (e.g. oversell via two concurrent
+            // reservations both reading the same available quantity). Maps to Postgres's native
+            // "xmin" system column rather than a real table column/migration.
+            entity.Property<uint>("xmin").IsRowVersion();
         });
 
         modelBuilder.Entity<StockBalance>(entity =>
@@ -73,6 +81,10 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
             entity.Property(x => x.DamagedQuantity).HasPrecision(18, 4);
             entity.Property(x => x.QuarantineQuantity).HasPrecision(18, 4);
             entity.HasIndex(x => new { x.ProductId, x.WarehouseId }).IsUnique();
+
+            // See the concurrency remarks on StockItem above — the same read-then-mutate race
+            // applies to this per-(product, warehouse) rollup.
+            entity.Property<uint>("xmin").IsRowVersion();
         });
 
         modelBuilder.Entity<StockLedgerEntry>(entity =>

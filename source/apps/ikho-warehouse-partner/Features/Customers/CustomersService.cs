@@ -2,9 +2,36 @@ using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehousePartner.Events.V1;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.Warehouse.Partner.Domain;
+using Ikho.Warehouse.Partner.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ikho.Warehouse.Partner.Features.Customers;
+
+/// <summary>Distinguishes why a customer creation attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
+public enum CreateCustomerOutcome
+{
+    /// <summary>The customer was created successfully.</summary>
+    Created,
+
+    /// <summary>The request failed local validation (a blank code, name, or tax id).</summary>
+    ValidationFailed,
+
+    /// <summary><c>Code</c> is already in use.</summary>
+    CodeAlreadyExists,
+}
+
+/// <summary>Distinguishes why a customer update attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
+public enum UpdateCustomerOutcome
+{
+    /// <summary>The customer was updated successfully.</summary>
+    Updated,
+
+    /// <summary>The customer does not exist.</summary>
+    NotFound,
+
+    /// <summary>The request failed local validation (a blank name or tax id).</summary>
+    ValidationFailed,
+}
 
 /// <summary>
 /// Business logic for creating, updating, and reading customers, and managing their addresses
@@ -14,13 +41,18 @@ namespace Ikho.Warehouse.Partner.Features.Customers;
 /// </summary>
 public sealed class CustomersService(ICustomerRepository repository, IOutboxWriter outbox)
 {
-    /// <summary>Creates a new customer. Returns <see langword="null"/> if the code is already in use.</summary>
-    public async Task<CustomerResponse?> CreateAsync(
+    /// <summary>Attempts to create a new customer. See <see cref="CreateCustomerOutcome"/> for the possible failure reasons.</summary>
+    public async Task<(CreateCustomerOutcome Outcome, CustomerResponse? Customer)> CreateAsync(
         CreateCustomerRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.TaxId))
+        {
+            return (CreateCustomerOutcome.ValidationFailed, null);
+        }
+
         if (await repository.CodeExistsAsync(request.Code, cancellationToken))
         {
-            return null;
+            return (CreateCustomerOutcome.CodeAlreadyExists, null);
         }
 
         var customer = new Customer
@@ -49,23 +81,29 @@ public sealed class CustomersService(ICustomerRepository repository, IOutboxWrit
         catch (DbUpdateException)
         {
             // Unique index on Code caught a concurrent create — treat same as upfront check.
-            return null;
+            return (CreateCustomerOutcome.CodeAlreadyExists, null);
         }
 
-        return CustomerResponse.FromEntity(customer);
+        return (CreateCustomerOutcome.Created, CustomerResponse.FromEntity(customer));
     }
 
     /// <summary>
-    /// Updates an existing customer's details, publishing <c>CustomerUpdated</c> only when a
-    /// field actually changes. Returns <see langword="null"/> if not found.
+    /// Attempts to update an existing customer's details, publishing <c>CustomerUpdated</c> only
+    /// when a field actually changes. See <see cref="UpdateCustomerOutcome"/> for the possible
+    /// failure reasons.
     /// </summary>
-    public async Task<CustomerResponse?> UpdateAsync(
+    public async Task<(UpdateCustomerOutcome Outcome, CustomerResponse? Customer)> UpdateAsync(
         Guid id, UpdateCustomerRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.TaxId))
+        {
+            return (UpdateCustomerOutcome.ValidationFailed, null);
+        }
+
         var customer = await repository.GetByIdAsync(id, cancellationToken);
         if (customer is null)
         {
-            return null;
+            return (UpdateCustomerOutcome.NotFound, null);
         }
 
         if (customer.Name != request.Name || customer.TaxId != request.TaxId)
@@ -86,7 +124,7 @@ public sealed class CustomersService(ICustomerRepository repository, IOutboxWrit
             await repository.SaveChangesAsync(cancellationToken);
         }
 
-        return CustomerResponse.FromEntity(customer);
+        return (UpdateCustomerOutcome.Updated, CustomerResponse.FromEntity(customer));
     }
 
     /// <summary>
@@ -153,6 +191,16 @@ public sealed class CustomersService(ICustomerRepository repository, IOutboxWrit
             return null;
         }
 
+        if (request.IsPrimary)
+        {
+            // Only one address per customer may be primary — demote any existing one before
+            // adding the new primary address.
+            foreach (var existing in customer.Addresses.Where(a => a.IsPrimary))
+            {
+                existing.IsPrimary = false;
+            }
+        }
+
         var address = new Address
         {
             CustomerId = customerId,
@@ -178,6 +226,16 @@ public sealed class CustomersService(ICustomerRepository repository, IOutboxWrit
         if (customer is null)
         {
             return null;
+        }
+
+        if (request.IsPrimary)
+        {
+            // Only one contact per customer may be primary — demote any existing one before
+            // adding the new primary contact.
+            foreach (var existing in customer.Contacts.Where(c => c.IsPrimary))
+            {
+                existing.IsPrimary = false;
+            }
         }
 
         var contact = new Contact

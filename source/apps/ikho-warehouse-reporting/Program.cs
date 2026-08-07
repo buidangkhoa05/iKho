@@ -6,6 +6,7 @@ using Ikho.SharedLibrary.ApiDocs;
 using Ikho.SharedLibrary.Events;
 using Ikho.SharedLibrary.Options;
 using Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
+using Ikho.Warehouse.Reporting.Features.FulfillmentKpis.Handlers;
 using Ikho.Warehouse.Reporting.Features.InboundStatus;
 using Ikho.Warehouse.Reporting.Features.InboundStatus.Handlers;
 using Ikho.Warehouse.Reporting.Features.InventoryPosition;
@@ -63,6 +64,16 @@ builder.Services.AddKafkaConsumer<ReportingDbContext, AllocationConfirmed, Alloc
     "warehouse.outbound.AllocationConfirmed", nameof(AllocationConfirmed), "WarehouseReporting.AllocationConfirmed");
 builder.Services.AddKafkaConsumer<ReportingDbContext, ShipmentDispatched, ShipmentDispatchedHandler>(
     "warehouse.outbound.ShipmentDispatched", nameof(ShipmentDispatched), "WarehouseReporting.ShipmentDispatched");
+
+// FulfillmentKpis subscribes independently to the same three topics above (distinct consumer
+// names -> distinct Kafka consumer groups, see KafkaConsumerBackgroundService), instead of its
+// repository being reached into from the InboundStatus/OutboundStatus handlers.
+builder.Services.AddKafkaConsumer<ReportingDbContext, ReceiptCompleted, ReceiptCompletedKpiHandler>(
+    "warehouse.inbound.ReceiptCompleted", nameof(ReceiptCompleted), "WarehouseReporting.FulfillmentKpis.ReceiptCompleted");
+builder.Services.AddKafkaConsumer<ReportingDbContext, AllocationConfirmed, AllocationConfirmedKpiHandler>(
+    "warehouse.outbound.AllocationConfirmed", nameof(AllocationConfirmed), "WarehouseReporting.FulfillmentKpis.AllocationConfirmed");
+builder.Services.AddKafkaConsumer<ReportingDbContext, ShipmentDispatched, ShipmentDispatchedKpiHandler>(
+    "warehouse.outbound.ShipmentDispatched", nameof(ShipmentDispatched), "WarehouseReporting.FulfillmentKpis.ShipmentDispatched");
 
 var app = builder.Build();
 

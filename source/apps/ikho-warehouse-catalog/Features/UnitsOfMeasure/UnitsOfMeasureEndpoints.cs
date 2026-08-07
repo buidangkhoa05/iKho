@@ -12,26 +12,35 @@ public static class UnitsOfMeasureEndpoints
     {
         var group = app.MapGroup("/api/warehouse/catalog/units-of-measure").WithTags("UnitsOfMeasure");
 
-        group.MapPost("/", async Task<Results<Created<UomResponse>, Conflict<string>>> (
+        group.MapPost("/", async Task<Results<Created<UomResponse>, Conflict<string>, BadRequest<string>>> (
             CreateUomRequest request,
             UnitsOfMeasureService service,
             CancellationToken cancellationToken) =>
         {
-            var uom = await service.CreateAsync(request, cancellationToken);
+            var (outcome, uom) = await service.CreateAsync(request, cancellationToken);
 
-            return uom is null
-                ? TypedResults.Conflict($"UOM code '{request.Code}' is already in use.")
-                : TypedResults.Created($"/api/warehouse/catalog/units-of-measure/{uom.Id}", uom);
+            return outcome switch
+            {
+                CreateUomOutcome.ValidationFailed => TypedResults.BadRequest("Code and Name are required."),
+                CreateUomOutcome.CodeAlreadyExists => TypedResults.Conflict($"UOM code '{request.Code}' is already in use."),
+                _ => TypedResults.Created($"/api/warehouse/catalog/units-of-measure/{uom!.Id}", uom),
+            };
         });
 
-        group.MapPut("/{id:guid}", async Task<Results<Ok<UomResponse>, NotFound>> (
+        group.MapPut("/{id:guid}", async Task<Results<Ok<UomResponse>, NotFound, BadRequest<string>>> (
             Guid id,
             UpdateUomRequest request,
             UnitsOfMeasureService service,
             CancellationToken cancellationToken) =>
         {
-            var uom = await service.UpdateAsync(id, request, cancellationToken);
-            return uom is null ? TypedResults.NotFound() : TypedResults.Ok(uom);
+            var (outcome, uom) = await service.UpdateAsync(id, request, cancellationToken);
+
+            return outcome switch
+            {
+                UpdateUomOutcome.NotFound => TypedResults.NotFound(),
+                UpdateUomOutcome.ValidationFailed => TypedResults.BadRequest("Name is required."),
+                _ => TypedResults.Ok(uom!),
+            };
         });
 
         group.MapGet("/{id:guid}", async Task<Results<Ok<UomResponse>, NotFound>> (

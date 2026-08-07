@@ -24,6 +24,50 @@ public sealed record UpdateProductRequest(
 /// <summary>Request body to activate or deactivate a product.</summary>
 public sealed record SetProductStatusRequest(bool IsActive);
 
+/// <summary>Result of a product creation attempt.</summary>
+public enum CreateProductOutcome
+{
+    /// <summary>The product was created successfully.</summary>
+    Created,
+
+    /// <summary>The request failed local validation (a blank SKU or name).</summary>
+    ValidationFailed,
+
+    /// <summary><c>Sku</c> is already in use.</summary>
+    SkuAlreadyExists,
+
+    /// <summary>The referenced <c>CategoryId</c> does not exist.</summary>
+    CategoryNotFound,
+
+    /// <summary>The referenced <c>BrandId</c> does not exist.</summary>
+    BrandNotFound,
+
+    /// <summary>The referenced <c>DefaultUomId</c> does not exist.</summary>
+    DefaultUomNotFound,
+}
+
+/// <summary>Result of a product update attempt.</summary>
+public enum UpdateProductOutcome
+{
+    /// <summary>The product was updated successfully.</summary>
+    Updated,
+
+    /// <summary>The product does not exist.</summary>
+    ProductNotFound,
+
+    /// <summary>The request failed local validation (a blank name).</summary>
+    ValidationFailed,
+
+    /// <summary>The referenced <c>CategoryId</c> does not exist.</summary>
+    CategoryNotFound,
+
+    /// <summary>The referenced <c>BrandId</c> does not exist.</summary>
+    BrandNotFound,
+
+    /// <summary>The referenced <c>DefaultUomId</c> does not exist.</summary>
+    DefaultUomNotFound,
+}
+
 /// <summary>Request body to add a barcode to a product.</summary>
 public sealed record AddBarcodeRequest(string Code);
 

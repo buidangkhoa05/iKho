@@ -16,21 +16,32 @@ public static class ProductsEndpoints
     {
         var group = app.MapGroup("/api/warehouse/catalog/products").WithTags("Products");
 
-        group.MapPost("/", async Task<Results<Created<ProductResponse>, Conflict<string>>> (
+        group.MapPost("/", async Task<Results<Created<ProductResponse>, NotFound<string>, Conflict<string>, BadRequest<string>>> (
             CreateProductRequest request,
             ProductsService service,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
-            var product = await service.CreateAsync(request, correlationId, cancellationToken);
+            var (outcome, product) = await service.CreateAsync(request, correlationId, cancellationToken);
 
-            return product is null
-                ? TypedResults.Conflict($"SKU '{request.Sku}' is already in use.")
-                : TypedResults.Created($"/api/warehouse/catalog/products/{product.Id}", product);
+            return outcome switch
+            {
+                CreateProductOutcome.ValidationFailed =>
+                    TypedResults.BadRequest("Sku and Name are required."),
+                CreateProductOutcome.CategoryNotFound =>
+                    TypedResults.NotFound($"Category '{request.CategoryId}' not found."),
+                CreateProductOutcome.BrandNotFound =>
+                    TypedResults.NotFound($"Brand '{request.BrandId}' not found."),
+                CreateProductOutcome.DefaultUomNotFound =>
+                    TypedResults.NotFound($"Unit of measure '{request.DefaultUomId}' not found."),
+                CreateProductOutcome.SkuAlreadyExists =>
+                    TypedResults.Conflict($"SKU '{request.Sku}' is already in use."),
+                _ => TypedResults.Created($"/api/warehouse/catalog/products/{product!.Id}", product),
+            };
         });
 
-        group.MapPut("/{id:guid}", async Task<Results<Ok<ProductResponse>, NotFound>> (
+        group.MapPut("/{id:guid}", async Task<Results<Ok<ProductResponse>, NotFound<string>, BadRequest<string>>> (
             Guid id,
             UpdateProductRequest request,
             ProductsService service,
@@ -38,8 +49,22 @@ public static class ProductsEndpoints
             CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
-            var product = await service.UpdateAsync(id, request, correlationId, cancellationToken);
-            return product is null ? TypedResults.NotFound() : TypedResults.Ok(product);
+            var (outcome, product) = await service.UpdateAsync(id, request, correlationId, cancellationToken);
+
+            return outcome switch
+            {
+                UpdateProductOutcome.ValidationFailed =>
+                    TypedResults.BadRequest("Name is required."),
+                UpdateProductOutcome.ProductNotFound =>
+                    TypedResults.NotFound($"Product '{id}' not found."),
+                UpdateProductOutcome.CategoryNotFound =>
+                    TypedResults.NotFound($"Category '{request.CategoryId}' not found."),
+                UpdateProductOutcome.BrandNotFound =>
+                    TypedResults.NotFound($"Brand '{request.BrandId}' not found."),
+                UpdateProductOutcome.DefaultUomNotFound =>
+                    TypedResults.NotFound($"Unit of measure '{request.DefaultUomId}' not found."),
+                _ => TypedResults.Ok(product!),
+            };
         });
 
         group.MapPatch("/{id:guid}/status", async Task<Results<Ok<ProductResponse>, NotFound>> (

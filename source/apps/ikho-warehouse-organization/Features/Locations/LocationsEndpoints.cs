@@ -17,12 +17,13 @@ public static class LocationsEndpoints
     {
         var group = app.MapGroup("/api/warehouse/organization").WithTags("Locations");
 
-        group.MapPost("/zones", async Task<Results<Created<ZoneResponse>, NotFound<string>, Conflict<string>>> (
+        group.MapPost("/zones", async Task<Results<Created<ZoneResponse>, NotFound<string>, Conflict<string>, BadRequest<string>>> (
             CreateZoneRequest request, LocationsService service, CancellationToken cancellationToken) =>
         {
             var (outcome, zone) = await service.CreateZoneAsync(request, cancellationToken);
             return outcome switch
             {
+                CreateLocationOutcome.ValidationFailed => TypedResults.BadRequest("Code and Name are required."),
                 CreateLocationOutcome.ParentNotFound => TypedResults.NotFound($"Warehouse '{request.WarehouseId}' does not exist."),
                 CreateLocationOutcome.CodeAlreadyExists => TypedResults.Conflict($"Zone code '{request.Code}' is already in use for this warehouse."),
                 _ => TypedResults.Created($"/api/warehouse/organization/zones/{zone!.Id}", zone),
@@ -36,12 +37,13 @@ public static class LocationsEndpoints
             return zone is null ? TypedResults.NotFound() : TypedResults.Ok(zone);
         });
 
-        group.MapPost("/aisles", async Task<Results<Created<AisleResponse>, NotFound<string>, Conflict<string>>> (
+        group.MapPost("/aisles", async Task<Results<Created<AisleResponse>, NotFound<string>, Conflict<string>, BadRequest<string>>> (
             CreateAisleRequest request, LocationsService service, CancellationToken cancellationToken) =>
         {
             var (outcome, aisle) = await service.CreateAisleAsync(request, cancellationToken);
             return outcome switch
             {
+                CreateLocationOutcome.ValidationFailed => TypedResults.BadRequest("Code and Name are required."),
                 CreateLocationOutcome.ParentNotFound => TypedResults.NotFound($"Zone '{request.ZoneId}' does not exist."),
                 CreateLocationOutcome.CodeAlreadyExists => TypedResults.Conflict($"Aisle code '{request.Code}' is already in use for this zone."),
                 _ => TypedResults.Created($"/api/warehouse/organization/aisles/{aisle!.Id}", aisle),
@@ -55,13 +57,14 @@ public static class LocationsEndpoints
             return aisle is null ? TypedResults.NotFound() : TypedResults.Ok(aisle);
         });
 
-        group.MapPost("/bins", async Task<Results<Created<BinResponse>, NotFound<string>, Conflict<string>>> (
+        group.MapPost("/bins", async Task<Results<Created<BinResponse>, NotFound<string>, Conflict<string>, BadRequest<string>>> (
             CreateBinRequest request, LocationsService service, HttpContext httpContext, CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
             var (outcome, bin) = await service.CreateBinAsync(request, correlationId, cancellationToken);
             return outcome switch
             {
+                CreateLocationOutcome.ValidationFailed => TypedResults.BadRequest("Code is required."),
                 CreateLocationOutcome.ParentNotFound => TypedResults.NotFound($"Aisle '{request.AisleId}' does not exist."),
                 CreateLocationOutcome.CodeAlreadyExists => TypedResults.Conflict($"Bin code '{request.Code}' is already in use for this aisle."),
                 _ => TypedResults.Created($"/api/warehouse/organization/bins/{bin!.Id}", bin),
@@ -79,12 +82,13 @@ public static class LocationsEndpoints
         group.MapGet("/bins/{id:guid}/validate", async (Guid id, LocationsService service, CancellationToken cancellationToken) =>
             TypedResults.Ok(await service.ValidateBinAsync(id, cancellationToken)));
 
-        group.MapPost("/docks", async Task<Results<Created<DockResponse>, NotFound<string>, Conflict<string>>> (
+        group.MapPost("/docks", async Task<Results<Created<DockResponse>, NotFound<string>, Conflict<string>, BadRequest<string>>> (
             CreateDockRequest request, LocationsService service, CancellationToken cancellationToken) =>
         {
             var (outcome, dock) = await service.CreateDockAsync(request, cancellationToken);
             return outcome switch
             {
+                CreateLocationOutcome.ValidationFailed => TypedResults.BadRequest("Code and Name are required."),
                 CreateLocationOutcome.ParentNotFound => TypedResults.NotFound($"Warehouse '{request.WarehouseId}' does not exist."),
                 CreateLocationOutcome.CodeAlreadyExists => TypedResults.Conflict($"Dock code '{request.Code}' is already in use for this warehouse."),
                 _ => TypedResults.Created($"/api/warehouse/organization/docks/{dock!.Id}", dock),

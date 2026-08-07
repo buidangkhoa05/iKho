@@ -11,6 +11,16 @@ public interface IPaymentsRepository
     /// <summary>Fetches an invoice by id, tracked for mutation (updating its status), or <see langword="null"/> if not found.</summary>
     Task<Invoice?> GetInvoiceByIdAsync(Guid invoiceId, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Forces <paramref name="invoice"/>'s row to participate in <see cref="SaveChangesAsync"/>'s
+    /// optimistic-concurrency check even if none of its mapped properties actually changed value
+    /// (e.g. <c>Status</c> staying <see cref="InvoiceStatus.PartiallyPaid"/> across two payments).
+    /// Without this, EF Core's change tracker would consider the invoice unmodified and skip
+    /// generating an <c>UPDATE</c> for it, silently bypassing the concurrency token — see the
+    /// remarks on <c>Invoice</c>'s configuration in <c>BillingDbContext</c>.
+    /// </summary>
+    void MarkForConcurrencyCheck(Invoice invoice);
+
     /// <summary>Sums the amount of every <see cref="PaymentStatus.Recorded"/> payment against an invoice.</summary>
     Task<decimal> GetRecordedAmountAsync(Guid invoiceId, CancellationToken cancellationToken);
 
@@ -36,6 +46,10 @@ public sealed class PaymentsRepository(BillingDbContext dbContext) : IPaymentsRe
     /// <inheritdoc />
     public Task<Invoice?> GetInvoiceByIdAsync(Guid invoiceId, CancellationToken cancellationToken) =>
         dbContext.Invoices.SingleOrDefaultAsync(x => x.Id == invoiceId, cancellationToken);
+
+    /// <inheritdoc />
+    public void MarkForConcurrencyCheck(Invoice invoice) =>
+        dbContext.Entry(invoice).Property(nameof(Invoice.Status)).IsModified = true;
 
     /// <inheritdoc />
     public async Task<decimal> GetRecordedAmountAsync(Guid invoiceId, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,18 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ikho-schema-management\Ikho.SchemaManagement.csproj" />
+    <!-- This is a class library consumed by every warehouse service via ProjectReference,
+         not an independently deployable app (see CLAUDE.md workspace-placement rule) — so it
+         uses the plain Sdk plus an explicit FrameworkReference rather than Sdk.Web, which would
+         otherwise imply OutputType=Exe and a standalone hosting model this project never uses. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Sdk.Web's default Content glob copies appsettings*.json into the publish
-         output of every project that references this one, colliding with the
-         referencing project's own appsettings*.json at the same relative path
-         (NETSDK1152). This library's own config is only meaningful when it runs
-         standalone, so keep it out of consumers' publish output. -->
-    <Content Update="appsettings*.json">
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
+    <ProjectReference Include="..\ikho-schema-management\Ikho.SchemaManagement.csproj" />
   </ItemGroup>
 
   <ItemGroup>

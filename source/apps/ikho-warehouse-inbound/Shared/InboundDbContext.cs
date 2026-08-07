@@ -62,6 +62,13 @@ public sealed class InboundDbContext(DbContextOptions<InboundDbContext> options)
             entity.Property(x => x.OrderedQuantity).HasPrecision(18, 4);
             entity.Property(x => x.ReceivedQuantity).HasPrecision(18, 4);
             entity.HasIndex(x => x.PurchaseOrderId);
+
+            // Optimistic concurrency: ReceivedQuantity is read-then-incremented by
+            // ReceiptsService.CompleteAsync without app-level locking, so two concurrent receipts
+            // against the same line must fail loudly (DbUpdateConcurrencyException) rather than
+            // both silently pass the "would exceed ordered quantity" check. Maps to Postgres's
+            // native "xmin" system column rather than a real table column/migration.
+            entity.Property<uint>("xmin").IsRowVersion();
         });
 
         modelBuilder.Entity<Receipt>(entity =>

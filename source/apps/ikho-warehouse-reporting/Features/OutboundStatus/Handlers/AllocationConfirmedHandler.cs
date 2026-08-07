@@ -1,35 +1,27 @@
 using Ikho.SchemaManagement.Contracts.WarehouseOutbound.Events.V1;
 using Ikho.SharedLibrary.Events;
-using Ikho.Warehouse.Reporting.Features.FulfillmentKpis;
 
 namespace Ikho.Warehouse.Reporting.Features.OutboundStatus.Handlers;
 
 /// <summary>
-/// Projects the Outbound service's <c>AllocationConfirmed</c> event onto both the
-/// outbound-status read model (per sales order) and the daily fulfillment-KPI counters.
+/// Projects the Outbound service's <c>AllocationConfirmed</c> event onto the outbound-status
+/// read model (per sales order). Daily fulfillment-KPI counters are updated independently by
+/// <see cref="Ikho.Warehouse.Reporting.Features.FulfillmentKpis.Handlers.AllocationConfirmedKpiHandler"/>,
+/// registered against the same topic under its own consumer group.
 /// </summary>
-public sealed class AllocationConfirmedHandler(
-    IOutboundStatusRepository outboundStatusRepository,
-    IFulfillmentKpiRepository fulfillmentKpiRepository) : IIntegrationEventHandler<AllocationConfirmed>
+public sealed class AllocationConfirmedHandler(IOutboundStatusRepository repository) : IIntegrationEventHandler<AllocationConfirmed>
 {
     /// <inheritdoc />
     public async Task HandleAsync(AllocationConfirmed @event, string? correlationId, CancellationToken cancellationToken)
     {
         var salesOrderId = Guid.Parse(@event.salesOrderId);
         var warehouseId = Guid.Parse(@event.warehouseId);
-        var confirmedOn = DateTimeOffset.Parse(@event.confirmedOn);
 
-        var status = await outboundStatusRepository.GetOrCreateAsync(salesOrderId, cancellationToken);
+        var status = await repository.GetOrCreateAsync(salesOrderId, cancellationToken);
         status.WarehouseId = warehouseId;
         status.AllocationsConfirmedCount += 1;
         status.UpdatedOnUtc = DateTimeOffset.UtcNow;
 
-        var kpi = await fulfillmentKpiRepository.GetOrCreateAsync(DateOnly.FromDateTime(confirmedOn.UtcDateTime), cancellationToken);
-        kpi.TotalAllocationsConfirmed += 1;
-        kpi.UpdatedOnUtc = DateTimeOffset.UtcNow;
-
-        // Both repositories share the same scoped ReportingDbContext, so a single SaveChanges
-        // call commits both mutations atomically.
-        await outboundStatusRepository.SaveChangesAsync(cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
     }
 }

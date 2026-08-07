@@ -4,6 +4,7 @@ using Ikho.SchemaManagement.Contracts.WarehouseInbound.Events.V1;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.Warehouse.Inbound.Domain;
 using Ikho.Warehouse.Inbound.Shared.Clients;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ikho.Warehouse.Inbound.Features.Receipts;
 
@@ -39,25 +40,31 @@ public enum CompleteReceiptOutcome
 
     /// <summary>Inventory returned an unexpected error.</summary>
     InventoryUnexpectedError,
+
+    /// <summary>Another request concurrently received against the same purchase order line; retry.</summary>
+    ConcurrencyConflict,
 }
 
 /// <summary>
 /// Business logic for completing receipts against a purchase order. For each line, verifies the
 /// line exists and would not be over-received, hands the quantity off to Inventory's
-/// receive-stock command, and — only once every line succeeds — records the
-/// <see cref="Receipt"/>/<see cref="ReceiptLine"/> rows, creates an already-completed
-/// <see cref="PutawayTask"/> per line (see the remarks on <see cref="PutawayTask"/> for why
-/// putaway is folded into this flow), advances the purchase order's status, and publishes
-/// <c>ReceiptCompleted</c> and one <c>PutawayTaskCompleted</c> per line via the transactional
-/// outbox.
+/// receive-stock command, and records the <see cref="Receipt"/>/<see cref="ReceiptLine"/> rows and
+/// an already-completed <see cref="PutawayTask"/> per line (see the remarks on
+/// <see cref="PutawayTask"/> for why putaway is folded into this flow), advancing the purchase
+/// order's status and publishing <c>ReceiptCompleted</c> plus one <c>PutawayTaskCompleted</c> per
+/// successfully-received line via the transactional outbox.
 /// </summary>
 /// <remarks>
-/// This slice does not implement saga-style compensation: if a later line's call to Inventory
-/// fails, quantities already handed off to Inventory for earlier lines in the same request are
-/// not rolled back (Inventory has already committed that stock), even though nothing is
-/// persisted on the Inbound side for this request. Operators must reconcile such partial
-/// failures manually — acceptable for this slice's scope, called out here rather than silently
-/// assumed away.
+/// This slice does not implement saga-style compensation against Inventory: if a later line's
+/// call fails, quantities already handed off to Inventory for earlier lines in the same request
+/// are not rolled back (Inventory has already committed that stock). Instead, lines that
+/// succeeded before the failure ARE persisted here as a partial receipt (mirroring
+/// <c>AllocationsService.AllocateAsync</c>'s forward-recovery pattern) — critically, this means a
+/// client retrying with the same full line list will only re-attempt the lines still missing a
+/// <see cref="ReceiptLine"/>, since <see cref="PurchaseOrderLine.ReceivedQuantity"/> already
+/// reflects the successful ones. Persisting nothing on partial failure (the previous behavior)
+/// would let a naive retry resubmit already-received lines to Inventory a second time, silently
+/// double-counting physical stock — worse than a partial receipt.
 /// </remarks>
 public sealed class ReceiptsService(IReceiptsRepository repository, IInventoryApiClient inventoryClient, IOutboxWriter outbox)
 {
@@ -94,20 +101,25 @@ public sealed class ReceiptsService(IReceiptsRepository repository, IInventoryAp
         };
         var putawayTasks = new List<PutawayTask>();
 
+        CompleteReceiptOutcome? failureOutcome = null;
+        string? failureError = null;
+
         foreach (var lineRequest in request.Lines)
         {
             var purchaseOrderLine = purchaseOrder.Lines.SingleOrDefault(l => l.Id == lineRequest.PurchaseOrderLineId);
             if (purchaseOrderLine is null)
             {
-                return (CompleteReceiptOutcome.PurchaseOrderLineNotFound, null,
-                    $"Purchase order line '{lineRequest.PurchaseOrderLineId}' was not found on purchase order '{purchaseOrder.Id}'.");
+                failureOutcome = CompleteReceiptOutcome.PurchaseOrderLineNotFound;
+                failureError = $"Purchase order line '{lineRequest.PurchaseOrderLineId}' was not found on purchase order '{purchaseOrder.Id}'.";
+                break;
             }
 
             if (purchaseOrderLine.ReceivedQuantity + lineRequest.Quantity > purchaseOrderLine.OrderedQuantity)
             {
-                return (CompleteReceiptOutcome.ExceedsOrderedQuantity, null,
-                    $"Receiving {lineRequest.Quantity} against line '{purchaseOrderLine.Id}' would exceed its ordered quantity of " +
-                    $"{purchaseOrderLine.OrderedQuantity} (already received {purchaseOrderLine.ReceivedQuantity}).");
+                failureOutcome = CompleteReceiptOutcome.ExceedsOrderedQuantity;
+                failureError = $"Receiving {lineRequest.Quantity} against line '{purchaseOrderLine.Id}' would exceed its ordered quantity of " +
+                    $"{purchaseOrderLine.OrderedQuantity} (already received {purchaseOrderLine.ReceivedQuantity}).";
+                break;
             }
 
             var inventoryResult = await inventoryClient.ReceiveStockAsync(
@@ -116,14 +128,15 @@ public sealed class ReceiptsService(IReceiptsRepository repository, IInventoryAp
 
             if (inventoryResult.Outcome != InventoryReceiveOutcome.Success)
             {
-                var error = inventoryResult.Error ?? "Inventory rejected the receipt.";
-                return inventoryResult.Outcome switch
+                failureError = inventoryResult.Error ?? "Inventory rejected the receipt.";
+                failureOutcome = inventoryResult.Outcome switch
                 {
-                    InventoryReceiveOutcome.BadRequest => (CompleteReceiptOutcome.InventoryBadRequest, null, error),
-                    InventoryReceiveOutcome.NotFound => (CompleteReceiptOutcome.InventoryNotFound, null, error),
-                    InventoryReceiveOutcome.Conflict => (CompleteReceiptOutcome.InventoryConflict, null, error),
-                    _ => (CompleteReceiptOutcome.InventoryUnexpectedError, null, error),
+                    InventoryReceiveOutcome.BadRequest => CompleteReceiptOutcome.InventoryBadRequest,
+                    InventoryReceiveOutcome.NotFound => CompleteReceiptOutcome.InventoryNotFound,
+                    InventoryReceiveOutcome.Conflict => CompleteReceiptOutcome.InventoryConflict,
+                    _ => CompleteReceiptOutcome.InventoryUnexpectedError,
                 };
+                break;
             }
 
             purchaseOrderLine.ReceivedQuantity += lineRequest.Quantity;
@@ -148,6 +161,13 @@ public sealed class ReceiptsService(IReceiptsRepository repository, IInventoryAp
                 BinId = receiptLine.BinId,
                 Quantity = receiptLine.Quantity,
             });
+        }
+
+        // Nothing from this request reached Inventory (the very first line failed local
+        // validation) — nothing to persist, so bail out without touching the database.
+        if (failureOutcome is not null && receipt.Lines.Count == 0)
+        {
+            return (failureOutcome.Value, null, failureError);
         }
 
         purchaseOrder.Status = purchaseOrder.Lines.All(l => l.ReceivedQuantity == l.OrderedQuantity)
@@ -184,7 +204,25 @@ public sealed class ReceiptsService(IReceiptsRepository repository, IInventoryAp
             repository.Add(outbox.Enqueue(nameof(PutawayTaskCompleted), JsonSerializer.Serialize(putawayTaskCompleted), correlationId));
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return (CompleteReceiptOutcome.ConcurrencyConflict, null,
+                "One or more purchase order lines were concurrently modified; retry the receipt.");
+        }
+
+        // Some lines succeeded but a later one failed — report the partial receipt alongside the
+        // failure that stopped it, so the caller knows exactly which lines still need retrying
+        // (any request line without a matching ReceiptLine here).
+        if (failureOutcome is not null)
+        {
+            return (failureOutcome.Value, ReceiptResponse.FromEntity(receipt),
+                $"{failureError} {receipt.Lines.Count} of {request.Lines.Count} lines were received and persisted before this failure; " +
+                "retry with only the remaining lines.");
+        }
 
         return (CompleteReceiptOutcome.Completed, ReceiptResponse.FromEntity(receipt), null);
     }

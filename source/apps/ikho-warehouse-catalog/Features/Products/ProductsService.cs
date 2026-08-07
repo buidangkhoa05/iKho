@@ -15,14 +15,35 @@ namespace Ikho.Warehouse.Catalog.Features.Products;
 public sealed class ProductsService(IProductRepository repository, IOutboxWriter outbox)
 {
     /// <summary>
-    /// Creates a new product. Returns <see langword="null"/> if the SKU is already in use.
+    /// Attempts to create a new product. See <see cref="CreateProductOutcome"/> for the possible
+    /// failure reasons.
     /// </summary>
-    public async Task<ProductResponse?> CreateAsync(
+    public async Task<(CreateProductOutcome Outcome, ProductResponse? Product)> CreateAsync(
         CreateProductRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Sku) || string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (CreateProductOutcome.ValidationFailed, null);
+        }
+
+        if (request.CategoryId is { } categoryId && !await repository.CategoryExistsAsync(categoryId, cancellationToken))
+        {
+            return (CreateProductOutcome.CategoryNotFound, null);
+        }
+
+        if (request.BrandId is { } brandId && !await repository.BrandExistsAsync(brandId, cancellationToken))
+        {
+            return (CreateProductOutcome.BrandNotFound, null);
+        }
+
+        if (request.DefaultUomId is { } defaultUomId && !await repository.UomExistsAsync(defaultUomId, cancellationToken))
+        {
+            return (CreateProductOutcome.DefaultUomNotFound, null);
+        }
+
         if (await repository.SkuExistsAsync(request.Sku, cancellationToken))
         {
-            return null;
+            return (CreateProductOutcome.SkuAlreadyExists, null);
         }
 
         var product = new Product
@@ -60,24 +81,44 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
         catch (DbUpdateException)
         {
             // Unique index on Sku caught a concurrent create — treat same as upfront check.
-            return null;
+            return (CreateProductOutcome.SkuAlreadyExists, null);
         }
 
-        return ProductResponse.FromEntity(product);
+        return (CreateProductOutcome.Created, ProductResponse.FromEntity(product));
     }
 
     /// <summary>
-    /// Updates an existing product's details, publishing <c>ProductUpdated</c> when descriptive
-    /// fields change and <c>ProductTrackingPolicyChanged</c> when lot/serial tracking flags
-    /// change. Returns <see langword="null"/> if not found.
+    /// Attempts to update an existing product's details, publishing <c>ProductUpdated</c> when
+    /// descriptive fields change and <c>ProductTrackingPolicyChanged</c> when lot/serial tracking
+    /// flags change. See <see cref="UpdateProductOutcome"/> for the possible failure reasons.
     /// </summary>
-    public async Task<ProductResponse?> UpdateAsync(
+    public async Task<(UpdateProductOutcome Outcome, ProductResponse? Product)> UpdateAsync(
         Guid id, UpdateProductRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (UpdateProductOutcome.ValidationFailed, null);
+        }
+
         var product = await repository.GetByIdAsync(id, cancellationToken);
         if (product is null)
         {
-            return null;
+            return (UpdateProductOutcome.ProductNotFound, null);
+        }
+
+        if (request.CategoryId is { } categoryId && !await repository.CategoryExistsAsync(categoryId, cancellationToken))
+        {
+            return (UpdateProductOutcome.CategoryNotFound, null);
+        }
+
+        if (request.BrandId is { } brandId && !await repository.BrandExistsAsync(brandId, cancellationToken))
+        {
+            return (UpdateProductOutcome.BrandNotFound, null);
+        }
+
+        if (request.DefaultUomId is { } defaultUomId && !await repository.UomExistsAsync(defaultUomId, cancellationToken))
+        {
+            return (UpdateProductOutcome.DefaultUomNotFound, null);
         }
 
         var detailsChanged = product.Name != request.Name
@@ -131,7 +172,7 @@ public sealed class ProductsService(IProductRepository repository, IOutboxWriter
             await repository.SaveChangesAsync(cancellationToken);
         }
 
-        return ProductResponse.FromEntity(product);
+        return (UpdateProductOutcome.Updated, ProductResponse.FromEntity(product));
     }
 
     /// <summary>

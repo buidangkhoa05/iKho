@@ -23,6 +23,8 @@ public static class StockAdjustmentsEndpoints
 
             return outcome switch
             {
+                AdjustStockOutcome.ValidationFailed =>
+                    TypedResults.BadRequest("ReasonCode is required."),
                 AdjustStockOutcome.StockItemNotFound =>
                     TypedResults.NotFound($"Stock item '{request.StockItemId}' was not found."),
                 AdjustStockOutcome.WouldGoNegative =>

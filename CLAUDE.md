@@ -35,7 +35,6 @@ Further architecture docs live under `docs/architecture/` (API gateway, warehous
 cd source
 pnpm install                               # install all JS deps
 pnpm nx serve ikho-ui                      # Angular dev server at :4200 (proxies /api to :5143)
-pnpm nx serve Ikho.SharedLibrary           # .NET shared lib API at :5143
 pnpm nx serve Ikho.Warehouse.Organization  # Organization service at :5151
 pnpm nx build ikho-ui                      # Angular production build
 pnpm nx build ikho-shared-ui               # buildable library compile

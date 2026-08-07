@@ -15,28 +15,39 @@ public static class CompaniesEndpoints
     {
         var group = app.MapGroup("/api/warehouse/organization/companies").WithTags("Companies");
 
-        group.MapPost("/", async Task<Results<Created<CompanyResponse>, Conflict<string>>> (
+        group.MapPost("/", async Task<Results<Created<CompanyResponse>, Conflict<string>, BadRequest<string>>> (
             CreateCompanyRequest request,
             CompaniesService service,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             var correlationId = httpContext.GetCorrelationId();
-            var company = await service.CreateAsync(request, correlationId, cancellationToken);
+            var (outcome, company) = await service.CreateAsync(request, correlationId, cancellationToken);
 
-            return company is null
-                ? TypedResults.Conflict($"Company code '{request.Code}' is already in use.")
-                : TypedResults.Created($"/api/warehouse/organization/companies/{company.Id}", company);
+            return outcome switch
+            {
+                CreateCompanyOutcome.ValidationFailed =>
+                    TypedResults.BadRequest("Code and Name are required."),
+                CreateCompanyOutcome.CodeAlreadyExists =>
+                    TypedResults.Conflict($"Company code '{request.Code}' is already in use."),
+                _ => TypedResults.Created($"/api/warehouse/organization/companies/{company!.Id}", company),
+            };
         });
 
-        group.MapPut("/{id:guid}", async Task<Results<Ok<CompanyResponse>, NotFound>> (
+        group.MapPut("/{id:guid}", async Task<Results<Ok<CompanyResponse>, NotFound, BadRequest<string>>> (
             Guid id,
             UpdateCompanyRequest request,
             CompaniesService service,
             CancellationToken cancellationToken) =>
         {
-            var company = await service.UpdateAsync(id, request, cancellationToken);
-            return company is null ? TypedResults.NotFound() : TypedResults.Ok(company);
+            var (outcome, company) = await service.UpdateAsync(id, request, cancellationToken);
+
+            return outcome switch
+            {
+                UpdateCompanyOutcome.NotFound => TypedResults.NotFound(),
+                UpdateCompanyOutcome.ValidationFailed => TypedResults.BadRequest("Name is required."),
+                _ => TypedResults.Ok(company!),
+            };
         });
 
         group.MapGet("/{id:guid}", async Task<Results<Ok<CompanyResponse>, NotFound>> (

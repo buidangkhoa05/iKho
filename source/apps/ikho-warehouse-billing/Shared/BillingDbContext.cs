@@ -55,6 +55,16 @@ public sealed class BillingDbContext(DbContextOptions<BillingDbContext> options)
                 .WithOne()
                 .HasForeignKey(x => x.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Optimistic concurrency: PaymentsService.RecordAsync reads the cumulative recorded
+            // amount (a SUM over Payments) and checks it against TotalAmount before inserting a
+            // new Payment, without app-level locking, so two concurrent payments against the same
+            // invoice must fail loudly (DbUpdateConcurrencyException) rather than both pass the
+            // check and jointly overshoot TotalAmount. Maps to Postgres's native "xmin" system
+            // column rather than a real table column/migration. See
+            // PaymentsRepository.MarkForConcurrencyCheck for why the caller must force this
+            // property dirty even when its value does not change.
+            entity.Property<uint>("xmin").IsRowVersion();
         });
 
         modelBuilder.Entity<InvoiceLine>(entity =>

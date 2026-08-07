@@ -4,6 +4,7 @@ using Ikho.SchemaManagement.Contracts.WarehouseInventory.Events.V1;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.Warehouse.Inventory.Domain;
 using Ikho.Warehouse.Inventory.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ikho.Warehouse.Inventory.Features.StockReservations;
 
@@ -18,6 +19,9 @@ public enum ReserveStockOutcome
 
     /// <summary>The request itself is invalid (e.g. non-positive quantity).</summary>
     ValidationFailed,
+
+    /// <summary>Another request concurrently mutated the same stock item/balance; retry.</summary>
+    ConcurrencyConflict,
 }
 
 /// <summary>Distinguishes why a release attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
@@ -31,6 +35,9 @@ public enum ReleaseStockOutcome
 
     /// <summary>The reservation exists but is not currently <see cref="ReservationStatus.Active"/>.</summary>
     NotActive,
+
+    /// <summary>Another request concurrently mutated the same stock item/balance; retry.</summary>
+    ConcurrencyConflict,
 }
 
 /// <summary>Distinguishes why a fulfill attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
@@ -44,6 +51,9 @@ public enum FulfillStockOutcome
 
     /// <summary>The reservation exists but is not currently <see cref="ReservationStatus.Active"/>.</summary>
     NotActive,
+
+    /// <summary>Another request concurrently mutated the same stock item/balance; retry.</summary>
+    ConcurrencyConflict,
 }
 
 /// <summary>
@@ -128,7 +138,14 @@ public sealed class StockReservationsService(IStockReservationsRepository reposi
         };
         repository.Add(outbox.Enqueue(nameof(StockReserved), JsonSerializer.Serialize(@event), correlationId));
 
-        await repository.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return (ReserveStockOutcome.ConcurrencyConflict, null);
+        }
 
         return (ReserveStockOutcome.Created, StockReservationResponse.FromEntity(reservation));
     }
@@ -195,7 +212,14 @@ public sealed class StockReservationsService(IStockReservationsRepository reposi
         };
         repository.Add(outbox.Enqueue(nameof(StockReleased), JsonSerializer.Serialize(@event), correlationId));
 
-        await repository.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return (ReleaseStockOutcome.ConcurrencyConflict, null);
+        }
 
         return (ReleaseStockOutcome.Released, StockReservationResponse.FromEntity(reservation));
     }
@@ -287,7 +311,14 @@ public sealed class StockReservationsService(IStockReservationsRepository reposi
         };
         repository.Add(outbox.Enqueue(nameof(StockShipped), JsonSerializer.Serialize(@event), correlationId));
 
-        await repository.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return (FulfillStockOutcome.ConcurrencyConflict, null);
+        }
 
         return (FulfillStockOutcome.Fulfilled, StockReservationResponse.FromEntity(reservation));
     }

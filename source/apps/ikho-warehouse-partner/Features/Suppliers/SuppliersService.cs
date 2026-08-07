@@ -2,9 +2,36 @@ using System.Text.Json;
 using Ikho.SchemaManagement.Contracts.WarehousePartner.Events.V1;
 using Ikho.SharedLibrary.Outbox;
 using Ikho.Warehouse.Partner.Domain;
+using Ikho.Warehouse.Partner.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ikho.Warehouse.Partner.Features.Suppliers;
+
+/// <summary>Distinguishes why a supplier creation attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
+public enum CreateSupplierOutcome
+{
+    /// <summary>The supplier was created successfully.</summary>
+    Created,
+
+    /// <summary>The request failed local validation (a blank code, name, or tax id).</summary>
+    ValidationFailed,
+
+    /// <summary><c>Code</c> is already in use.</summary>
+    CodeAlreadyExists,
+}
+
+/// <summary>Distinguishes why a supplier update attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
+public enum UpdateSupplierOutcome
+{
+    /// <summary>The supplier was updated successfully.</summary>
+    Updated,
+
+    /// <summary>The supplier does not exist.</summary>
+    NotFound,
+
+    /// <summary>The request failed local validation (a blank name or tax id).</summary>
+    ValidationFailed,
+}
 
 /// <summary>
 /// Business logic for creating, updating, and reading suppliers, and managing their addresses
@@ -14,13 +41,18 @@ namespace Ikho.Warehouse.Partner.Features.Suppliers;
 /// </summary>
 public sealed class SuppliersService(ISupplierRepository repository, IOutboxWriter outbox)
 {
-    /// <summary>Creates a new supplier. Returns <see langword="null"/> if the code is already in use.</summary>
-    public async Task<SupplierResponse?> CreateAsync(
+    /// <summary>Attempts to create a new supplier. See <see cref="CreateSupplierOutcome"/> for the possible failure reasons.</summary>
+    public async Task<(CreateSupplierOutcome Outcome, SupplierResponse? Supplier)> CreateAsync(
         CreateSupplierRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.TaxId))
+        {
+            return (CreateSupplierOutcome.ValidationFailed, null);
+        }
+
         if (await repository.CodeExistsAsync(request.Code, cancellationToken))
         {
-            return null;
+            return (CreateSupplierOutcome.CodeAlreadyExists, null);
         }
 
         var supplier = new Supplier
@@ -49,23 +81,29 @@ public sealed class SuppliersService(ISupplierRepository repository, IOutboxWrit
         catch (DbUpdateException)
         {
             // Unique index on Code caught a concurrent create — treat same as upfront check.
-            return null;
+            return (CreateSupplierOutcome.CodeAlreadyExists, null);
         }
 
-        return SupplierResponse.FromEntity(supplier);
+        return (CreateSupplierOutcome.Created, SupplierResponse.FromEntity(supplier));
     }
 
     /// <summary>
-    /// Updates an existing supplier's details, publishing <c>SupplierUpdated</c> only when a
-    /// field actually changes. Returns <see langword="null"/> if not found.
+    /// Attempts to update an existing supplier's details, publishing <c>SupplierUpdated</c> only
+    /// when a field actually changes. See <see cref="UpdateSupplierOutcome"/> for the possible
+    /// failure reasons.
     /// </summary>
-    public async Task<SupplierResponse?> UpdateAsync(
+    public async Task<(UpdateSupplierOutcome Outcome, SupplierResponse? Supplier)> UpdateAsync(
         Guid id, UpdateSupplierRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.TaxId))
+        {
+            return (UpdateSupplierOutcome.ValidationFailed, null);
+        }
+
         var supplier = await repository.GetByIdAsync(id, cancellationToken);
         if (supplier is null)
         {
-            return null;
+            return (UpdateSupplierOutcome.NotFound, null);
         }
 
         if (supplier.Name != request.Name || supplier.TaxId != request.TaxId)
@@ -86,7 +124,7 @@ public sealed class SuppliersService(ISupplierRepository repository, IOutboxWrit
             await repository.SaveChangesAsync(cancellationToken);
         }
 
-        return SupplierResponse.FromEntity(supplier);
+        return (UpdateSupplierOutcome.Updated, SupplierResponse.FromEntity(supplier));
     }
 
     /// <summary>
@@ -153,6 +191,16 @@ public sealed class SuppliersService(ISupplierRepository repository, IOutboxWrit
             return null;
         }
 
+        if (request.IsPrimary)
+        {
+            // Only one address per supplier may be primary — demote any existing one before
+            // adding the new primary address.
+            foreach (var existing in supplier.Addresses.Where(a => a.IsPrimary))
+            {
+                existing.IsPrimary = false;
+            }
+        }
+
         var address = new Address
         {
             SupplierId = supplierId,
@@ -178,6 +226,16 @@ public sealed class SuppliersService(ISupplierRepository repository, IOutboxWrit
         if (supplier is null)
         {
             return null;
+        }
+
+        if (request.IsPrimary)
+        {
+            // Only one contact per supplier may be primary — demote any existing one before
+            // adding the new primary contact.
+            foreach (var existing in supplier.Contacts.Where(c => c.IsPrimary))
+            {
+                existing.IsPrimary = false;
+            }
         }
 
         var contact = new Contact

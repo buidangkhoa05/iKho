@@ -5,6 +5,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ikho.Warehouse.Catalog.Features.Categories;
 
+/// <summary>Distinguishes why a category creation attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
+public enum CreateCategoryOutcome
+{
+    /// <summary>The category was created successfully.</summary>
+    Created,
+
+    /// <summary>The request failed local validation (a blank code or name).</summary>
+    ValidationFailed,
+
+    /// <summary><c>Code</c> is already in use.</summary>
+    CodeAlreadyExists,
+}
+
+/// <summary>Distinguishes why a category update attempt did or did not succeed, so the endpoint can return an accurate status code.</summary>
+public enum UpdateCategoryOutcome
+{
+    /// <summary>The category was updated successfully.</summary>
+    Updated,
+
+    /// <summary>The category does not exist.</summary>
+    NotFound,
+
+    /// <summary>The request failed local validation (a blank name).</summary>
+    ValidationFailed,
+}
+
 /// <summary>
 /// Business logic for creating and updating product categories. Publishes <c>CategoryCreated</c>
 /// on creation and <c>CategoryUpdated</c> when name or active status changes, via the
@@ -13,14 +39,20 @@ namespace Ikho.Warehouse.Catalog.Features.Categories;
 public sealed class CategoriesService(ICategoryRepository repository, IOutboxWriter outbox)
 {
     /// <summary>
-    /// Creates a new category. Returns <see langword="null"/> if the code is already in use.
+    /// Attempts to create a new category. See <see cref="CreateCategoryOutcome"/> for the
+    /// possible failure reasons.
     /// </summary>
-    public async Task<CategoryResponse?> CreateAsync(
+    public async Task<(CreateCategoryOutcome Outcome, CategoryResponse? Category)> CreateAsync(
         CreateCategoryRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (CreateCategoryOutcome.ValidationFailed, null);
+        }
+
         if (await repository.CodeExistsAsync(request.Code, cancellationToken))
         {
-            return null;
+            return (CreateCategoryOutcome.CodeAlreadyExists, null);
         }
 
         var category = new Domain.Category { Code = request.Code, Name = request.Name };
@@ -42,23 +74,29 @@ public sealed class CategoriesService(ICategoryRepository repository, IOutboxWri
         }
         catch (DbUpdateException)
         {
-            return null;
+            return (CreateCategoryOutcome.CodeAlreadyExists, null);
         }
 
-        return CategoryResponse.FromEntity(category);
+        return (CreateCategoryOutcome.Created, CategoryResponse.FromEntity(category));
     }
 
     /// <summary>
-    /// Updates an existing category's name and active status, publishing <c>CategoryUpdated</c>
-    /// only when a field actually changes. Returns <see langword="null"/> if not found.
+    /// Attempts to update an existing category's name and active status, publishing
+    /// <c>CategoryUpdated</c> only when a field actually changes. See
+    /// <see cref="UpdateCategoryOutcome"/> for the possible failure reasons.
     /// </summary>
-    public async Task<CategoryResponse?> UpdateAsync(
+    public async Task<(UpdateCategoryOutcome Outcome, CategoryResponse? Category)> UpdateAsync(
         Guid id, UpdateCategoryRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (UpdateCategoryOutcome.ValidationFailed, null);
+        }
+
         var category = await repository.GetByIdAsync(id, cancellationToken);
         if (category is null)
         {
-            return null;
+            return (UpdateCategoryOutcome.NotFound, null);
         }
 
         if (category.Name != request.Name || category.IsActive != request.IsActive)
@@ -80,7 +118,7 @@ public sealed class CategoriesService(ICategoryRepository repository, IOutboxWri
             await repository.SaveChangesAsync(cancellationToken);
         }
 
-        return CategoryResponse.FromEntity(category);
+        return (UpdateCategoryOutcome.Updated, CategoryResponse.FromEntity(category));
     }
 
     /// <summary>Returns a single category by id, or <see langword="null"/> if not found.</summary>

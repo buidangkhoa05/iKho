@@ -40,6 +40,8 @@ public static class ReceiptsEndpoints
                     TypedResults.Conflict(error ?? "Inventory reported a conflict while receiving stock."),
                 CompleteReceiptOutcome.InventoryUnexpectedError =>
                     TypedResults.Conflict(error ?? "Inventory returned an unexpected error while receiving stock."),
+                CompleteReceiptOutcome.ConcurrencyConflict =>
+                    TypedResults.Conflict(error ?? "One or more purchase order lines were concurrently modified; retry the receipt."),
                 _ => TypedResults.Created($"/api/warehouse/inbound/receipts/{receipt!.Id}", receipt),
             };
         });

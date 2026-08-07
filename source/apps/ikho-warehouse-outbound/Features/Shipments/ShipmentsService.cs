@@ -29,6 +29,20 @@ public enum DispatchSalesOrderOutcome
 /// decrement by calling Inventory's fulfill endpoint, then records the shipment and marks the
 /// order shipped.
 /// </summary>
+/// <remarks>
+/// This slice does not implement saga-style compensation against Inventory: if a later
+/// allocation's fulfill call fails, allocations already fulfilled earlier in the same request are
+/// not rolled back (Inventory has already decremented that stock and consumed the reservation).
+/// Instead, whatever succeeded before the failure is persisted here as a partial shipment
+/// (mirroring <c>AllocationsService.AllocateAsync</c>'s forward-recovery pattern) — the sales
+/// order is left in <see cref="SalesOrderStatus.Allocated"/> rather than advanced to
+/// <see cref="SalesOrderStatus.Shipped"/>, and only the allocations actually fulfilled are moved
+/// to <see cref="AllocationStatus.Fulfilled"/>, so a retry only re-attempts allocations still
+/// <see cref="AllocationStatus.Reserved"/>. Persisting nothing on partial failure (the previous
+/// behavior) would leave Inventory believing stock shipped that Outbound has no record of, and a
+/// naive retry would re-attempt fulfilling an already-consumed reservation and get permanently
+/// stuck.
+/// </remarks>
 public sealed class ShipmentsService(IShipmentsRepository repository, IInventoryApiClient inventoryClient, IOutboxWriter outbox)
 {
     /// <summary>Dispatches a shipment for every reserved allocation on the given sales order.</summary>
@@ -56,18 +70,15 @@ public sealed class ShipmentsService(IShipmentsRepository repository, IInventory
             Status = ShipmentStatus.Dispatched,
         };
 
+        string? failureError = null;
+
         foreach (var allocation in allocations.Where(a => a.Status == AllocationStatus.Reserved))
         {
             var (fulfillOutcome, reservation) = await inventoryClient.FulfillReservationAsync(allocation.InventoryReservationId, cancellationToken);
             if (fulfillOutcome != InventoryFulfillOutcome.Fulfilled || reservation is null)
             {
-                // Nothing has been saved yet at this point (no SaveChangesAsync call above), so
-                // returning here leaves the database untouched even though an earlier iteration
-                // of this loop may have already fulfilled a different allocation in Inventory
-                // itself (no saga/compensation against Inventory in this slice). A client can
-                // safely retry the dispatch once the underlying Inventory issue is resolved.
-                return (DispatchSalesOrderOutcome.InventoryFulfillFailed, null,
-                    $"Failed to fulfill reservation '{allocation.InventoryReservationId}' for allocation '{allocation.Id}' (outcome: {fulfillOutcome}).");
+                failureError = $"Failed to fulfill reservation '{allocation.InventoryReservationId}' for allocation '{allocation.Id}' (outcome: {fulfillOutcome}).";
+                break;
             }
 
             allocation.Status = AllocationStatus.Fulfilled;
@@ -81,8 +92,21 @@ public sealed class ShipmentsService(IShipmentsRepository repository, IInventory
             });
         }
 
+        // Nothing reached Inventory (the very first allocation failed) — nothing to persist.
+        if (failureError is not null && shipment.Lines.Count == 0)
+        {
+            return (DispatchSalesOrderOutcome.InventoryFulfillFailed, null, failureError);
+        }
+
         repository.Add(shipment);
-        salesOrder.Status = SalesOrderStatus.Shipped;
+
+        // Only advance the order to Shipped once every reserved allocation has actually been
+        // fulfilled — a partial dispatch leaves it Allocated so a retry picks up where this
+        // request left off (see the type's remarks).
+        if (failureError is null)
+        {
+            salesOrder.Status = SalesOrderStatus.Shipped;
+        }
 
         var @event = new ShipmentDispatched
         {
@@ -95,6 +119,13 @@ public sealed class ShipmentsService(IShipmentsRepository repository, IInventory
         repository.Add(outbox.Enqueue(nameof(ShipmentDispatched), JsonSerializer.Serialize(@event), correlationId));
 
         await repository.SaveChangesAsync(cancellationToken);
+
+        if (failureError is not null)
+        {
+            return (DispatchSalesOrderOutcome.InventoryFulfillFailed, ShipmentResponse.FromEntity(shipment),
+                $"{failureError} {shipment.Lines.Count} allocation(s) were fulfilled and persisted before this failure; " +
+                "retry to continue with the remaining reserved allocations.");
+        }
 
         return (DispatchSalesOrderOutcome.Dispatched, ShipmentResponse.FromEntity(shipment), null);
     }

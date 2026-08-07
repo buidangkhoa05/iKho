@@ -15,6 +15,9 @@ public enum CreateWarehouseOutcome
     /// <summary>The warehouse was created successfully.</summary>
     Created,
 
+    /// <summary>The request failed local validation (a blank code or name).</summary>
+    ValidationFailed,
+
     /// <summary>The referenced <c>CompanyId</c> does not exist.</summary>
     CompanyNotFound,
 
@@ -35,6 +38,11 @@ public sealed class WarehousesService(IWarehouseRepository repository, IOutboxWr
     public async Task<(CreateWarehouseOutcome Outcome, WarehouseResponse? Warehouse)> CreateAsync(
         CreateWarehouseRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (CreateWarehouseOutcome.ValidationFailed, null);
+        }
+
         if (!await repository.CompanyExistsAsync(request.CompanyId, cancellationToken))
         {
             return (CreateWarehouseOutcome.CompanyNotFound, null);

@@ -31,6 +31,8 @@ public static class PaymentsEndpoints
                     TypedResults.Conflict(error ?? $"Invoice '{id}' has been voided and cannot accept payments."),
                 RecordPaymentOutcome.ExceedsTotalAmount =>
                     TypedResults.Conflict(error ?? "Recording this payment would exceed the invoice's total amount."),
+                RecordPaymentOutcome.ConcurrencyConflict =>
+                    TypedResults.Conflict(error ?? $"Invoice '{id}' was concurrently modified by another payment; retry."),
                 _ => TypedResults.Created($"/api/warehouse/billing/invoices/{id}/payments/{payment!.Id}", payment),
             };
         });

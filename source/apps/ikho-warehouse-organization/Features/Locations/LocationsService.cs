@@ -15,6 +15,9 @@ public enum CreateLocationOutcome
     /// <summary>The location was created successfully.</summary>
     Created,
 
+    /// <summary>The request failed local validation (a blank code or name).</summary>
+    ValidationFailed,
+
     /// <summary>The referenced parent location does not exist.</summary>
     ParentNotFound,
 
@@ -32,6 +35,11 @@ public sealed class LocationsService(ILocationRepository repository, IOutboxWrit
     /// <summary>Creates a new zone under a warehouse.</summary>
     public async Task<(CreateLocationOutcome Outcome, ZoneResponse? Zone)> CreateZoneAsync(CreateZoneRequest request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (CreateLocationOutcome.ValidationFailed, null);
+        }
+
         if (!await repository.WarehouseExistsAsync(request.WarehouseId, cancellationToken))
         {
             return (CreateLocationOutcome.ParentNotFound, null);
@@ -61,6 +69,11 @@ public sealed class LocationsService(ILocationRepository repository, IOutboxWrit
     /// <summary>Creates a new aisle under a zone.</summary>
     public async Task<(CreateLocationOutcome Outcome, AisleResponse? Aisle)> CreateAisleAsync(CreateAisleRequest request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (CreateLocationOutcome.ValidationFailed, null);
+        }
+
         if (!await repository.ZoneExistsAsync(request.ZoneId, cancellationToken))
         {
             return (CreateLocationOutcome.ParentNotFound, null);
@@ -90,6 +103,11 @@ public sealed class LocationsService(ILocationRepository repository, IOutboxWrit
     /// <summary>Creates a new bin under an aisle, publishing <c>BinCreated</c>.</summary>
     public async Task<(CreateLocationOutcome Outcome, BinResponse? Bin)> CreateBinAsync(CreateBinRequest request, string? correlationId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code))
+        {
+            return (CreateLocationOutcome.ValidationFailed, null);
+        }
+
         var aisle = await repository.GetAisleByIdAsync(request.AisleId, cancellationToken);
         if (aisle is null)
         {
@@ -132,6 +150,11 @@ public sealed class LocationsService(ILocationRepository repository, IOutboxWrit
     /// <summary>Creates a new dock under a warehouse.</summary>
     public async Task<(CreateLocationOutcome Outcome, DockResponse? Dock)> CreateDockAsync(CreateDockRequest request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name))
+        {
+            return (CreateLocationOutcome.ValidationFailed, null);
+        }
+
         if (!await repository.WarehouseExistsAsync(request.WarehouseId, cancellationToken))
         {
             return (CreateLocationOutcome.ParentNotFound, null);

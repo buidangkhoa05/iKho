@@ -59,17 +59,6 @@ services:
       timeout: 5s
       retries: 10
 
-  shared-library:
-    build:
-      context: .
-      dockerfile: docker/dotnet.Dockerfile
-      args:
-        PROJECT_PATH: libs/ikho-shared-library/Ikho.SharedLibrary.csproj
-        ASSEMBLY_NAME: Ikho.SharedLibrary
-    container_name: ikho-shared-library
-    ports:
-      - "5143:8080"
-
   warehouse-organization:
     build:
       context: .
@@ -352,7 +341,6 @@ services:
         ASSEMBLY_NAME: Ikho.ApiGateway
     container_name: ikho-api-gateway
     environment:
-      ReverseProxy__Clusters__shared-library-cluster__Destinations__destination1__Address: http://shared-library:8080
       ReverseProxy__Clusters__warehouse-organization-cluster__Destinations__destination1__Address: http://warehouse-organization:8080
       ReverseProxy__Clusters__warehouse-catalog-cluster__Destinations__destination1__Address: http://warehouse-catalog:8080
       ReverseProxy__Clusters__warehouse-partner-cluster__Destinations__destination1__Address: http://warehouse-partner:8080
@@ -365,8 +353,6 @@ services:
     ports:
       - "5080:8080"
     depends_on:
-      shared-library:
-        condition: service_started
       warehouse-organization:
         condition: service_healthy
       warehouse-catalog:
