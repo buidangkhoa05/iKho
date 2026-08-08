@@ -42,3 +42,39 @@ jobs:
             nx-frontend-${{ hashFiles('source/pnpm-lock.yaml') }}-
 
       - run: pnpm exec nx affected -t lint test build --parallel=3
+
+  backend-ci:
+    name: Backend (.NET build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: source
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: source/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('source/**/*.csproj') }}
+          restore-keys: |
+            nuget-
+
+      - run: pnpm exec nx affected -t build --parallel=3
