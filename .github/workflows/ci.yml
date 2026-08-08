@@ -108,6 +108,7 @@ jobs:
         (github.ref == 'refs/heads/main' && needs.ci-success.result == 'success')
       )
     runs-on: ubuntu-latest
+    environment: DEV
     strategy:
       fail-fast: false
       matrix:
