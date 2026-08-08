@@ -229,3 +229,33 @@ jobs:
           else
             echo "should_publish=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Compute image tags
+        if: steps.affected.outputs.should_publish == 'true'
+        id: tags
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            echo "tags=${{ matrix.repo }}:$VERSION" >> "$GITHUB_OUTPUT"
+          else
+            SHA_SHORT=$(git rev-parse --short=7 HEAD)
+            echo "tags=${{ matrix.repo }}:latest,${{ matrix.repo }}:$SHA_SHORT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: docker/login-action@v3
+        if: steps.affected.outputs.should_publish == 'true'
+        with:
+          username: buidangkhoa05
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+        if: steps.affected.outputs.should_publish == 'true'
+
+      - uses: docker/build-push-action@v6
+        if: steps.affected.outputs.should_publish == 'true'
+        with:
+          context: source
+          file: source/${{ matrix.dockerfile }}
+          build-args: ${{ matrix.build_args }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
