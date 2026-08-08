@@ -98,3 +98,134 @@ jobs:
             echo "One or more CI jobs failed."
             exit 1
           fi
+
+  docker-publish:
+    name: Publish ${{ matrix.key }} image
+    needs: [ci-success]
+    if: |
+      always() && (
+        github.ref_type == 'tag' ||
+        (github.ref == 'refs/heads/main' && needs.ci-success.result == 'success')
+      )
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: api-gateway
+            nx_project: Ikho.ApiGateway
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-api-gateway/Ikho.ApiGateway.csproj
+              ASSEMBLY_NAME=Ikho.ApiGateway
+            repo: buidangkhoa05/ikho-api-gateway
+          - key: ui
+            nx_project: ikho-ui
+            dockerfile: apps/ikho-ui/Dockerfile
+            build_args: ""
+            repo: buidangkhoa05/ikho-ui
+          - key: warehouse-billing
+            nx_project: Ikho.Warehouse.Billing
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-billing/Ikho.Warehouse.Billing.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Billing
+            repo: buidangkhoa05/ikho-warehouse-billing
+          - key: warehouse-catalog
+            nx_project: Ikho.Warehouse.Catalog
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-catalog/Ikho.Warehouse.Catalog.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Catalog
+            repo: buidangkhoa05/ikho-warehouse-catalog
+          - key: warehouse-inbound
+            nx_project: Ikho.Warehouse.Inbound
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-inbound/Ikho.Warehouse.Inbound.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Inbound
+            repo: buidangkhoa05/ikho-warehouse-inbound
+          - key: warehouse-inventory
+            nx_project: Ikho.Warehouse.Inventory
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-inventory/Ikho.Warehouse.Inventory.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Inventory
+            repo: buidangkhoa05/ikho-warehouse-inventory
+          - key: warehouse-organization
+            nx_project: Ikho.Warehouse.Organization
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-organization/Ikho.Warehouse.Organization.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Organization
+            repo: buidangkhoa05/ikho-warehouse-organization
+          - key: warehouse-outbound
+            nx_project: Ikho.Warehouse.Outbound
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-outbound/Ikho.Warehouse.Outbound.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Outbound
+            repo: buidangkhoa05/ikho-warehouse-outbound
+          - key: warehouse-partner
+            nx_project: Ikho.Warehouse.Partner
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-partner/Ikho.Warehouse.Partner.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Partner
+            repo: buidangkhoa05/ikho-warehouse-partner
+          - key: warehouse-reporting
+            nx_project: Ikho.Warehouse.Reporting
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-reporting/Ikho.Warehouse.Reporting.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Reporting
+            repo: buidangkhoa05/ikho-warehouse-reporting
+          - key: warehouse-returns
+            nx_project: Ikho.Warehouse.Returns
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-warehouse-returns/Ikho.Warehouse.Returns.csproj
+              ASSEMBLY_NAME=Ikho.Warehouse.Returns
+            repo: buidangkhoa05/ikho-warehouse-returns
+    defaults:
+      run:
+        working-directory: source
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: nrwl/nx-set-shas@v4
+        if: github.ref_type == 'branch'
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: source/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check whether this service is affected
+        id: affected
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          AFFECTED=$(pnpm exec nx show projects --affected --json)
+          if echo "$AFFECTED" | node -e "
+            let d='';process.stdin.on('data',c=>d+=c);
+            process.stdin.on('end',()=>{
+              const list = JSON.parse(d);
+              process.exit(list.includes('${{ matrix.nx_project }}') ? 0 : 1);
+            });
+          "; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          fi
