@@ -1,5 +1,6 @@
 # iKho
 
+[![CI](https://github.com/buidangkhoa05/iKho/actions/workflows/ci.yml/badge.svg)](https://github.com/buidangkhoa05/iKho/actions/workflows/ci.yml)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Angular](https://img.shields.io/badge/Angular-19-DD0031?style=flat-square&logo=angular)](https://angular.dev/)
 [![Nx](https://img.shields.io/badge/Nx-23-143055?style=flat-square&logo=nx)](https://nx.dev/)
