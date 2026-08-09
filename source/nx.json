@@ -63,6 +63,9 @@
     {
       "plugin": "@nx/dotnet",
       "options": {
+        "build": {
+          "dependsOn": ["restore", "^build"]
+        },
         "watch": {
           "targetName": "serve",
           "args": ["run"]
