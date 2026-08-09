@@ -3,6 +3,8 @@ import { Localized } from '../i18n/localized.type';
 import { CATEGORIES } from './categories.data';
 import { LEDGER } from './ledger.data';
 import { PRODUCTS } from './products.data';
+import { PURCHASE_ORDERS } from './purchase-orders.data';
+import { PUTAWAY_TASKS } from './putaway-tasks.data';
 import { RECEIPTS } from './receipts.data';
 import { ScreenId } from './screens.data';
 
@@ -327,6 +329,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
   inbound: {
     panelTitle: { en: 'Purchase orders', vi: 'Đơn mua hàng' },
     panelSubtitle: { en: 'Expected and received lines · WH-1 Rotterdam', vi: 'Dòng dự kiến và đã nhận · WH-1 Rotterdam' },
+    detailedTabId: 'main',
     kpis: [
       { label: { en: 'Open orders', vi: 'Đơn đang mở' }, value: '37' },
       { label: { en: 'Receiving now', vi: 'Đang nhận' }, value: '3' },
@@ -346,12 +349,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
           { key: 'eta', label: { en: 'ETA', vi: 'Giờ đến' }, mono: true },
           { key: 'status', label: { en: 'Status', vi: 'Trạng thái' }, status: true },
         ],
-        rows: [
-          { po: 'PO-10482', supplier: 'Vanderberg Steel', expected: '40', received: '40', dock: 'Dock 3', eta: '09:30', status: 'in-stock', label: { en: 'Posted', vi: 'Đã ghi nhận' } },
-          { po: 'PO-10488', supplier: 'Nordic Labels A/S', expected: '18', received: '12', dock: 'Dock 3', eta: '09:52', status: 'inbound', label: { en: 'Receiving', vi: 'Đang nhận' } },
-          { po: 'PO-10490', supplier: 'EuroPallet NV', expected: '24', received: '0', dock: 'Dock 1', eta: '10:15', status: 'inbound', label: { en: 'Expected', vi: 'Dự kiến' } },
-          { po: 'PO-10477', supplier: 'Wrapline BV', expected: '30', received: '6', dock: 'Dock 2', eta: '08:05', status: 'low-stock', label: { en: 'Short', vi: 'Thiếu' } },
-        ],
+        rows: PURCHASE_ORDERS,
       },
       {
         id: 'receipts',
@@ -373,19 +371,15 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
         label: { en: 'Putaway tasks', vi: 'Nhiệm vụ cất kho' },
         subtitle: { en: 'Generated from received lines, assigned to operators', vi: 'Sinh từ dòng đã nhận, giao cho nhân viên vận hành' },
         columns: [
-          { key: 'task', label: { en: 'Task', vi: 'Nhiệm vụ' }, mono: true },
+          { key: 'id', label: { en: 'Task', vi: 'Nhiệm vụ' }, mono: true },
           { key: 'sku', label: same('SKU'), mono: true },
-          { key: 'from', label: { en: 'From', vi: 'Từ' }, mono: true },
-          { key: 'to', label: { en: 'To', vi: 'Đến' }, mono: true },
+          { key: 'fromDock', label: { en: 'From', vi: 'Từ' }, mono: true },
+          { key: 'toBin', label: { en: 'To', vi: 'Đến' }, mono: true },
           { key: 'qty', label: { en: 'Quantity', vi: 'Số lượng' }, align: 'right', mono: true },
           { key: 'operator', label: { en: 'Operator', vi: 'Nhân viên' } },
           { key: 'status', label: { en: 'Status', vi: 'Trạng thái' }, status: true },
         ],
-        rows: [
-          { task: 'PUT-7741', sku: 'IKH-482910', from: 'Dock 3', to: 'A-12-04', qty: '240', operator: 'T. Willems', status: 'inbound', label: { en: 'Assigned', vi: 'Đã giao' } },
-          { task: 'PUT-7742', sku: 'IKH-330298', from: 'Dock 3', to: 'A-04-09', qty: '60', operator: 'T. Willems', status: 'inbound', label: { en: 'Assigned', vi: 'Đã giao' } },
-          { task: 'PUT-7739', sku: 'IKH-559071', from: 'Dock 1', to: 'B-05-08', qty: '620', operator: 'S. Peeters', status: 'in-stock', label: { en: 'Complete', vi: 'Hoàn thành' } },
-        ],
+        rows: PUTAWAY_TASKS,
       },
     ],
   },
