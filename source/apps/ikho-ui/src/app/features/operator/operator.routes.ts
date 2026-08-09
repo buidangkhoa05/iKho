@@ -17,7 +17,18 @@ export const operatorRoutes: Route[] = [
     path: 'catalogue',
     loadComponent: () => import('./catalogue/operator-catalogue').then((m) => m.OperatorCatalogue),
   },
-  outlinedScreen('inbound'),
+  {
+    path: 'inbound',
+    loadComponent: () => import('./inbound/operator-inbound-entry').then((m) => m.OperatorInboundEntry),
+  },
+  {
+    path: 'inbound/receive/:poId',
+    loadComponent: () => import('./inbound/operator-inbound-receive').then((m) => m.OperatorInboundReceive),
+  },
+  {
+    path: 'inbound/putaway/:taskId',
+    loadComponent: () => import('./inbound/operator-inbound-putaway').then((m) => m.OperatorInboundPutaway),
+  },
   outlinedScreen('outbound'),
   outlinedScreen('inventory'),
   outlinedScreen('returns'),
