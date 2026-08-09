@@ -21,7 +21,7 @@ Inbound → Outbound → Returns → Reporting. Each module leans on data and UI
 
 | # | Module | Design spec | Implementation plan | Status |
 |---|--------|-------------|----------------------|--------|
-| 1 | Inbound | [2026-08-09-inbound-office-operator-ui-design.md](../superpowers/specs/2026-08-09-inbound-office-operator-ui-design.md) | _pending_ | Spec written, awaiting review |
+| 1 | Inbound | [2026-08-09-inbound-office-operator-ui-design.md](../superpowers/specs/2026-08-09-inbound-office-operator-ui-design.md) | [2026-08-09-inbound-office-operator-ui.md](../superpowers/plans/2026-08-09-inbound-office-operator-ui.md) | Implemented |
 | 2 | Outbound | _pending_ | _pending_ | Not started |
 | 3 | Returns | _pending_ | _pending_ | Not started |
 | 4 | Reporting/dashboards | _pending_ | _pending_ | Not started |
