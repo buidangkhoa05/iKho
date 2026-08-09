@@ -5,7 +5,7 @@ import { ADMIN_SCREENS } from '../../../core/mock-data/admin-screens.data';
 import { screenMeta, screenTitle, ScreenId, SCREENS } from '../../../core/mock-data/screens.data';
 import { OfficeScreen } from '../../../shared/components/office-screen/office-screen';
 
-type GenericScreenId = Exclude<ScreenId, 'dashboard' | 'catalogue' | 'inventory'>;
+type GenericScreenId = Exclude<ScreenId, 'dashboard' | 'catalogue' | 'inventory' | 'inbound'>;
 
 @Component({
   selector: 'app-office-generic-screen',

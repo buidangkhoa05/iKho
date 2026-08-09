@@ -21,9 +21,12 @@ export const officeRoutes: Route[] = [
     path: 'inventory',
     loadComponent: () => import('./inventory/office-inventory').then((m) => m.OfficeInventory),
   },
+  {
+    path: 'inbound',
+    loadComponent: () => import('./inbound/office-inbound').then((m) => m.OfficeInbound),
+  },
   genericScreen('organization'),
   genericScreen('partners'),
-  genericScreen('inbound'),
   genericScreen('outbound'),
   genericScreen('returns'),
   genericScreen('billing'),
