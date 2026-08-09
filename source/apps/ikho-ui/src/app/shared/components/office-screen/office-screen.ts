@@ -11,6 +11,7 @@ export interface OfficeDetailPanel {
   status: StockStatus;
   statusLabel: string;
   fields: { label: string; value: string }[];
+  action?: { label: string; onClick: () => void };
 }
 
 type StatusFilterId = 'all' | 'in-stock' | 'low-stock' | 'out-of-stock';
@@ -130,6 +131,9 @@ const CHIP_ACTIVE = 'border-primary bg-primary text-on-primary';
               </div>
             }
           </div>
+          @if (d.action; as action) {
+            <lib-button variant="primary" [fullWidth]="true" (click)="action.onClick()">{{ action.label }}</lib-button>
+          }
         </aside>
       }
     </div>

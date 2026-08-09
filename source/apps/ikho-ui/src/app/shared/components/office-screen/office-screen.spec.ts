@@ -70,4 +70,36 @@ describe('OfficeScreen', () => {
     expect(() => instance.onRowClick({ key: 'rcp-1' })).not.toThrow();
     expect(instance.selectedKey()).toBeNull();
   });
+
+  it('renders and wires an optional detail-panel action button', () => {
+    const fixture = TestBed.createComponent(OfficeScreen);
+    fixture.componentRef.setInput('title', 'Outbound');
+    fixture.componentRef.setInput('detailedTabId', 'main');
+    fixture.componentRef.setInput('rowKey', (row: Record<string, unknown>) => String(row['id']));
+
+    let actionCalls = 0;
+    fixture.componentRef.setInput('detail', () => ({
+      eyebrow: 'Detail',
+      title: 'Row title',
+      code: 'ROW-1',
+      status: 'inbound' as const,
+      statusLabel: 'Open',
+      fields: [],
+      action: { label: 'Allocate', onClick: () => actionCalls++ },
+    }));
+    fixture.componentRef.setInput('tabs', [
+      { id: 'main', label: 'Main', columns: [{ key: 'id', label: 'ID' }], rows: [{ id: 'ROW-1' }] },
+    ]);
+    fixture.detectChanges();
+
+    fixture.componentInstance.onRowClick({ id: 'ROW-1' });
+    fixture.detectChanges();
+
+    const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('aside button'));
+    const actionButton = buttons.find((b) => b.textContent?.trim() === 'Allocate') as HTMLButtonElement | undefined;
+    expect(actionButton).toBeTruthy();
+
+    actionButton!.click();
+    expect(actionCalls).toBe(1);
+  });
 });
