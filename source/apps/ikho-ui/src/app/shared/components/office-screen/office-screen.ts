@@ -205,6 +205,7 @@ export class OfficeScreen {
   }
 
   onRowClick(row: Record<string, unknown>): void {
+    if (!this.isDetailedActive()) return;
     this.selectedKey.set(this.rowKey()(row));
   }
 
