@@ -26,7 +26,7 @@ describe('OperatorInboundPutaway', () => {
     expect(text).toContain('A-12-04');
   });
 
-  it('confirming removes the task from the store and navigates back to the entry list', () => {
+  it('confirming marks the task in-stock in the store (keeping it in the ledger) and navigates back to the entry list', () => {
     const store = TestBed.inject(InboundStore);
     const fixture = TestBed.createComponent(OperatorInboundPutaway);
     fixture.componentRef.setInput('taskId', 'PUT-7741');
@@ -34,7 +34,27 @@ describe('OperatorInboundPutaway', () => {
 
     (fixture.componentInstance as unknown as { confirm: () => void }).confirm();
 
-    expect(store.putawayTasks().some((t) => t.id === 'PUT-7741')).toBe(false);
+    const task = store.putawayTasks().find((t) => t.id === 'PUT-7741');
+    expect(task).toBeDefined();
+    expect(task!.status).toBe('in-stock');
     expect(navigateCalls[0][0]).toEqual(['/operator/inbound']);
+  });
+
+  it('confirming with an edited bin updates the task toBin in the store', () => {
+    const store = TestBed.inject(InboundStore);
+    const fixture = TestBed.createComponent(OperatorInboundPutaway);
+    fixture.componentRef.setInput('taskId', 'PUT-7741');
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      binInput: { set: (v: string) => void };
+      confirm: () => void;
+    };
+
+    instance.binInput.set('Z-01-01');
+    instance.confirm();
+
+    const task = store.putawayTasks().find((t) => t.id === 'PUT-7741')!;
+    expect(task.toBin).toBe('Z-01-01');
   });
 });

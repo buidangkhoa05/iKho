@@ -20,6 +20,9 @@ export interface DockReceiptLineInput {
   sku: string;
   qty: number;
   exceptionReason?: Localized<string>;
+  lotNumber?: string;
+  expirationDate?: string;
+  serialNumbers?: string[];
 }
 
 let poSeq = 10500;
@@ -71,11 +74,13 @@ export class InboundStore {
 
     const hasException = lines.some((l) => l.exceptionReason);
     const isComplete = updatedLines.every((l) => l.receivedQty >= l.expectedQty);
-    const status = hasException ? 'low-stock' : isComplete ? 'in-stock' : 'inbound';
-    const label: Localized<string> = hasException
-      ? { en: 'Short', vi: 'Thiếu' }
-      : isComplete
-        ? { en: 'Posted', vi: 'Đã ghi nhận' }
+    const status = isComplete ? 'in-stock' : hasException ? 'low-stock' : 'inbound';
+    const label: Localized<string> = isComplete
+      ? hasException
+        ? { en: 'Over-received', vi: 'Nhận vượt số lượng' }
+        : { en: 'Posted', vi: 'Đã ghi nhận' }
+      : hasException
+        ? { en: 'Short', vi: 'Thiếu' }
         : { en: 'Receiving', vi: 'Đang nhận' };
     const totalReceived = updatedLines.reduce((sum, l) => sum + l.receivedQty, 0);
 
@@ -87,6 +92,9 @@ export class InboundStore {
       productName: productName(l.sku),
       qty: l.qty,
       exceptionReason: l.exceptionReason,
+      lotNumber: l.lotNumber,
+      expirationDate: l.expirationDate,
+      serialNumbers: l.serialNumbers,
     }));
 
     const receipt: Receipt = {
@@ -119,7 +127,13 @@ export class InboundStore {
     this.putawayTasks.update((tasks) => [...tasks, ...newTasks]);
   }
 
-  confirmPutaway(taskId: string): void {
-    this.putawayTasks.update((tasks) => tasks.filter((t) => t.id !== taskId));
+  confirmPutaway(taskId: string, toBin?: string): void {
+    this.putawayTasks.update((tasks) =>
+      tasks.map((t) =>
+        t.id === taskId
+          ? { ...t, toBin: toBin && toBin.trim() ? toBin.trim() : t.toBin, status: 'in-stock', label: { en: 'Complete', vi: 'Hoàn thành' } }
+          : t,
+      ),
+    );
   }
 }

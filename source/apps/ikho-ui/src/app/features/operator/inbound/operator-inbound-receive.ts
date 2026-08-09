@@ -10,6 +10,9 @@ interface ConfirmedLine {
   productName: string;
   qty: number;
   exceptionReason?: string;
+  lotNumber?: string;
+  expirationDate?: string;
+  serialNumbers?: string[];
 }
 
 @Component({
@@ -87,7 +90,7 @@ export class OperatorInboundReceive {
 
   protected readonly remainingQty = computed(() => {
     const line = this.currentLine();
-    return line ? line.expectedQty - line.receivedQty : 0;
+    return line ? Math.max(0, line.expectedQty - line.receivedQty) : 0;
   });
 
   protected readonly product = computed(() => PRODUCTS.find((p) => p.sku === this.currentLine()?.sku));
@@ -140,6 +143,14 @@ export class OperatorInboundReceive {
         productName: line.productName[this.lang.lang()],
         qty,
         exceptionReason: mismatch ? this.reasonInput().trim() : undefined,
+        lotNumber: this.needsLot() ? this.lotInput().trim() || undefined : undefined,
+        expirationDate: this.needsLot() ? this.expirationInput().trim() || undefined : undefined,
+        serialNumbers: this.needsSerial()
+          ? this.serialInput()
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : undefined,
       },
     ]);
 
@@ -161,6 +172,9 @@ export class OperatorInboundReceive {
       sku: c.sku,
       qty: c.qty,
       exceptionReason: c.exceptionReason ? { en: c.exceptionReason, vi: c.exceptionReason } : undefined,
+      lotNumber: c.lotNumber,
+      expirationDate: c.expirationDate,
+      serialNumbers: c.serialNumbers,
     }));
     this.store.recordDockReceipt(this.poId(), lines);
     this.router.navigate(['/operator/inbound']);

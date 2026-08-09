@@ -6,6 +6,9 @@ export interface ReceiptLineDetail {
   productName: Localized<string>;
   qty: number;
   exceptionReason?: Localized<string>;
+  lotNumber?: string;
+  expirationDate?: string;
+  serialNumbers?: string[];
 }
 
 export interface Receipt {

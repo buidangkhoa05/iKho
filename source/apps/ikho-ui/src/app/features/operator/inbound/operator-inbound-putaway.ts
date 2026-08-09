@@ -1,13 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Button, Icon } from '@ikho/shared-ui';
+import { Button, Icon, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { InboundStore } from '../../../core/state/inbound-store';
 
 @Component({
   selector: 'app-operator-inbound-putaway',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, Icon],
+  imports: [Button, Icon, TextInput],
   host: { class: 'flex flex-col gap-6' },
   template: `
     @if (!task()) {
@@ -22,6 +22,7 @@ import { InboundStore } from '../../../core/state/inbound-store';
             <span class="font-mono text-sm text-accent-teal">{{ task()!.fromDock }} → {{ task()!.toBin }} · {{ task()!.qty }} {{ unitsLabel() }}</span>
           </div>
         </div>
+        <lib-text-input [label]="binLabel()" [value]="binInput()" (valueChange)="binInput.set($event)" />
         <lib-button variant="operator" [fullWidth]="true" (click)="confirm()">{{ confirmLabel() }}</lib-button>
       </div>
     }
@@ -36,12 +37,15 @@ export class OperatorInboundPutaway {
 
   protected readonly task = computed(() => this.store.putawayTasks().find((t) => t.id === this.taskId()));
 
+  protected readonly binInput = linkedSignal(() => this.task()?.toBin ?? '');
+
   protected readonly notFoundLabel = computed(() => (this.lang.lang() === 'en' ? 'Putaway task not found' : 'Không tìm thấy nhiệm vụ cất kho'));
   protected readonly unitsLabel = computed(() => (this.lang.lang() === 'en' ? 'units' : 'cái'));
+  protected readonly binLabel = computed(() => (this.lang.lang() === 'en' ? 'Putaway bin' : 'Ô kệ cất hàng'));
   protected readonly confirmLabel = computed(() => (this.lang.lang() === 'en' ? 'Confirm putaway' : 'Xác nhận cất kho'));
 
   protected confirm(): void {
-    this.store.confirmPutaway(this.taskId());
+    this.store.confirmPutaway(this.taskId(), this.binInput());
     this.router.navigate(['/operator/inbound']);
   }
 }
