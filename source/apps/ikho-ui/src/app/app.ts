@@ -1,13 +1,11 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { AppTopBar } from './shared/layouts/app-top-bar/app-top-bar';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, AppTopBar],
   selector: 'app-root',
   templateUrl: './app.html',
-  styleUrl: './app.css',
 })
-export class App {
-  protected title = 'ikho-ui';
-}
+export class App {}

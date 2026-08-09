@@ -477,3 +477,28 @@ Icons use a consistent 1.5px stroke weight at 20–24px on the Office Console an
 5. Default body to `{typography.body-md}`; reserve `{typography.body-lg}` for lead copy in report summaries.
 6. Keep the two tracks separated by *context of use* — when designing a new screen, decide whether it's an Office Console view or an Operator Mode flow before picking colors.
 7. Status badges are always pill-shaped and always carry a text label — this pairing is non-negotiable.
+
+## Implementation Notes (`ikho-ui`)
+
+The tokens on this page are the source of truth; `src/styles/tokens.css` is their CSS transcription and the only place they're defined in code. Components consume them as **Tailwind CSS v4 utility classes**, not hand-written CSS.
+
+### How tokens become utilities
+`tokens.css` declares colors, font sizes, radii, shadows, and spacing inside an `@theme` block using Tailwind's namespace convention, so each token doubles as a utility class:
+
+| Token namespace | Example token | Generated utility |
+|---|---|---|
+| `--color-*` | `--color-primary` | `bg-primary`, `text-primary`, `border-primary` |
+| `--color-status-*` | `--color-status-in-stock` | `bg-status-in-stock`, `text-status-in-stock` |
+| `--radius-*` | `--radius-card` | `rounded-card` |
+| `--shadow-*` | `--shadow-card` | `shadow-card` |
+| `--text-*` (+ `--text-*--line-height` / `--font-weight`) | `--text-heading-md` | `text-heading-md` (sets size, line-height, and weight together) |
+| `--font-*` | `--font-core`, `--font-mono` | `font-core`, `font-mono` |
+| `--spacing-*` | `--spacing-lg` | `p-lg`, `gap-lg`, etc. (alongside Tailwind's default numeric scale) |
+
+Composite/layout tokens that aren't a single Tailwind-scale value (`--sidebar-width`, `--transition-control`, `--duration-*`) stay as plain `:root` custom properties and are consumed via arbitrary-value classes, e.g. `w-[var(--sidebar-width)]`, `[transition:var(--transition-control)]`.
+
+### Rules for new components
+- No `styles:` block in `@Component` metadata — express everything as classes on the template elements. Use `host: { class: '...' }` for host-element styling instead of a `:host { }` rule.
+- Prefer the generated token utilities (`bg-primary`, `rounded-card`) over arbitrary values (`bg-[#14213d]`) — if a value needs a new named utility, add it to `tokens.css`'s `@theme` block rather than hardcoding it in a component.
+- For an element whose classes differ by state (active/inactive tab, selected chip, nav item), build the complete class string per state in a component method (see `office-sidebar.ts`'s `itemClasses()` for the pattern) rather than layering two `[class.x]` bindings that both touch the same CSS property — Tailwind's compiled rule order depends on class discovery order across the whole build, not template order, so conflicting same-property utilities on one element can silently resolve backwards.
+- Six-status vocabulary, pill-only badges, Office/Operator canvas separation, and every other rule on this page still apply — Tailwind is the authoring mechanism, not a license to introduce new colors or shapes ad hoc.

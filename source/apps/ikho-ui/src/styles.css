@@ -1,1 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+@import './styles/tokens.css';
+
+/* Tailwind's preflight already resets box-sizing/margins; just the app-specific base below. */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font: 450 14px/1.5 var(--font-core);
+  color: var(--color-text-body);
+  background: var(--color-surface-page);
+}
+
+a {
+  color: var(--color-action-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-action-primary-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -66,6 +66,7 @@ src/app/core/
 - **HTTP**: Angular `HttpClient` in feature services. All API calls under `/api/*` (proxied to .NET)
 - **State**: Angular Signals for reactive state; avoid RxJS where Signals suffice
 - **Routing**: `provideRouter()` with lazy-loaded feature routes via `loadComponent()`
+- **Styling**: Tailwind CSS v4, utility classes directly in templates — no hand-written component `styles:` blocks (see `apps/ikho-ui/DESIGN.md` → Implementation notes). Design tokens live in `apps/ikho-ui/src/styles/tokens.css` under `@theme`, so class names track the token names 1:1 (`--color-primary` → `bg-primary`/`text-primary`, `--radius-card` → `rounded-card`, `--text-heading-md` → `text-heading-md`). For a value with no matching utility, use Tailwind's arbitrary-value syntax against the same variable (`w-[var(--sidebar-width)]`) rather than reintroducing plain CSS. When a class's active/inactive variants target the same CSS property (e.g. an active vs. default background), build the *whole* class string per state in a `protected` component method instead of combining two conditional `[class.x]` bindings — Tailwind's generated rule order isn't guaranteed to follow the order classes appear in the template, so two same-property utilities on one element can silently apply in the wrong precedence.
 - **Testing**: `vitest-angular` via `@angular/build:unit-test`. Test files colocated (`.spec.ts`)
 - **Standalone**: All components, directives, pipes use `standalone: true` (Angular 19 default)
 
