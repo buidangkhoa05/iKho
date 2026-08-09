@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { Button, DataPanel, DataTable, Icon, KpiCard, StatusBadge, StockStatus, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
@@ -42,7 +42,7 @@ const CHIP_ACTIVE = 'border-primary bg-primary text-on-primary';
         <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
       </div>
       @if (primaryActionLabel(); as label) {
-        <lib-button variant="primary">{{ label }}</lib-button>
+        <lib-button variant="primary" (click)="primaryAction.emit()">{{ label }}</lib-button>
       }
     </div>
 
@@ -150,6 +150,8 @@ export class OfficeScreen {
   readonly searchFields = input<string[]>([]);
   readonly rowKey = input<(row: Record<string, unknown>) => string>(() => '');
   readonly detail = input<(row: Record<string, unknown>) => OfficeDetailPanel | null>(() => null);
+
+  readonly primaryAction = output<void>();
 
   protected readonly activeTabId = signal<string | null>(null);
   protected readonly query = signal('');
