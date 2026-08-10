@@ -5,6 +5,7 @@ import { LangService } from '../../../core/i18n/lang.service';
 import { OPERATOR_STATS, TASK_QUEUE_LABEL } from '../../../core/mock-data/dashboard.data';
 import { STATIC_TASKS } from '../../../core/mock-data/tasks.data';
 import { InboundStore } from '../../../core/state/inbound-store';
+import { OutboundStore } from '../../../core/state/outbound-store';
 
 interface QueueCard {
   id: string;
@@ -15,7 +16,7 @@ interface QueueCard {
   route: string;
   qty: string;
   clickable: boolean;
-  taskId?: string;
+  navTarget?: string[];
 }
 
 @Component({
@@ -62,7 +63,8 @@ interface QueueCard {
 export class OperatorDashboard {
   private readonly router = inject(Router);
   private readonly lang = inject(LangService);
-  private readonly store = inject(InboundStore);
+  private readonly inboundStore = inject(InboundStore);
+  private readonly outboundStore = inject(OutboundStore);
 
   protected readonly stats = computed(() =>
     OPERATOR_STATS.map((s) => ({ label: s.label[this.lang.lang()], value: s.value })),
@@ -72,7 +74,7 @@ export class OperatorDashboard {
   protected readonly tasks = computed<QueueCard[]>(() => {
     const lang = this.lang.lang();
 
-    const putaway: QueueCard[] = this.store
+    const putaway: QueueCard[] = this.inboundStore
       .putawayTasks()
       .filter((t) => t.status !== 'in-stock')
       .map((t) => ({
@@ -84,7 +86,22 @@ export class OperatorDashboard {
         route: `${t.fromDock} → ${t.toBin}`,
         qty: `${t.qty} ${lang === 'en' ? 'units' : 'cái'}`,
         clickable: true,
-        taskId: t.id,
+        navTarget: ['/operator/inbound/putaway', t.id],
+      }));
+
+    const dispatchReady: QueueCard[] = this.outboundStore
+      .salesOrders()
+      .filter((so) => so.status === 'outbound')
+      .map((so) => ({
+        id: so.so,
+        status: so.status,
+        icon: 'package-check',
+        kind: lang === 'en' ? 'Dispatch' : 'Xuất kho',
+        title: so.customer,
+        route: `${so.dock} · ${so.cutoff}`,
+        qty: `${so.ordered} ${lang === 'en' ? 'units' : 'cái'}`,
+        clickable: true,
+        navTarget: ['/operator/outbound/dispatch', so.so],
       }));
 
     const staticTasks: QueueCard[] = STATIC_TASKS.map((t) => ({
@@ -98,12 +115,12 @@ export class OperatorDashboard {
       clickable: false,
     }));
 
-    return [...putaway, ...staticTasks];
+    return [...putaway, ...dispatchReady, ...staticTasks];
   });
 
   protected onTaskClick(task: QueueCard): void {
-    if (task.clickable && task.taskId) {
-      this.router.navigate(['/operator/inbound/putaway', task.taskId]);
+    if (task.clickable && task.navTarget) {
+      this.router.navigate(task.navTarget);
     }
   }
 }

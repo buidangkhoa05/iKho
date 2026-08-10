@@ -1,6 +1,7 @@
 import { Router } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { InboundStore } from '../../../core/state/inbound-store';
+import { OutboundStore } from '../../../core/state/outbound-store';
 import { OperatorDashboard } from './operator-dashboard';
 
 describe('OperatorDashboard', () => {
@@ -40,11 +41,44 @@ describe('OperatorDashboard', () => {
     const fixture = TestBed.createComponent(OperatorDashboard);
     fixture.detectChanges();
 
-    (fixture.componentInstance as unknown as { onTaskClick: (t: { clickable: boolean; taskId?: string }) => void }).onTaskClick({
+    (fixture.componentInstance as unknown as { onTaskClick: (t: { clickable: boolean; navTarget?: string[] }) => void }).onTaskClick({
       clickable: true,
-      taskId: 'PUT-7741',
+      navTarget: ['/operator/inbound/putaway', 'PUT-7741'],
     });
 
     expect(navigateCalls[0][0]).toEqual(['/operator/inbound/putaway', 'PUT-7741']);
+  });
+
+  it('lists dispatch-ready sales orders from OutboundStore alongside putaway tasks', () => {
+    const fixture = TestBed.createComponent(OperatorDashboard);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('PUT-7741');
+    expect(text).toContain('SO-88219');
+  });
+
+  it('reflects a dispatched sales order disappearing from the queue', () => {
+    const store = TestBed.inject(OutboundStore);
+    const fixture = TestBed.createComponent(OperatorDashboard);
+    fixture.detectChanges();
+
+    store.dispatch('SO-88219');
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).not.toContain('SO-88219');
+  });
+
+  it('navigates to the dispatch-confirm screen when a dispatch-ready card is clicked', () => {
+    const fixture = TestBed.createComponent(OperatorDashboard);
+    fixture.detectChanges();
+
+    (fixture.componentInstance as unknown as { onTaskClick: (t: { clickable: boolean; navTarget?: string[] }) => void }).onTaskClick({
+      clickable: true,
+      navTarget: ['/operator/outbound/dispatch', 'SO-88219'],
+    });
+
+    expect(navigateCalls[0][0]).toEqual(['/operator/outbound/dispatch', 'SO-88219']);
   });
 });
