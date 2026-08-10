@@ -2,11 +2,14 @@ import { StockStatus } from '@ikho/shared-ui';
 import { Localized } from '../i18n/localized.type';
 import { ALLOCATIONS } from './allocations.data';
 import { CATEGORIES } from './categories.data';
+import { DISPOSITIONS } from './dispositions.data';
+import { INSPECTIONS } from './inspections.data';
 import { LEDGER } from './ledger.data';
 import { PRODUCTS } from './products.data';
 import { PURCHASE_ORDERS } from './purchase-orders.data';
 import { PUTAWAY_TASKS } from './putaway-tasks.data';
 import { RECEIPTS } from './receipts.data';
+import { RETURN_ORDERS } from './return-orders.data';
 import { SALES_ORDERS } from './sales-orders.data';
 import { SHIPMENTS } from './shipments.data';
 import { ScreenId } from './screens.data';
@@ -445,6 +448,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
   returns: {
     panelTitle: { en: 'Return orders', vi: 'Đơn trả hàng' },
     panelSubtitle: { en: 'Inspection and disposition · WH-3 Utrecht', vi: 'Kiểm tra và xử lý · WH-3 Utrecht' },
+    detailedTabId: 'main',
     kpis: [
       { label: { en: 'Open returns', vi: 'Đơn trả đang mở' }, value: '8' },
       { label: { en: 'Awaiting inspection', vi: 'Chờ kiểm tra' }, value: '3', trendStatus: 'low-stock' },
@@ -457,18 +461,12 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
         label: { en: 'Return orders', vi: 'Đơn trả hàng' },
         columns: [
           { key: 'rma', label: same('RMA'), mono: true },
-          { key: 'customer', label: { en: 'Customer', vi: 'Khách hàng' } },
-          { key: 'ref', label: { en: 'Original order', vi: 'Đơn gốc' }, mono: true },
-          { key: 'lines', label: { en: 'Lines', vi: 'Dòng' }, align: 'right', mono: true },
-          { key: 'reason', label: { en: 'Reason', vi: 'Lý do' }, localized: true },
-          { key: 'disposition', label: { en: 'Disposition', vi: 'Xử lý' }, localized: true },
+          { key: 'partner', label: { en: 'Partner', vi: 'Đối tác' } },
+          { key: 'sourceRef', label: { en: 'Source', vi: 'Nguồn gốc' }, mono: true },
+          { key: 'qty', label: { en: 'Quantity', vi: 'Số lượng' }, align: 'right', mono: true },
           { key: 'status', label: { en: 'Status', vi: 'Trạng thái' }, status: true },
         ],
-        rows: [
-          { rma: 'RMA-0331', customer: 'Meijer Retail Group', ref: 'SO-88112', lines: '4', reason: { en: 'Damaged in transit', vi: 'Hư hỏng khi vận chuyển' }, disposition: { en: 'Scrap', vi: 'Huỷ' }, status: 'returns', label: { en: 'Inspected', vi: 'Đã kiểm tra' } },
-          { rma: 'RMA-0334', customer: 'Brico Bouwmarkt', ref: 'SO-88140', lines: '12', reason: { en: 'Wrong item shipped', vi: 'Giao sai hàng' }, disposition: { en: 'Restock', vi: 'Nhập lại' }, status: 'in-stock', label: { en: 'Restocked', vi: 'Đã nhập lại' } },
-          { rma: 'RMA-0337', customer: 'Hafen Bremen GmbH', ref: 'SO-88155', lines: '6', reason: { en: 'Customer cancelled', vi: 'Khách huỷ đơn' }, disposition: { en: '—', vi: '—' }, status: 'returns', label: { en: 'Awaiting inspection', vi: 'Chờ kiểm tra' } },
-        ],
+        rows: RETURN_ORDERS,
       },
       {
         id: 'inspections',
@@ -481,11 +479,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
           { key: 'outcome', label: { en: 'Outcome', vi: 'Kết quả' }, localized: true },
           { key: 'inspector', label: { en: 'Inspector', vi: 'Người kiểm tra' } },
         ],
-        rows: [
-          { id: 'INS-0912', rma: 'RMA-0331', sku: 'IKH-105522', outcome: { en: 'Unsellable — crushed', vi: 'Không bán được — bị bẹp' }, inspector: 'S. Peeters' },
-          { id: 'INS-0914', rma: 'RMA-0334', sku: 'IKH-318440', outcome: { en: 'Sellable — unopened', vi: 'Bán được — chưa mở' }, inspector: 'S. Peeters' },
-          { id: 'INS-0915', rma: 'RMA-0337', sku: 'IKH-482910', outcome: { en: 'Pending', vi: 'Chờ xử lý' }, inspector: '—' },
-        ],
+        rows: INSPECTIONS,
       },
       {
         id: 'dispositions',
@@ -498,10 +492,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
           { key: 'action', label: { en: 'Action', vi: 'Hành động' }, localized: true },
           { key: 'qty', label: { en: 'Quantity', vi: 'Số lượng' }, align: 'right', mono: true },
         ],
-        rows: [
-          { id: 'DIS-0441', rma: 'RMA-0331', sku: 'IKH-105522', action: { en: 'Scrap', vi: 'Huỷ' }, qty: '4' },
-          { id: 'DIS-0442', rma: 'RMA-0334', sku: 'IKH-318440', action: { en: 'Restock to A-11-06', vi: 'Nhập lại vào A-11-06' }, qty: '12' },
-        ],
+        rows: DISPOSITIONS,
       },
     ],
   },
