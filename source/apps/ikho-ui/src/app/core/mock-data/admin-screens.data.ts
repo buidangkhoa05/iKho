@@ -1,11 +1,14 @@
 import { StockStatus } from '@ikho/shared-ui';
 import { Localized } from '../i18n/localized.type';
+import { ALLOCATIONS } from './allocations.data';
 import { CATEGORIES } from './categories.data';
 import { LEDGER } from './ledger.data';
 import { PRODUCTS } from './products.data';
 import { PURCHASE_ORDERS } from './purchase-orders.data';
 import { PUTAWAY_TASKS } from './putaway-tasks.data';
 import { RECEIPTS } from './receipts.data';
+import { SALES_ORDERS } from './sales-orders.data';
+import { SHIPMENTS } from './shipments.data';
 import { ScreenId } from './screens.data';
 
 export interface AdminKpi {
@@ -387,6 +390,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
   outbound: {
     panelTitle: { en: 'Sales orders', vi: 'Đơn bán hàng' },
     panelSubtitle: { en: 'Allocation and dispatch · cut-off 17:00', vi: 'Phân bổ và xuất hàng · chốt 17:00' },
+    detailedTabId: 'main',
     kpis: [
       { label: { en: 'Open orders', vi: 'Đơn đang mở' }, value: '52' },
       { label: { en: 'Allocated', vi: 'Đã phân bổ' }, value: '41' },
@@ -400,18 +404,13 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
         columns: [
           { key: 'so', label: same('SO'), mono: true },
           { key: 'customer', label: { en: 'Customer', vi: 'Khách hàng' } },
-          { key: 'lines', label: { en: 'Lines', vi: 'Dòng' }, align: 'right', mono: true },
+          { key: 'ordered', label: { en: 'Ordered', vi: 'Đã đặt' }, align: 'right', mono: true },
           { key: 'allocated', label: { en: 'Allocated', vi: 'Đã phân bổ' }, align: 'right', mono: true },
           { key: 'dock', label: { en: 'Dock', vi: 'Cửa' } },
           { key: 'cutoff', label: { en: 'Cut-off', vi: 'Giờ chốt' }, mono: true },
           { key: 'status', label: { en: 'Status', vi: 'Trạng thái' }, status: true },
         ],
-        rows: [
-          { so: 'SO-88214', customer: 'Meijer Retail Group', lines: '18', allocated: '18', dock: 'Dock 2', cutoff: '17:00', status: 'in-stock', label: { en: 'Dispatched', vi: 'Đã xuất' } },
-          { so: 'SO-88219', customer: 'Brico Bouwmarkt', lines: '24', allocated: '21', dock: 'Dock 2', cutoff: '17:00', status: 'outbound', label: { en: 'Picking', vi: 'Đang lấy hàng' } },
-          { so: 'SO-88222', customer: 'Meijer Retail Group', lines: '9', allocated: '9', dock: 'Dock 4', cutoff: '12:00', status: 'outbound', label: { en: 'Allocated', vi: 'Đã phân bổ' } },
-          { so: 'SO-88208', customer: 'Hafen Bremen GmbH', lines: '32', allocated: '19', dock: 'Dock 1', cutoff: '17:00', status: 'low-stock', label: { en: 'Short allocation', vi: 'Thiếu phân bổ' } },
-        ],
+        rows: SALES_ORDERS,
       },
       {
         id: 'allocations',
@@ -424,11 +423,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
           { key: 'qty', label: { en: 'Quantity', vi: 'Số lượng' }, align: 'right', mono: true },
           { key: 'status', label: { en: 'Status', vi: 'Trạng thái' }, status: true },
         ],
-        rows: [
-          { so: 'SO-88219', sku: 'IKH-105522', bin: 'B-02-11', qty: '260', status: 'outbound', label: { en: 'Reserved', vi: 'Đã giữ' } },
-          { so: 'SO-88222', sku: 'IKH-559071', bin: 'B-05-08', qty: '140', status: 'outbound', label: { en: 'Reserved', vi: 'Đã giữ' } },
-          { so: 'SO-88208', sku: 'IKH-482910', bin: 'A-12-04', qty: '40', status: 'low-stock', label: { en: 'Partial', vi: 'Một phần' } },
-        ],
+        rows: ALLOCATIONS,
       },
       {
         id: 'shipments',
@@ -442,11 +437,7 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
           { key: 'departure', label: { en: 'Departure', vi: 'Giờ khởi hành' }, mono: true },
           { key: 'status', label: { en: 'Status', vi: 'Trạng thái' }, status: true },
         ],
-        rows: [
-          { shipment: 'SHP-51120', so: 'SO-88214', carrier: 'DHL Freight', dock: 'Dock 2', departure: '07:55', status: 'in-stock', label: { en: 'Departed', vi: 'Đã rời kho' } },
-          { shipment: 'SHP-51124', so: 'SO-88219', carrier: 'PostNL', dock: 'Dock 2', departure: '17:00', status: 'outbound', label: { en: 'Loading', vi: 'Đang xếp hàng' } },
-          { shipment: 'SHP-51125', so: 'SO-88222', carrier: 'DSV Road', dock: 'Dock 4', departure: '12:00', status: 'outbound', label: { en: 'Planned', vi: 'Đã lên kế hoạch' } },
-        ],
+        rows: SHIPMENTS,
       },
     ],
   },
