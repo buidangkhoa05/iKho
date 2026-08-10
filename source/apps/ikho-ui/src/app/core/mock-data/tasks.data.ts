@@ -11,11 +11,10 @@ export interface OperatorTask {
   qty: Localized<string>;
 }
 
-/** Static, non-Inbound task-queue entries (e.g. Outbound picks). Putaway tasks come from InboundStore / PUTAWAY_TASKS. */
-export const STATIC_TASKS: OperatorTask[] = [
-  {
-    id: 'PIK-3318', status: 'outbound', icon: 'package-check',
-    kind: { en: 'Pick', vi: 'Lấy hàng' }, title: { en: 'Euro pallet, heat-treated', vi: 'Pallet Euro, xử lý nhiệt' },
-    route: 'D-01-01 → Dock 2', qty: { en: '48 units', vi: '48 cái' },
-  },
-];
+/**
+ * Static, non-store-backed task-queue entries. Empty for now — Inbound's putaway
+ * tasks and Outbound's dispatch-ready orders are both store-backed (see
+ * InboundStore/OutboundStore); this array exists for any future domain that adds
+ * simple decorative queue entries before it has its own store.
+ */
+export const STATIC_TASKS: OperatorTask[] = [];

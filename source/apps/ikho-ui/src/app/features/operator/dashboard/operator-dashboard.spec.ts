@@ -16,13 +16,12 @@ describe('OperatorDashboard', () => {
     }).compileComponents();
   });
 
-  it('lists active putaway tasks from the store alongside the static pick task', () => {
+  it('lists active putaway tasks from the store', () => {
     const fixture = TestBed.createComponent(OperatorDashboard);
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('PUT-7741');
-    expect(text).toContain('PIK-3318');
   });
 
   it('reflects a confirmed putaway task disappearing from the queue', () => {
