@@ -38,5 +38,20 @@ export const operatorRoutes: Route[] = [
     loadComponent: () => import('./outbound/operator-outbound-dispatch').then((m) => m.OperatorOutboundDispatch),
   },
   outlinedScreen('inventory'),
-  outlinedScreen('returns'),
+  {
+    path: 'returns',
+    loadComponent: () => import('./returns/operator-returns-entry').then((m) => m.OperatorReturnsEntry),
+  },
+  {
+    path: 'returns/receive/:rma',
+    loadComponent: () => import('./returns/operator-returns-receive').then((m) => m.OperatorReturnsReceive),
+  },
+  {
+    path: 'returns/inspect/:rma',
+    loadComponent: () => import('./returns/operator-returns-inspect').then((m) => m.OperatorReturnsInspect),
+  },
+  {
+    path: 'returns/disposition/:rma',
+    loadComponent: () => import('./returns/operator-returns-disposition').then((m) => m.OperatorReturnsDisposition),
+  },
 ];

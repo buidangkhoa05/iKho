@@ -3,7 +3,7 @@ import { LangService } from '../../../core/i18n/lang.service';
 import { screenTitle, ScreenId, SCREENS } from '../../../core/mock-data/screens.data';
 import { OperatorOutlinedScreen } from '../../../shared/components/operator-outlined-screen/operator-outlined-screen';
 
-type OutlinedScreenId = Exclude<ScreenId, 'dashboard' | 'catalogue' | 'inbound' | 'outbound'>;
+type OutlinedScreenId = Exclude<ScreenId, 'dashboard' | 'catalogue' | 'inbound' | 'outbound' | 'returns'>;
 
 @Component({
   selector: 'app-operator-outlined-screen-route',
