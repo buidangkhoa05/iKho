@@ -6,6 +6,7 @@ import { OPERATOR_STATS, TASK_QUEUE_LABEL } from '../../../core/mock-data/dashbo
 import { STATIC_TASKS } from '../../../core/mock-data/tasks.data';
 import { InboundStore } from '../../../core/state/inbound-store';
 import { OutboundStore } from '../../../core/state/outbound-store';
+import { ReturnsStore } from '../../../core/state/returns-store';
 
 interface QueueCard {
   id: string;
@@ -65,6 +66,7 @@ export class OperatorDashboard {
   private readonly lang = inject(LangService);
   private readonly inboundStore = inject(InboundStore);
   private readonly outboundStore = inject(OutboundStore);
+  private readonly returnsStore = inject(ReturnsStore);
 
   protected readonly stats = computed(() =>
     OPERATOR_STATS.map((s) => ({ label: s.label[this.lang.lang()], value: s.value })),
@@ -103,6 +105,22 @@ export class OperatorDashboard {
         navTarget: ['/operator/outbound/dispatch', so.so],
       }));
 
+    const returnsNext: QueueCard[] = [
+      ...this.returnsStore.toReceive().map((order) => ({ order, kind: lang === 'en' ? 'Receive' : 'Nhận hàng', path: '/operator/returns/receive' })),
+      ...this.returnsStore.toInspect().map((order) => ({ order, kind: lang === 'en' ? 'Inspect' : 'Kiểm tra', path: '/operator/returns/inspect' })),
+      ...this.returnsStore.toDisposition().map((order) => ({ order, kind: lang === 'en' ? 'Disposition' : 'Xử lý', path: '/operator/returns/disposition' })),
+    ].map(({ order, kind, path }) => ({
+      id: order.rma,
+      status: order.status,
+      icon: 'undo-2',
+      kind,
+      title: order.partner,
+      route: `${order.sourceRef} · ${kind}`,
+      qty: `${order.qty} ${lang === 'en' ? 'units' : 'cái'}`,
+      clickable: true,
+      navTarget: [path, order.rma],
+    }));
+
     const staticTasks: QueueCard[] = STATIC_TASKS.map((t) => ({
       id: t.id,
       status: t.status,
@@ -114,7 +132,7 @@ export class OperatorDashboard {
       clickable: false,
     }));
 
-    return [...putaway, ...dispatchReady, ...staticTasks];
+    return [...putaway, ...dispatchReady, ...returnsNext, ...staticTasks];
   });
 
   protected onTaskClick(task: QueueCard): void {

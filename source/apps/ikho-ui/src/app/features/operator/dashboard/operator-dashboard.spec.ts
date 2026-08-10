@@ -2,6 +2,7 @@ import { Router } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { InboundStore } from '../../../core/state/inbound-store';
 import { OutboundStore } from '../../../core/state/outbound-store';
+import { ReturnsStore } from '../../../core/state/returns-store';
 import { OperatorDashboard } from './operator-dashboard';
 
 describe('OperatorDashboard', () => {
@@ -80,5 +81,39 @@ describe('OperatorDashboard', () => {
     });
 
     expect(navigateCalls[0][0]).toEqual(['/operator/outbound/dispatch', 'SO-88219']);
+  });
+
+  it('lists a return order needing receipt alongside putaway and dispatch-ready tasks', () => {
+    const fixture = TestBed.createComponent(OperatorDashboard);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('PUT-7741');
+    expect(text).toContain('SO-88219');
+    expect(text).toContain('RMA-0343');
+  });
+
+  it('reflects a return order moving to its next stage, updating its dashboard card', () => {
+    const store = TestBed.inject(ReturnsStore);
+    const fixture = TestBed.createComponent(OperatorDashboard);
+    fixture.detectChanges();
+
+    store.receive('RMA-0343');
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('RMA-0343');
+  });
+
+  it('navigates to the returns receive screen when a to-receive card is clicked', () => {
+    const fixture = TestBed.createComponent(OperatorDashboard);
+    fixture.detectChanges();
+
+    (fixture.componentInstance as unknown as { onTaskClick: (t: { clickable: boolean; navTarget?: string[] }) => void }).onTaskClick({
+      clickable: true,
+      navTarget: ['/operator/returns/receive', 'RMA-0343'],
+    });
+
+    expect(navigateCalls[0][0]).toEqual(['/operator/returns/receive', 'RMA-0343']);
   });
 });
