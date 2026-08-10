@@ -38,6 +38,9 @@ export const DISPOSITION_RULE: Record<InspectionResult, DispositionOutcome[]> = 
   Defective: ['Quarantine', 'Scrap', 'VendorReturn'],
 };
 
+/** Disposition outcomes that require a target bin. */
+export const OUTCOMES_REQUIRING_BIN: DispositionOutcome[] = ['Restock', 'Quarantine'];
+
 let rmaSeq = 344;
 let inspectionSeq = 920;
 let dispositionSeq = 443;
@@ -134,7 +137,7 @@ export class ReturnsStore {
       return { ok: false, error: `'${outcome}' is not a valid disposition for a '${order.inspectionResult}' inspection result.` };
     }
 
-    const needsBin = outcome === 'Restock' || outcome === 'Quarantine';
+    const needsBin = OUTCOMES_REQUIRING_BIN.includes(outcome);
     const trimmedBin = bin?.trim();
     if (needsBin && !trimmedBin) {
       return { ok: false, error: 'A bin is required for Restock or Quarantine.' };

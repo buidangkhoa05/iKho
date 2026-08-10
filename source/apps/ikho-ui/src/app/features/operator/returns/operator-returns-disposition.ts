@@ -4,7 +4,7 @@ import { Button, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { PRODUCTS } from '../../../core/mock-data/products.data';
 import { DISPOSITION_OUTCOME_LABELS, DispositionOutcome, INSPECTION_RESULT_LABELS } from '../../../core/mock-data/return-orders.data';
-import { DISPOSITION_RULE, ReturnsStore } from '../../../core/state/returns-store';
+import { DISPOSITION_RULE, OUTCOMES_REQUIRING_BIN, ReturnsStore } from '../../../core/state/returns-store';
 
 @Component({
   selector: 'app-operator-returns-disposition',
@@ -67,7 +67,7 @@ export class OperatorReturnsDisposition {
    * the bin has to be visible and fillable before that tap for outcomes that require it — a
    * value entered here is only actually used by the store when the tapped outcome needs one.
    */
-  protected readonly needsBin = computed(() => this.allowedOutcomes().some((o) => o === 'Restock' || o === 'Quarantine'));
+  protected readonly needsBin = computed(() => this.allowedOutcomes().some((o) => OUTCOMES_REQUIRING_BIN.includes(o)));
   protected readonly binInput = linkedSignal(() => {
     const sku = this.order()?.lines[0]?.sku;
     return sku ? (PRODUCTS.find((p) => p.sku === sku)?.bin ?? '') : '';
