@@ -98,11 +98,16 @@ describe('OperatorDashboard', () => {
     const fixture = TestBed.createComponent(OperatorDashboard);
     fixture.detectChanges();
 
+    let text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('RMA-0343');
+    expect(text).toContain('Receive');
+
     store.receive('RMA-0343');
     fixture.detectChanges();
 
-    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('RMA-0343');
+    expect(text).toContain('Inspect');
   });
 
   it('navigates to the returns receive screen when a to-receive card is clicked', () => {

@@ -122,9 +122,12 @@ export class OfficeReturns {
   protected readonly detail = computed(() => {
     const lang = this.lang.lang();
     const eyebrow = lang === 'en' ? 'Return order detail' : 'Chi tiết đơn trả hàng';
+    const typeLabel = lang === 'en' ? 'Type' : 'Loại';
     const sourceRefLabel = lang === 'en' ? 'Source' : 'Nguồn gốc';
     const inspectionLabel = lang === 'en' ? 'Inspection' : 'Kiểm tra';
     const dispositionLabel = lang === 'en' ? 'Disposition' : 'Xử lý';
+    const customerTypeValueLabel = lang === 'en' ? 'Customer return' : 'Trả từ khách hàng';
+    const supplierTypeValueLabel = lang === 'en' ? 'Supplier return' : 'Trả cho NCC';
     return (row: Record<string, unknown>): OfficeDetailPanel => {
       const status = row['status'] as OfficeDetailPanel['status'];
       const lines = row['lines'] as ReturnOrderLine[];
@@ -138,6 +141,7 @@ export class OfficeReturns {
         status,
         statusLabel: resolveStatusLabel({ status, label: row['label'] as Localized<string> | undefined }, lang),
         fields: [
+          { label: typeLabel, value: row['type'] === 'customer' ? customerTypeValueLabel : supplierTypeValueLabel },
           { label: sourceRefLabel, value: String(row['sourceRef']) },
           ...lines.map((l) => ({ label: l.productName[lang], value: `${l.qty} · ${REASON_LABELS[l.reasonCode][lang]}` })),
           { label: inspectionLabel, value: inspectionResult ? INSPECTION_RESULT_LABELS[inspectionResult][lang] : '—' },

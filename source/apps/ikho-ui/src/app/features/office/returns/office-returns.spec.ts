@@ -66,6 +66,7 @@ describe('OfficeReturns', () => {
     const panel = instance.detail()(dispositionedRow);
 
     expect(panel.action).toBeUndefined();
+    expect(panel.fields.some((f) => f.value.includes('Customer return'))).toBe(true);
     expect(panel.fields.some((f) => f.value.includes('Damaged'))).toBe(true);
     expect(panel.fields.some((f) => f.value.includes('Scrap'))).toBe(true);
   });
