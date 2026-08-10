@@ -44,10 +44,7 @@ export class OperatorOutboundEntry {
 
   protected readonly dispatchReady = computed(() => {
     const lang = this.lang.lang();
-    return this.store
-      .salesOrders()
-      .filter((so) => so.status === 'outbound')
-      .map((so) => ({ ...so, statusLabel: resolveStatusLabel(so, lang) }));
+    return this.store.dispatchReady().map((so) => ({ ...so, statusLabel: resolveStatusLabel(so, lang) }));
   });
 
   protected readonly emptyLabel = computed(() => (this.lang.lang() === 'en' ? 'Nothing here right now' : 'Hiện chưa có gì'));

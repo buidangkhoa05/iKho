@@ -49,7 +49,31 @@ describe('OperatorOutboundDispatch', () => {
     fixture.detectChanges();
 
     const instance = fixture.componentInstance as unknown as { dispatchError: () => string | null };
-    expect(instance.dispatchError()).toContain('not fully allocated');
+    expect(instance.dispatchError()).toContain('not ready to dispatch');
+    expect(navigateCalls.length).toBe(0);
+  });
+
+  it('does not render a confirm button for an already-dispatched order and shows a status message instead', () => {
+    const fixture = TestBed.createComponent(OperatorOutboundDispatch);
+    fixture.componentRef.setInput('soId', 'SO-88214'); // seeded with status 'in-stock' (already dispatched)
+    fixture.detectChanges();
+
+    const nativeElement = fixture.nativeElement as HTMLElement;
+    expect(nativeElement.querySelector('lib-button')).toBeNull();
+    expect(nativeElement.textContent).toContain('already been dispatched');
+  });
+
+  it('prevents a duplicate dispatch if confirm is somehow invoked again on an already-dispatched order', () => {
+    const store = TestBed.inject(OutboundStore);
+    const fixture = TestBed.createComponent(OperatorOutboundDispatch);
+    fixture.componentRef.setInput('soId', 'SO-88214');
+    fixture.detectChanges();
+
+    const shipmentsBefore = store.shipments().length;
+
+    (fixture.componentInstance as unknown as { confirm: () => void }).confirm();
+
+    expect(store.shipments().length).toBe(shipmentsBefore);
     expect(navigateCalls.length).toBe(0);
   });
 });

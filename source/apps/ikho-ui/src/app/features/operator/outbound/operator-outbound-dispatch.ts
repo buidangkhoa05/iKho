@@ -28,7 +28,11 @@ import { OutboundStore } from '../../../core/state/outbound-store';
         @if (dispatchError(); as err) {
           <span class="font-core text-sm text-status-out-of-stock">{{ err }}</span>
         }
-        <lib-button variant="operator" [fullWidth]="true" (click)="confirm()">{{ confirmLabel() }}</lib-button>
+        @if (order()!.status !== 'outbound') {
+          <span class="font-core text-sm text-shade-40">{{ alreadyDispatchedLabel() }}</span>
+        } @else {
+          <lib-button variant="operator" [fullWidth]="true" (click)="confirm()">{{ confirmLabel() }}</lib-button>
+        }
       </div>
     }
   `,
@@ -47,6 +51,9 @@ export class OperatorOutboundDispatch {
   protected readonly cutoffLabel = computed(() => (this.lang.lang() === 'en' ? 'Cut-off:' : 'Giờ chốt:'));
   protected readonly unitsLabel = computed(() => (this.lang.lang() === 'en' ? 'units' : 'cái'));
   protected readonly confirmLabel = computed(() => (this.lang.lang() === 'en' ? 'Confirm dispatch' : 'Xác nhận xuất kho'));
+  protected readonly alreadyDispatchedLabel = computed(() =>
+    this.lang.lang() === 'en' ? 'This order has already been dispatched' : 'Đơn hàng này đã được xuất kho',
+  );
 
   protected confirm(): void {
     const result = this.store.dispatch(this.soId());

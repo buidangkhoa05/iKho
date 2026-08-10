@@ -54,6 +54,14 @@ describe('OutboundStore', () => {
     expect(store.allocations().length).toBe(allocationsBefore);
   });
 
+  it('dispatchReady only includes orders with status outbound', () => {
+    const ready = store.dispatchReady();
+
+    expect(ready.every((o) => o.status === 'outbound')).toBe(true);
+    expect(ready.some((o) => o.so === 'SO-88214')).toBe(false); // already dispatched (in-stock)
+    expect(ready.some((o) => o.so === 'SO-88219')).toBe(true); // allocated, ready to dispatch
+  });
+
   it('dispatch succeeds for an allocated order, creates a shipment, and clears its allocations', () => {
     const shipmentsBefore = store.shipments().length;
 
@@ -73,5 +81,31 @@ describe('OutboundStore', () => {
 
     expect(result.ok).toBe(false);
     expect(store.shipments().length).toBe(shipmentsBefore);
+  });
+
+  it('dispatch fails for an order that has already been dispatched and does not create a second shipment', () => {
+    const shipmentsBefore = store.shipments().length;
+
+    // SO-88214 is seeded with status 'in-stock' (already dispatched) despite allocated === ordered.
+    const result = store.dispatch('SO-88214');
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain('not ready to dispatch');
+    }
+    expect(store.shipments().length).toBe(shipmentsBefore);
+  });
+
+  it('dispatch fails when called twice in a row on the same order (double-dispatch via Back button)', () => {
+    const order = store.createSalesOrder({ customer: 'Test Retail BV', dock: 'Dock 6', cutoff: '14:00', lines: [{ sku: 'IKH-482910', qty: 5 }] });
+    store.allocate(order.so);
+
+    const first = store.dispatch(order.so);
+    const shipmentsAfterFirst = store.shipments().length;
+    const second = store.dispatch(order.so);
+
+    expect(first.ok).toBe(true);
+    expect(second.ok).toBe(false);
+    expect(store.shipments().length).toBe(shipmentsAfterFirst);
   });
 });

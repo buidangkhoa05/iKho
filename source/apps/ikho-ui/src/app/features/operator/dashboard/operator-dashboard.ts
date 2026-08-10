@@ -90,8 +90,7 @@ export class OperatorDashboard {
       }));
 
     const dispatchReady: QueueCard[] = this.outboundStore
-      .salesOrders()
-      .filter((so) => so.status === 'outbound')
+      .dispatchReady()
       .map((so) => ({
         id: so.so,
         status: so.status,

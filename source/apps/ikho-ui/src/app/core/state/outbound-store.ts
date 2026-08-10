@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { Localized } from '../i18n/localized.type';
 import { Allocation, ALLOCATIONS } from '../mock-data/allocations.data';
 import { PRODUCTS } from '../mock-data/products.data';
@@ -32,6 +32,9 @@ export class OutboundStore {
   readonly salesOrders = signal<SalesOrder[]>([...SALES_ORDERS]);
   readonly allocations = signal<Allocation[]>([...ALLOCATIONS]);
   readonly shipments = signal<Shipment[]>([...SHIPMENTS]);
+
+  /** Single source of truth for which sales orders are ready to dispatch. */
+  readonly dispatchReady = computed(() => this.salesOrders().filter((o) => o.status === 'outbound'));
 
   createSalesOrder(input: CreateSalesOrderInput): SalesOrder {
     const lines: SalesOrderLine[] = input.lines.map((line) => ({
@@ -95,8 +98,8 @@ export class OutboundStore {
 
   dispatch(soId: string): DispatchResult {
     const order = this.salesOrders().find((o) => o.so === soId);
-    if (!order || order.allocated <= 0 || order.allocated !== order.ordered) {
-      return { ok: false, error: `Sales order '${soId}' is not fully allocated.` };
+    if (!order || order.status !== 'outbound') {
+      return { ok: false, error: `Sales order '${soId}' is not ready to dispatch.` };
     }
 
     const shipment: Shipment = {
