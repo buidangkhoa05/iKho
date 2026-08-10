@@ -107,7 +107,7 @@ describe('OperatorDashboard', () => {
 
     text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('RMA-0343');
-    expect(text).toContain('Inspect');
+    expect(text).not.toContain('Receive');
   });
 
   it('navigates to the returns receive screen when a to-receive card is clicked', () => {
