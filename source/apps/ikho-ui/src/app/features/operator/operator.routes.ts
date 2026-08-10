@@ -29,7 +29,14 @@ export const operatorRoutes: Route[] = [
     path: 'inbound/putaway/:taskId',
     loadComponent: () => import('./inbound/operator-inbound-putaway').then((m) => m.OperatorInboundPutaway),
   },
-  outlinedScreen('outbound'),
+  {
+    path: 'outbound',
+    loadComponent: () => import('./outbound/operator-outbound-entry').then((m) => m.OperatorOutboundEntry),
+  },
+  {
+    path: 'outbound/dispatch/:soId',
+    loadComponent: () => import('./outbound/operator-outbound-dispatch').then((m) => m.OperatorOutboundDispatch),
+  },
   outlinedScreen('inventory'),
   outlinedScreen('returns'),
 ];
