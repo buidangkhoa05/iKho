@@ -31,7 +31,10 @@ export const officeRoutes: Route[] = [
   },
   genericScreen('organization'),
   genericScreen('partners'),
-  genericScreen('returns'),
+  {
+    path: 'returns',
+    loadComponent: () => import('./returns/office-returns').then((m) => m.OfficeReturns),
+  },
   genericScreen('billing'),
   genericScreen('reporting'),
 ];
