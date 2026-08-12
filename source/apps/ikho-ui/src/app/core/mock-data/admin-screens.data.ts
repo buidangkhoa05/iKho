@@ -3,8 +3,11 @@ import { Localized } from '../i18n/localized.type';
 import { ALLOCATIONS } from './allocations.data';
 import { CATEGORIES } from './categories.data';
 import { DISPOSITIONS } from './dispositions.data';
+import { INBOUND_STATUSES } from './inbound-status.data';
 import { INSPECTIONS } from './inspections.data';
+import { INVENTORY_POSITIONS } from './inventory-positions.data';
 import { LEDGER } from './ledger.data';
+import { OUTBOUND_STATUSES } from './outbound-status.data';
 import { PRODUCTS } from './products.data';
 import { PURCHASE_ORDERS } from './purchase-orders.data';
 import { PUTAWAY_TASKS } from './putaway-tasks.data';
@@ -547,48 +550,52 @@ export const ADMIN_SCREENS: Record<Exclude<ScreenId, 'dashboard'>, AdminScreenDa
   },
 
   reporting: {
-    panelTitle: { en: 'Read models', vi: 'Mô hình đọc' },
-    panelSubtitle: { en: 'Rebuildable from source events · Office Console only', vi: 'Dựng lại được từ sự kiện gốc · Chỉ trên Office Console' },
-    kpis: [
-      { label: { en: 'Fulfillment rate', vi: 'Tỷ lệ hoàn thành' }, value: '98.2%', trend: { en: '+0.4%', vi: '+0.4%' }, trendStatus: 'in-stock', caption: { en: 'vs. last week', vi: 'so với tuần trước' } },
-      { label: { en: 'On-time dispatch', vi: 'Xuất đúng hạn' }, value: '96.4%', trend: { en: '-1.1%', vi: '-1.1%' }, trendStatus: 'low-stock', caption: { en: 'vs. last week', vi: 'so với tuần trước' } },
-      { label: { en: 'Inventory accuracy', vi: 'Độ chính xác tồn kho' }, value: '99.1%' },
-      { label: { en: 'Stock turns', vi: 'Vòng quay tồn kho' }, value: '6.4' },
-    ],
+    panelTitle: { en: 'Reporting', vi: 'Báo cáo' },
+    panelSubtitle: { en: 'Read models rebuilt from source events', vi: 'Mô hình đọc dựng lại từ sự kiện gốc' },
+    kpis: [],
     tabs: [
       {
-        id: 'main',
-        label: { en: 'Read models', vi: 'Mô hình đọc' },
+        id: 'inventory',
+        label: { en: 'Inventory position', vi: 'Vị thế tồn kho' },
+        subtitle: { en: 'On-hand, reserved, quarantine and damaged by SKU and warehouse', vi: 'Tồn kho, đã giữ, cách ly và hư hỏng theo SKU và kho' },
         columns: [
-          { key: 'report', label: { en: 'Report', vi: 'Báo cáo' }, localized: true },
-          { key: 'model', label: { en: 'Read model', vi: 'Mô hình đọc' }, mono: true },
-          { key: 'refreshed', label: { en: 'Refreshed', vi: 'Cập nhật' }, mono: true },
-          { key: 'schedule', label: { en: 'Schedule', vi: 'Lịch chạy' }, localized: true },
-          { key: 'owner', label: { en: 'Owner', vi: 'Phụ trách' } },
+          { key: 'sku', label: same('SKU'), mono: true },
+          { key: 'productName', label: { en: 'Product', vi: 'Sản phẩm' }, localized: true },
+          { key: 'warehouse', label: { en: 'Warehouse', vi: 'Kho' } },
+          { key: 'onHand', label: { en: 'On hand', vi: 'Tồn kho' }, align: 'right', mono: true },
+          { key: 'reserved', label: { en: 'Reserved', vi: 'Đã giữ' }, align: 'right', mono: true },
+          { key: 'quarantine', label: { en: 'Quarantine', vi: 'Cách ly' }, align: 'right', mono: true },
+          { key: 'damaged', label: { en: 'Damaged', vi: 'Hư hỏng' }, align: 'right', mono: true },
+          { key: 'available', label: { en: 'Available', vi: 'Khả dụng' }, align: 'right', mono: true },
+          { key: 'status', label: { en: 'Status', vi: 'Trạng thái' }, status: true },
         ],
-        rows: [
-          { report: { en: 'Inventory position', vi: 'Vị thế tồn kho' }, model: 'InventoryPositionReadModel', refreshed: '09:40', schedule: { en: 'Every 15 min', vi: 'Mỗi 15 phút' }, owner: 'M. de Vries' },
-          { report: { en: 'Inbound status', vi: 'Trạng thái nhập kho' }, model: 'InboundStatusReadModel', refreshed: '09:35', schedule: { en: 'Hourly', vi: 'Mỗi giờ' }, owner: 'M. de Vries' },
-          { report: { en: 'Outbound status', vi: 'Trạng thái xuất kho' }, model: 'OutboundStatusReadModel', refreshed: '09:35', schedule: { en: 'Hourly', vi: 'Mỗi giờ' }, owner: 'K. Bakker' },
-          { report: { en: 'Fulfillment KPIs', vi: 'KPI giao hàng' }, model: 'FulfillmentKpiReadModel', refreshed: '06:00', schedule: { en: 'Daily', vi: 'Hàng ngày' }, owner: 'K. Bakker' },
-        ],
+        rows: INVENTORY_POSITIONS,
       },
       {
-        id: 'exports',
-        label: { en: 'Scheduled exports', vi: 'Xuất theo lịch' },
-        subtitle: { en: 'Recurring deliveries · Office Console only', vi: 'Gửi định kỳ · Chỉ trên Office Console' },
+        id: 'inbound',
+        label: { en: 'Inbound status', vi: 'Trạng thái nhập kho' },
+        subtitle: { en: 'Receipt and putaway progress by purchase order', vi: 'Tiến độ nhận hàng và cất kho theo đơn mua' },
         columns: [
-          { key: 'id', label: { en: 'Export', vi: 'Bản xuất' }, mono: true },
-          { key: 'report', label: { en: 'Report', vi: 'Báo cáo' }, localized: true },
-          { key: 'format', label: { en: 'Format', vi: 'Định dạng' }, mono: true },
-          { key: 'schedule', label: { en: 'Schedule', vi: 'Lịch chạy' }, localized: true },
-          { key: 'recipient', label: { en: 'Recipient', vi: 'Người nhận' } },
+          { key: 'po', label: same('PO'), mono: true },
+          { key: 'warehouse', label: { en: 'Warehouse', vi: 'Kho' } },
+          { key: 'receiptsCompleted', label: { en: 'Receipts completed', vi: 'Đã nhận' }, align: 'right', mono: true },
+          { key: 'putawayCompleted', label: { en: 'Putaway completed', vi: 'Đã cất kho' }, align: 'right', mono: true },
+          { key: 'lastReceiptOn', label: { en: 'Last receipt', vi: 'Lần nhận cuối' }, mono: true },
         ],
-        rows: [
-          { id: 'EXP-114', report: { en: 'Inventory position', vi: 'Vị thế tồn kho' }, format: 'CSV', schedule: { en: 'Daily 06:00', vi: 'Hàng ngày 06:00' }, recipient: 'planning@ikho.nl' },
-          { id: 'EXP-118', report: { en: 'Fulfillment KPIs', vi: 'KPI giao hàng' }, format: 'XLSX', schedule: { en: 'Weekly, Monday', vi: 'Hàng tuần, thứ Hai' }, recipient: 'board@ikho.nl' },
-          { id: 'EXP-121', report: { en: 'Outbound status', vi: 'Trạng thái xuất kho' }, format: 'CSV', schedule: { en: 'Hourly', vi: 'Mỗi giờ' }, recipient: 'ops@ikho.nl' },
+        rows: INBOUND_STATUSES,
+      },
+      {
+        id: 'outbound',
+        label: { en: 'Outbound status', vi: 'Trạng thái xuất kho' },
+        subtitle: { en: 'Allocation and dispatch progress by sales order', vi: 'Tiến độ phân bổ và xuất hàng theo đơn bán' },
+        columns: [
+          { key: 'so', label: same('SO'), mono: true },
+          { key: 'warehouse', label: { en: 'Warehouse', vi: 'Kho' } },
+          { key: 'allocationsConfirmed', label: { en: 'Allocations confirmed', vi: 'Đã phân bổ' }, align: 'right', mono: true },
+          { key: 'shipmentsDispatched', label: { en: 'Shipments dispatched', vi: 'Đã xuất' }, align: 'right', mono: true },
+          { key: 'lastShipmentOn', label: { en: 'Last shipment', vi: 'Lần xuất cuối' }, mono: true },
         ],
+        rows: OUTBOUND_STATUSES,
       },
     ],
   },
