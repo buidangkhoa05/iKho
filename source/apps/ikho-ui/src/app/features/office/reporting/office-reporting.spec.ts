@@ -12,11 +12,12 @@ describe('OfficeReporting', () => {
     const fixture = TestBed.createComponent(OfficeReporting);
     fixture.detectChanges();
 
-    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Receipts today');
-    expect(text).toContain('20');
-    expect(text).toContain('SKUs at zero available');
-    expect(text).toContain('1');
+    const cards = (fixture.nativeElement as HTMLElement).querySelectorAll('lib-kpi-card');
+    expect(cards.length).toBe(4);
+    expect(cards[0].textContent).toContain('Receipts today');
+    expect(cards[0].textContent).toContain('20');
+    expect(cards[3].textContent).toContain('SKUs at zero available');
+    expect(cards[3].textContent).toContain('1');
   });
 
   it('renders all three status tables with seeded rows', () => {

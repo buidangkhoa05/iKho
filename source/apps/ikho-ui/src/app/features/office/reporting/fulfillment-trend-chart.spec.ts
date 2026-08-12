@@ -28,10 +28,12 @@ describe('FulfillmentTrendChart', () => {
     fixture.componentRef.setInput('data', SAMPLE_DATA);
     fixture.detectChanges();
 
-    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Receipts');
-    expect(text).toContain('Shipments');
-    expect(text).toContain('Allocations');
+    const legendItems = (fixture.nativeElement as HTMLElement).querySelectorAll('[data-legend-item]');
+    expect(legendItems.length).toBe(3);
+    const legendText = Array.from(legendItems).map((el) => el.textContent).join(' ');
+    expect(legendText).toContain('Receipts');
+    expect(legendText).toContain('Shipments');
+    expect(legendText).toContain('Allocations');
   });
 
   it('renders one table row per day with the seeded dates', () => {
@@ -39,23 +41,25 @@ describe('FulfillmentTrendChart', () => {
     fixture.componentRef.setInput('data', SAMPLE_DATA);
     fixture.detectChanges();
 
-    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Aug 06');
-    expect(text).toContain('Aug 07');
-    expect(text).toContain('Aug 08');
+    const tableRows = (fixture.nativeElement as HTMLElement).querySelectorAll('lib-data-table tbody tr');
+    expect(tableRows.length).toBe(3); // matches SAMPLE_DATA's 3 days
+    expect(tableRows[0].textContent).toContain('Aug 06');
+    expect(tableRows[1].textContent).toContain('Aug 07');
+    expect(tableRows[2].textContent).toContain('Aug 08');
   });
 
-  it('shows a tooltip with the series and value when a bar is hovered', () => {
+  it('shows a tooltip with the date, series and value when a bar is hovered', () => {
     const fixture = TestBed.createComponent(FulfillmentTrendChart);
     fixture.componentRef.setInput('data', SAMPLE_DATA);
     fixture.detectChanges();
 
     const instance = fixture.componentInstance as unknown as { hoveredBar: { set: (v: unknown) => void } };
-    instance.hoveredBar.set({ x: 0, y: 0, width: 16, height: 40, color: '#2563eb', value: 24, series: 'receipts' });
+    instance.hoveredBar.set({ x: 0, y: 0, width: 16, height: 40, color: '#2563eb', value: 24, series: 'receipts', date: 'Aug 06' });
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('Receipts: 24');
+    expect(text).toContain('Aug 06');
   });
 
   it('renders always-visible value labels above each bar', () => {

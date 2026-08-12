@@ -13,6 +13,7 @@ interface Bar {
   color: string;
   value: number;
   series: SeriesKey;
+  date: string;
 }
 
 interface Group {
@@ -42,7 +43,7 @@ const BAR_GAP = 4;
       <div class="flex flex-col gap-4">
         <div class="flex gap-4">
           @for (s of legendItems(); track s.key) {
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5" data-legend-item [attr.data-series]="s.key">
               <span class="inline-block size-2.5 rounded-full" [style.background]="s.color"></span>
               <span class="font-core text-[13px] text-shade-60">{{ s.label }}</span>
             </div>
@@ -150,6 +151,7 @@ export class FulfillmentTrendChart {
           color: s.color,
           value,
           series: s.key,
+          date: d.date,
         };
       });
     });
@@ -163,6 +165,6 @@ export class FulfillmentTrendChart {
   }
 
   protected tooltipText(bar: Bar): string {
-    return `${this.seriesLabel(bar.series)}: ${bar.value}`;
+    return `${bar.date} · ${this.seriesLabel(bar.series)}: ${bar.value}`;
   }
 }
