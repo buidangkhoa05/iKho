@@ -24,6 +24,6 @@ Inbound → Outbound → Returns → Reporting. Each module leans on data and UI
 | 1 | Inbound | [2026-08-09-inbound-office-operator-ui-design.md](../superpowers/specs/2026-08-09-inbound-office-operator-ui-design.md) | [2026-08-09-inbound-office-operator-ui.md](../superpowers/plans/2026-08-09-inbound-office-operator-ui.md) | Implemented |
 | 2 | Outbound | [2026-08-09-outbound-office-operator-ui-design.md](../superpowers/specs/2026-08-09-outbound-office-operator-ui-design.md) | [2026-08-09-outbound-office-operator-ui.md](../superpowers/plans/2026-08-09-outbound-office-operator-ui.md) | Implemented |
 | 3 | Returns | [2026-08-10-returns-office-operator-ui-design.md](../superpowers/specs/2026-08-10-returns-office-operator-ui-design.md) | [2026-08-10-returns-office-operator-ui.md](../superpowers/plans/2026-08-10-returns-office-operator-ui.md) | Implemented |
-| 4 | Reporting/dashboards | _pending_ | _pending_ | Not started |
+| 4 | Reporting/dashboards | [2026-08-12-reporting-dashboards-ui-design.md](../superpowers/specs/2026-08-12-reporting-dashboards-ui-design.md) | [2026-08-12-reporting-dashboards-ui.md](../superpowers/plans/2026-08-12-reporting-dashboards-ui.md) | Implemented |
 
 Update the table as each module's spec and plan land.
