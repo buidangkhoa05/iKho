@@ -64,6 +64,16 @@ const BAR_GAP = 4;
               (mouseleave)="hoveredBar.set(null)"
             />
           }
+          @for (bar of bars(); track bar.x + '-' + bar.series + '-label') {
+            <text
+              [attr.x]="bar.x + bar.width / 2"
+              [attr.y]="bar.y - 4"
+              text-anchor="middle"
+              class="font-core"
+              font-size="10"
+              fill="var(--color-shade-60)"
+            >{{ bar.value }}</text>
+          }
           @for (group of groups(); track group.label) {
             <text [attr.x]="group.centerX" [attr.y]="chartHeight - 10" text-anchor="middle" class="font-core" font-size="11" fill="var(--color-shade-50)">{{ group.label }}</text>
           }
