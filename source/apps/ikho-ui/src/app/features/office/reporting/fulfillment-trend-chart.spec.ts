@@ -63,14 +63,17 @@ describe('FulfillmentTrendChart', () => {
     fixture.componentRef.setInput('data', SAMPLE_DATA);
     fixture.detectChanges();
 
-    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    // Check for values from SAMPLE_DATA: Aug 06 (24, 19, 21), Aug 07 (15, 27, 30), Aug 08 (21, 24, 23)
-    expect(text).toContain('24'); // receipts for Aug 06 and shipments for Aug 08
-    expect(text).toContain('19'); // shipments for Aug 06
-    expect(text).toContain('21'); // allocations for Aug 06 and receipts for Aug 08
-    expect(text).toContain('15'); // receipts for Aug 07
-    expect(text).toContain('27'); // shipments for Aug 07
-    expect(text).toContain('30'); // allocations for Aug 07
-    expect(text).toContain('23'); // allocations for Aug 08
+    const labels = (fixture.nativeElement as HTMLElement).querySelectorAll('.chart-bar-label');
+    expect(labels.length).toBe(9); // one label per bar, 3 days × 3 series
+
+    // Verify labels contain the expected values
+    const labelValues = Array.from(labels).map((l) => l.textContent?.trim());
+    expect(labelValues).toContain('24'); // receipts for Aug 06 and shipments for Aug 08
+    expect(labelValues).toContain('19'); // shipments for Aug 06
+    expect(labelValues).toContain('21'); // allocations for Aug 06 and receipts for Aug 08
+    expect(labelValues).toContain('15'); // receipts for Aug 07
+    expect(labelValues).toContain('27'); // shipments for Aug 07
+    expect(labelValues).toContain('30'); // allocations for Aug 07
+    expect(labelValues).toContain('23'); // allocations for Aug 08
   });
 });

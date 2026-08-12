@@ -69,7 +69,7 @@ const BAR_GAP = 4;
               [attr.x]="bar.x + bar.width / 2"
               [attr.y]="bar.y - 4"
               text-anchor="middle"
-              class="font-core"
+              class="font-core chart-bar-label"
               font-size="10"
               fill="var(--color-shade-60)"
             >{{ bar.value }}</text>
