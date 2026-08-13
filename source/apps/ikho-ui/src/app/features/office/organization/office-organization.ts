@@ -5,6 +5,7 @@ import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
 import { Warehouse } from '../../../core/mock-data/organization.data';
 import { screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
 import { OrganizationStore } from '../../../core/state/organization-store';
+import { WarehouseDetailPanel } from './warehouse-detail-panel';
 
 interface WarehouseRow extends Record<string, unknown> {
   code: string;
@@ -19,7 +20,7 @@ interface WarehouseRow extends Record<string, unknown> {
 @Component({
   selector: 'app-office-organization',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DataPanel, DataTable, KpiCard, TextInput],
+  imports: [DataPanel, DataTable, KpiCard, TextInput, WarehouseDetailPanel],
   template: `
     <div class="flex flex-col gap-6">
       <div>
@@ -40,9 +41,26 @@ interface WarehouseRow extends Record<string, unknown> {
         <span class="ml-auto font-core text-[13px] text-shade-50">{{ filteredRows().length }} {{ lang.pick(strings.results) }}</span>
       </div>
 
-      <lib-data-panel [title]="t().panelTitle">
-        <lib-data-table [columns]="columns()" [rows]="filteredRows()" [emptyLabel]="t().noResults" />
-      </lib-data-panel>
+      <div class="flex items-start gap-5">
+        <div class="min-w-0 flex-1">
+          <lib-data-panel [title]="t().panelTitle">
+            <lib-data-table [columns]="columns()" [rows]="filteredRows()" [emptyLabel]="t().noResults" [clickable]="true" (rowClick)="onRowClick($event)" />
+          </lib-data-panel>
+        </div>
+        @if (selectedWarehouse(); as sw) {
+          <app-warehouse-detail-panel
+            [warehouse]="sw"
+            [companyName]="selectedCompanyName()"
+            (closePanel)="selectedCode.set(null)"
+            (toggleStatus)="onToggleStatus()"
+            (saveDetails)="onSaveDetails($event)"
+            (addZone)="onAddZone($event)"
+            (toggleZoneStatus)="onToggleZoneStatus($event)"
+            (addDock)="onAddDock($event)"
+            (toggleDockStatus)="onToggleDockStatus($event)"
+          />
+        }
+      </div>
     </div>
   `,
 })
@@ -95,6 +113,20 @@ export class OfficeOrganization {
 
   protected readonly query = signal('');
 
+  protected readonly selectedCode = signal<string | null>(null);
+
+  protected readonly selectedWarehouse = computed<Warehouse | null>(() => {
+    const code = this.selectedCode();
+    if (!code) return null;
+    return this.store.warehouses().find((w) => w.code === code) ?? null;
+  });
+
+  protected readonly selectedCompanyName = computed<string>(() => {
+    const w = this.selectedWarehouse();
+    if (!w) return '';
+    return this.store.companies().find((c) => c.code === w.companyCode)?.name ?? '—';
+  });
+
   protected readonly rows = computed<WarehouseRow[]>(() => {
     const companies = this.store.companies();
     return this.store.warehouses().map((w) => this.toRow(w, companies.find((c) => c.code === w.companyCode)?.name ?? '—'));
@@ -116,5 +148,45 @@ export class OfficeOrganization {
       status: w.isActive ? 'in-stock' : 'out-of-stock',
       statusLabel: w.isActive ? this.t().active : this.t().inactive,
     };
+  }
+
+  protected onRowClick(row: Record<string, unknown>): void {
+    this.selectedCode.set(String(row['code']));
+  }
+
+  protected onToggleStatus(): void {
+    const w = this.selectedWarehouse();
+    if (!w) return;
+    this.store.setWarehouseStatus(w.code, !w.isActive);
+  }
+
+  protected onSaveDetails(input: { name: string }): void {
+    const w = this.selectedWarehouse();
+    if (!w) return;
+    this.store.updateWarehouse(w.code, input);
+  }
+
+  protected onAddZone(zone: { code: string; name: string }): void {
+    const w = this.selectedWarehouse();
+    if (!w) return;
+    this.store.addZone(w.code, zone);
+  }
+
+  protected onToggleZoneStatus(event: { zoneCode: string; isActive: boolean }): void {
+    const w = this.selectedWarehouse();
+    if (!w) return;
+    this.store.setZoneStatus(w.code, event.zoneCode, event.isActive);
+  }
+
+  protected onAddDock(dock: { code: string; name: string }): void {
+    const w = this.selectedWarehouse();
+    if (!w) return;
+    this.store.addDock(w.code, dock);
+  }
+
+  protected onToggleDockStatus(event: { dockCode: string; isActive: boolean }): void {
+    const w = this.selectedWarehouse();
+    if (!w) return;
+    this.store.setDockStatus(w.code, event.dockCode, event.isActive);
   }
 }
