@@ -22,7 +22,7 @@ import { NewPartnerAddress, NewPartnerContact } from '../../../core/state/partne
           type="button"
           class="inline-flex size-8 flex-none cursor-pointer items-center justify-center rounded-md border-none bg-transparent hover:bg-surface-elevated-light"
           [attr.aria-label]="lang.pick(strings.close)"
-          (click)="close.emit()"
+          (click)="closePanel.emit()"
         >
           <lib-icon name="x" [size]="18" color="var(--color-shade-50)" />
         </button>
@@ -142,7 +142,7 @@ export class PartnerDetailPanel {
 
   readonly partner = input.required<Partner>();
 
-  readonly close = output<void>();
+  readonly closePanel = output<void>();
   readonly toggleStatus = output<void>();
   readonly saveDetails = output<{ name: string; taxId: string }>();
   readonly addAddress = output<NewPartnerAddress>();

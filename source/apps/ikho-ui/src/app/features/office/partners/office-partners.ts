@@ -91,7 +91,7 @@ interface PartnerRow extends Record<string, unknown> {
         @if (selectedPartner(); as sp) {
           <app-partner-detail-panel
             [partner]="sp"
-            (close)="selectedCode.set(null)"
+            (closePanel)="selectedCode.set(null)"
             (toggleStatus)="onToggleStatus()"
             (saveDetails)="onSaveDetails($event)"
             (addAddress)="onAddAddress($event)"

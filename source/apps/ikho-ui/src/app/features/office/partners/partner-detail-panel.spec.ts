@@ -182,7 +182,7 @@ describe('PartnerDetailPanel', () => {
     fixture.detectChanges();
 
     let emitted = false;
-    fixture.componentInstance.close.subscribe(() => (emitted = true));
+    fixture.componentInstance.closePanel.subscribe(() => (emitted = true));
 
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[aria-label="Close"]')?.click();
 
