@@ -132,4 +132,64 @@ describe('OfficeOrganization', () => {
     const reopenedCode = reopenedInputs.find((i) => i.closest('label')?.textContent?.includes('Code')) as HTMLInputElement;
     expect(reopenedCode.value).toBe('');
   });
+
+  it('creates a warehouse under an existing company', () => {
+    const fixture = TestBed.createComponent(OfficeOrganization);
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      showCreateForm: { set: (v: boolean) => void };
+      formCode: { set: (v: string) => void };
+      formName: { set: (v: string) => void };
+      formCompanyCode: { set: (v: string) => void };
+      formError: () => string | null;
+      submitCreate: () => void;
+    };
+
+    instance.showCreateForm.set(true);
+    instance.formCode.set('WH-1'); // duplicate within RTM-LOG
+    instance.formName.set('New WH');
+    instance.formCompanyCode.set('RTM-LOG');
+    instance.submitCreate();
+    fixture.detectChanges();
+
+    expect(instance.formError()).toContain('WH-1');
+
+    instance.formCode.set('WH-9');
+    instance.submitCreate();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('New WH');
+  });
+
+  it('creates a warehouse under a newly created inline company', () => {
+    const fixture = TestBed.createComponent(OfficeOrganization);
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      showCreateForm: { set: (v: boolean) => void };
+      formCode: { set: (v: string) => void };
+      formName: { set: (v: string) => void };
+      showNewCompanyForm: { set: (v: boolean) => void };
+      newCompanyCode: { set: (v: string) => void };
+      newCompanyName: { set: (v: string) => void };
+      formError: () => string | null;
+      submitCreate: () => void;
+    };
+
+    instance.showCreateForm.set(true);
+    instance.formCode.set('WH-9');
+    instance.formName.set('Ghent Satellite');
+    instance.showNewCompanyForm.set(true);
+    instance.newCompanyCode.set('GHT-LOG');
+    instance.newCompanyName.set('Ghent Logistics NV');
+    instance.submitCreate();
+    fixture.detectChanges();
+
+    expect(instance.formError()).toBeNull();
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Ghent Satellite');
+    expect(text).toContain('Ghent Logistics NV');
+  });
 });

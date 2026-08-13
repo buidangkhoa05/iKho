@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DataPanel, DataTable, DataTableColumn, KpiCard, TextInput } from '@ikho/shared-ui';
+import { Button, DataPanel, DataTable, DataTableColumn, KpiCard, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
 import { Warehouse } from '../../../core/mock-data/organization.data';
-import { screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
+import { screenMeta, screenTitle, SCREENS } from '../../../core/mock-data/screens.data';
 import { OrganizationStore } from '../../../core/state/organization-store';
 import { WarehouseDetailPanel } from './warehouse-detail-panel';
 
@@ -20,13 +20,60 @@ interface WarehouseRow extends Record<string, unknown> {
 @Component({
   selector: 'app-office-organization',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DataPanel, DataTable, KpiCard, TextInput, WarehouseDetailPanel],
+  imports: [DataPanel, DataTable, KpiCard, TextInput, Button, WarehouseDetailPanel],
   template: `
     <div class="flex flex-col gap-6">
-      <div>
-        <div class="font-core text-2xl font-bold tracking-[-0.4px] text-ink">{{ title() }}</div>
-        <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div class="font-core text-2xl font-bold tracking-[-0.4px] text-ink">{{ title() }}</div>
+          <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
+        </div>
+        <lib-button variant="primary" (click)="showCreateForm.set(true)">{{ addWarehouseLabel() }}</lib-button>
       </div>
+
+      @if (showCreateForm()) {
+        <lib-data-panel [title]="t().createTitle" [subtitle]="t().createSubtitle">
+          <div class="flex flex-col gap-4">
+            <div class="grid grid-cols-2 gap-4">
+              <lib-text-input [label]="t().code" [value]="formCode()" (valueChange)="formCode.set($event)" />
+              <lib-text-input [label]="t().name" [value]="formName()" (valueChange)="formName.set($event)" />
+            </div>
+
+            @if (showNewCompanyForm()) {
+              <div class="flex flex-col gap-3 rounded-md border border-hairline-light p-3">
+                <div class="grid grid-cols-2 gap-4">
+                  <lib-text-input [label]="t().companyCode" [value]="newCompanyCode()" (valueChange)="newCompanyCode.set($event)" />
+                  <lib-text-input [label]="t().companyName" [value]="newCompanyName()" (valueChange)="newCompanyName.set($event)" />
+                </div>
+                <lib-button variant="ghost" (click)="showNewCompanyForm.set(false)">{{ t().useExistingCompany }}</lib-button>
+              </div>
+            } @else {
+              <div class="flex flex-col gap-2">
+                <span class="font-core text-[13px] text-shade-50">{{ t().company }}</span>
+                <select
+                  class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                  [value]="formCompanyCode()"
+                  (change)="formCompanyCode.set($any($event.target).value)"
+                >
+                  <option value="" disabled>{{ t().selectCompany }}</option>
+                  @for (c of store.companies(); track c.code) {
+                    <option [value]="c.code">{{ c.name }}</option>
+                  }
+                </select>
+                <lib-button variant="ghost" (click)="showNewCompanyForm.set(true)">{{ t().newCompany }}</lib-button>
+              </div>
+            }
+
+            @if (formError(); as err) {
+              <span class="font-core text-xs text-status-out-of-stock">{{ err }}</span>
+            }
+            <div class="flex gap-3">
+              <lib-button variant="primary" (click)="submitCreate()">{{ t().save }}</lib-button>
+              <lib-button variant="ghost" (click)="cancelCreate()">{{ t().cancel }}</lib-button>
+            </div>
+          </div>
+        </lib-data-panel>
+      }
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
         @for (k of kpis(); track k.label) {
@@ -71,6 +118,7 @@ export class OfficeOrganization {
 
   protected readonly title = computed(() => screenTitle('organization', 'admin', this.lang.lang()));
   protected readonly meta = computed(() => screenMeta('organization', 'admin', this.lang.lang()));
+  protected readonly addWarehouseLabel = computed(() => SCREENS.organization.action[this.lang.lang()]);
 
   protected readonly t = computed(() => {
     const en = this.lang.lang() === 'en';
@@ -87,6 +135,22 @@ export class OfficeOrganization {
       colZones: en ? 'Zones' : 'Khu',
       colDocks: en ? 'Docks' : 'Cửa kho',
       colStatus: en ? 'Status' : 'Trạng thái',
+      createTitle: en ? 'Add warehouse' : 'Thêm kho',
+      createSubtitle: en ? 'Code, name, and company' : 'Mã, tên và công ty',
+      code: en ? 'Code' : 'Mã',
+      name: en ? 'Name' : 'Tên',
+      save: en ? 'Save' : 'Lưu',
+      cancel: en ? 'Cancel' : 'Huỷ',
+      company: en ? 'Company' : 'Công ty',
+      companyCode: en ? 'Company code' : 'Mã công ty',
+      companyName: en ? 'Company name' : 'Tên công ty',
+      selectCompany: en ? 'Select a company' : 'Chọn công ty',
+      newCompany: en ? '+ New company' : '+ Công ty mới',
+      useExistingCompany: en ? 'Use an existing company instead' : 'Dùng công ty đã có',
+      requiredError: en ? 'Code, Name, and Company are required.' : 'Cần nhập mã, tên và công ty.',
+      duplicateError: (code: string) => (en ? `Warehouse code '${code}' is already in use for this company.` : `Mã kho '${code}' đã được sử dụng cho công ty này.`),
+      companyRequiredError: en ? 'Company code and name are required.' : 'Cần nhập mã và tên công ty.',
+      companyDuplicateError: (code: string) => (en ? `Company code '${code}' is already in use.` : `Mã công ty '${code}' đã được sử dụng.`),
     };
   });
 
@@ -126,6 +190,15 @@ export class OfficeOrganization {
     if (!w) return '';
     return this.store.companies().find((c) => c.code === w.companyCode)?.name ?? '—';
   });
+
+  protected readonly showCreateForm = signal(false);
+  protected readonly formCode = signal('');
+  protected readonly formName = signal('');
+  protected readonly formCompanyCode = signal('');
+  protected readonly showNewCompanyForm = signal(false);
+  protected readonly newCompanyCode = signal('');
+  protected readonly newCompanyName = signal('');
+  protected readonly formError = signal<string | null>(null);
 
   protected readonly rows = computed<WarehouseRow[]>(() => {
     const companies = this.store.companies();
@@ -188,5 +261,53 @@ export class OfficeOrganization {
     const w = this.selectedWarehouse();
     if (!w) return;
     this.store.setDockStatus(w.code, event.dockCode, event.isActive);
+  }
+
+  protected submitCreate(): void {
+    let companyCode = this.formCompanyCode();
+
+    if (this.showNewCompanyForm()) {
+      const code = this.newCompanyCode().trim();
+      const name = this.newCompanyName().trim();
+      if (!code || !name) {
+        this.formError.set(this.t().companyRequiredError);
+        return;
+      }
+      const companyOutcome = this.store.addCompany({ code, name });
+      if (companyOutcome === 'duplicate-code') {
+        this.formError.set(this.t().companyDuplicateError(code));
+        return;
+      }
+      companyCode = code;
+    }
+
+    const outcome = this.store.addWarehouse({
+      code: this.formCode(),
+      companyCode,
+      name: this.formName(),
+    });
+
+    if (outcome === 'invalid' || outcome === 'company-not-found') {
+      this.formError.set(this.t().requiredError);
+      return;
+    }
+    if (outcome === 'duplicate-code') {
+      this.formError.set(this.t().duplicateError(this.formCode().trim()));
+      return;
+    }
+
+    this.formError.set(null);
+    this.formCode.set('');
+    this.formName.set('');
+    this.formCompanyCode.set('');
+    this.showNewCompanyForm.set(false);
+    this.newCompanyCode.set('');
+    this.newCompanyName.set('');
+    this.showCreateForm.set(false);
+  }
+
+  protected cancelCreate(): void {
+    this.formError.set(null);
+    this.showCreateForm.set(false);
   }
 }
