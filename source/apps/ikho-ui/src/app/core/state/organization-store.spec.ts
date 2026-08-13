@@ -179,6 +179,18 @@ describe('OrganizationStore', () => {
     expect(outcome).toBe('duplicate-code');
   });
 
+  it('addDock rejects a blank code or name', () => {
+    const outcome = store.addDock('WH-1', { code: '', name: 'Test' });
+
+    expect(outcome).toBe('invalid');
+  });
+
+  it('addDock rejects an unknown warehouseCode', () => {
+    const outcome = store.addDock('WH-999', { code: 'D-X', name: 'Test' });
+
+    expect(outcome).toBe('not-found');
+  });
+
   it('setDockStatus flips isActive for the matching dock in the matching warehouse only', () => {
     store.setDockStatus('WH-1', 'D-1', false);
 
