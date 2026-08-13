@@ -7,7 +7,7 @@ Decomposed from the Warehouse Operations Console UI rollout's follow-up ("extend
 | # | Module | Design spec | Implementation plan | Status |
 |---|--------|-------------|----------------------|--------|
 | 1 | Partners | [2026-08-12-partners-ui-design.md](../superpowers/specs/2026-08-12-partners-ui-design.md) | [2026-08-12-partners-ui.md](../superpowers/plans/2026-08-12-partners-ui.md) | Implemented |
-| 2 | Organization | — | — | Not started |
+| 2 | Organization | [2026-08-13-organization-ui-design.md](../superpowers/specs/2026-08-13-organization-ui-design.md) | [2026-08-13-organization-ui.md](../superpowers/plans/2026-08-13-organization-ui.md) | Implemented |
 | 3 | Billing | — | — | Not started |
 
 Update the table as each module's spec and plan land.
