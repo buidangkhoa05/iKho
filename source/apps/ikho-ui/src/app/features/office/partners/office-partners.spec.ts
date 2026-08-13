@@ -102,4 +102,36 @@ describe('OfficePartners', () => {
 
     expect(instance.store.partners().find((p) => p.code === 'SUP-0142')!.isActive).toBe(false);
   });
+
+  it('opens the add-partner form, rejects a duplicate code, and creates a row on valid submit', () => {
+    const fixture = TestBed.createComponent(OfficePartners);
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      showCreateForm: { set: (v: boolean) => void };
+      formType: { set: (v: 'supplier' | 'customer') => void };
+      formCode: { set: (v: string) => void };
+      formName: { set: (v: string) => void };
+      formTaxId: { set: (v: string) => void };
+      formError: () => string | null;
+      submitCreate: () => void;
+    };
+
+    instance.showCreateForm.set(true);
+    instance.formType.set('customer');
+    instance.formCode.set('SUP-0142'); // duplicate
+    instance.formName.set('New Co');
+    instance.formTaxId.set('NL-1');
+    instance.submitCreate();
+    fixture.detectChanges();
+
+    expect(instance.formError()).toContain('SUP-0142');
+
+    instance.formCode.set('CUS-9001');
+    instance.submitCreate();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('New Co');
+  });
 });

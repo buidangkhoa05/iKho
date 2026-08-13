@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DataPanel, DataTable, DataTableColumn, KpiCard, TextInput } from '@ikho/shared-ui';
+import { Button, DataPanel, DataTable, DataTableColumn, KpiCard, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
-import { Partner } from '../../../core/mock-data/partners.data';
-import { screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
+import { Partner, PartnerType } from '../../../core/mock-data/partners.data';
+import { screenMeta, screenTitle, SCREENS } from '../../../core/mock-data/screens.data';
 import { NewPartnerAddress, NewPartnerContact, PartnersStore } from '../../../core/state/partners-store';
 import { PartnerDetailPanel } from './partner-detail-panel';
 
@@ -27,13 +27,39 @@ interface PartnerRow extends Record<string, unknown> {
 @Component({
   selector: 'app-office-partners',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DataPanel, DataTable, KpiCard, PartnerDetailPanel, TextInput],
+  imports: [Button, DataPanel, DataTable, KpiCard, PartnerDetailPanel, TextInput],
   template: `
     <div class="flex flex-col gap-6">
-      <div>
-        <div class="font-core text-2xl font-bold tracking-[-0.4px] text-ink">{{ title() }}</div>
-        <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div class="font-core text-2xl font-bold tracking-[-0.4px] text-ink">{{ title() }}</div>
+          <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
+        </div>
+        <lib-button variant="primary" (click)="showCreateForm.set(true)">{{ addPartnerLabel() }}</lib-button>
       </div>
+
+      @if (showCreateForm()) {
+        <lib-data-panel [title]="t().createTitle" [subtitle]="t().createSubtitle">
+          <div class="flex flex-col gap-4">
+            <div class="flex gap-3">
+              <lib-button [variant]="formType() === 'supplier' ? 'primary' : 'secondary'" (click)="formType.set('supplier')">{{ t().supplier }}</lib-button>
+              <lib-button [variant]="formType() === 'customer' ? 'primary' : 'secondary'" (click)="formType.set('customer')">{{ t().customer }}</lib-button>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <lib-text-input [label]="t().code" [value]="formCode()" (valueChange)="formCode.set($event)" />
+              <lib-text-input [label]="t().name" [value]="formName()" (valueChange)="formName.set($event)" />
+              <lib-text-input [label]="t().taxId" [value]="formTaxId()" (valueChange)="formTaxId.set($event)" />
+            </div>
+            @if (formError(); as err) {
+              <span class="font-core text-xs text-status-out-of-stock">{{ err }}</span>
+            }
+            <div class="flex gap-3">
+              <lib-button variant="primary" (click)="submitCreate()">{{ t().save }}</lib-button>
+              <lib-button variant="ghost" (click)="cancelCreate()">{{ t().cancel }}</lib-button>
+            </div>
+          </div>
+        </lib-data-panel>
+      }
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
         @for (k of kpis(); track k.label) {
@@ -82,6 +108,7 @@ export class OfficePartners {
 
   protected readonly title = computed(() => screenTitle('partners', 'admin', this.lang.lang()));
   protected readonly meta = computed(() => screenMeta('partners', 'admin', this.lang.lang()));
+  protected readonly addPartnerLabel = computed(() => SCREENS.partners.action[this.lang.lang()]);
 
   protected readonly t = computed(() => {
     const en = this.lang.lang() === 'en';
@@ -101,6 +128,15 @@ export class OfficePartners {
       colCity: en ? 'City' : 'Thành phố',
       colContact: en ? 'Contact' : 'Liên hệ',
       colStatus: en ? 'Status' : 'Trạng thái',
+      createTitle: en ? 'Add partner' : 'Thêm đối tác',
+      createSubtitle: en ? 'Code, type, name, and tax ID' : 'Mã, loại, tên và mã số thuế',
+      code: en ? 'Code' : 'Mã',
+      name: en ? 'Name' : 'Tên',
+      taxId: en ? 'Tax ID' : 'Mã số thuế',
+      save: en ? 'Save' : 'Lưu',
+      cancel: en ? 'Cancel' : 'Huỷ',
+      requiredError: en ? 'Code, Name, and Tax ID are required.' : 'Cần nhập mã, tên và mã số thuế.',
+      duplicateError: (code: string) => (en ? `Partner code '${code}' is already in use.` : `Mã đối tác '${code}' đã được sử dụng.`),
     };
   });
 
@@ -142,6 +178,13 @@ export class OfficePartners {
     return this.store.partners().find((p) => p.code === code) ?? null;
   });
 
+  protected readonly showCreateForm = signal(false);
+  protected readonly formType = signal<PartnerType>('supplier');
+  protected readonly formCode = signal('');
+  protected readonly formName = signal('');
+  protected readonly formTaxId = signal('');
+  protected readonly formError = signal<string | null>(null);
+
   protected readonly rows = computed<PartnerRow[]>(() => this.store.partners().map((p) => this.toRow(p)));
 
   protected readonly filteredRows = computed(() => {
@@ -156,6 +199,36 @@ export class OfficePartners {
 
   protected chipClasses(id: TypeFilter): string {
     return id === this.typeFilter() ? `${CHIP_BASE} ${CHIP_ACTIVE}` : `${CHIP_BASE} ${CHIP_DEFAULT}`;
+  }
+
+  protected submitCreate(): void {
+    const outcome = this.store.addPartner({
+      code: this.formCode(),
+      type: this.formType(),
+      name: this.formName(),
+      taxId: this.formTaxId(),
+    });
+
+    if (outcome === 'invalid') {
+      this.formError.set(this.t().requiredError);
+      return;
+    }
+    if (outcome === 'duplicate-code') {
+      this.formError.set(this.t().duplicateError(this.formCode().trim()));
+      return;
+    }
+
+    this.formError.set(null);
+    this.formCode.set('');
+    this.formName.set('');
+    this.formTaxId.set('');
+    this.formType.set('supplier');
+    this.showCreateForm.set(false);
+  }
+
+  protected cancelCreate(): void {
+    this.formError.set(null);
+    this.showCreateForm.set(false);
   }
 
   protected onRowClick(row: Record<string, unknown>): void {
