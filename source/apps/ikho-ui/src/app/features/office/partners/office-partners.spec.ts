@@ -103,6 +103,61 @@ describe('OfficePartners', () => {
     expect(instance.store.partners().find((p) => p.code === 'SUP-0142')!.isActive).toBe(false);
   });
 
+  it('adding an address appends it to the partner and clears the form for the next add', () => {
+    const fixture = TestBed.createComponent(OfficePartners);
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const table = root.querySelector('lib-data-table')!;
+    const firstRow = table.querySelector('tbody tr') as HTMLElement;
+    firstRow.click();
+    fixture.detectChanges();
+
+    const setTextInputByLabel = (label: string, value: string) => {
+      const textInputs = Array.from(root.querySelectorAll('lib-text-input'));
+      const host = textInputs.find((el) => Array.from(el.querySelectorAll('span')).some((s) => s.textContent?.trim() === label));
+      const input = host?.querySelector('input') as HTMLInputElement;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+    };
+    const clickButtonWithText = (text: string) => {
+      const buttons = Array.from(root.querySelectorAll('button'));
+      buttons.find((b) => b.textContent?.trim() === text)?.click();
+    };
+
+    clickButtonWithText('Add address');
+    fixture.detectChanges();
+
+    setTextInputByLabel('Line 1', 'Nieuwe Kade 8');
+    setTextInputByLabel('City', 'Rotterdam');
+    setTextInputByLabel('Country', 'Netherlands');
+    fixture.detectChanges();
+
+    clickButtonWithText('Save address');
+    fixture.detectChanges();
+
+    let text = root.textContent ?? '';
+    expect(text).toContain('Nieuwe Kade 8, Rotterdam');
+
+    // Reopening "Add address" after a successful save must show empty fields, not the
+    // just-saved values (regression guard for the stale-field-values bug).
+    clickButtonWithText('Add address');
+    fixture.detectChanges();
+
+    const line1Input = Array.from(root.querySelectorAll('lib-text-input'))
+      .find((el) => Array.from(el.querySelectorAll('span')).some((s) => s.textContent?.trim() === 'Line 1'))
+      ?.querySelector('input') as HTMLInputElement;
+    const cityInput = Array.from(root.querySelectorAll('lib-text-input'))
+      .find((el) => Array.from(el.querySelectorAll('span')).some((s) => s.textContent?.trim() === 'City'))
+      ?.querySelector('input') as HTMLInputElement;
+
+    expect(line1Input.value).toBe('');
+    expect(cityInput.value).toBe('');
+
+    text = root.textContent ?? '';
+    expect(text).toContain('Nieuwe Kade 8, Rotterdam');
+  });
+
   it('opens the add-partner form, rejects a duplicate code, and creates a row on valid submit', () => {
     const fixture = TestBed.createComponent(OfficePartners);
     fixture.detectChanges();

@@ -16,6 +16,7 @@ const CHIP_ACTIVE = 'border-primary bg-primary text-on-primary';
 interface PartnerRow extends Record<string, unknown> {
   code: string;
   name: string;
+  partnerType: PartnerType;
   type: 'inbound' | 'outbound';
   typeLabel: string;
   city: string;
@@ -191,7 +192,7 @@ export class OfficePartners {
     const q = this.query().trim().toLowerCase();
     const type = this.typeFilter();
     return this.rows().filter((row) => {
-      if (type !== 'all' && row.type !== (type === 'supplier' ? 'inbound' : 'outbound')) return false;
+      if (type !== 'all' && row.partnerType !== type) return false;
       if (!q) return true;
       return [row.code, row.name, row.city, row.contact].join(' ').toLowerCase().includes(q);
     });
@@ -224,6 +225,8 @@ export class OfficePartners {
     this.formTaxId.set('');
     this.formType.set('supplier');
     this.showCreateForm.set(false);
+    this.query.set('');
+    this.typeFilter.set('all');
   }
 
   protected cancelCreate(): void {
@@ -265,6 +268,7 @@ export class OfficePartners {
     return {
       code: p.code,
       name: p.name,
+      partnerType: p.type,
       // Reuses the 'inbound'/'outbound' status colors purely for their hue (Supplier vs Customer) — not their receiving/shipping meaning.
       type: p.type === 'supplier' ? 'inbound' : 'outbound',
       typeLabel: p.type === 'supplier' ? this.t().supplier : this.t().customer,

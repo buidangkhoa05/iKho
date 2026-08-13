@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { Button, Icon, StatusBadge, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
+import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
 import { Partner } from '../../../core/mock-data/partners.data';
 import { NewPartnerAddress, NewPartnerContact } from '../../../core/state/partners-store';
 
@@ -20,7 +21,7 @@ import { NewPartnerAddress, NewPartnerContact } from '../../../core/state/partne
         <button
           type="button"
           class="inline-flex size-8 flex-none cursor-pointer items-center justify-center rounded-md border-none bg-transparent hover:bg-surface-elevated-light"
-          [attr.aria-label]="t().close"
+          [attr.aria-label]="lang.pick(strings.close)"
           (click)="close.emit()"
         >
           <lib-icon name="x" [size]="18" color="var(--color-shade-50)" />
@@ -136,7 +137,8 @@ import { NewPartnerAddress, NewPartnerContact } from '../../../core/state/partne
   `,
 })
 export class PartnerDetailPanel {
-  private readonly lang = inject(LangService);
+  protected readonly lang = inject(LangService);
+  protected readonly strings = UI_STRINGS;
 
   readonly partner = input.required<Partner>();
 
@@ -150,7 +152,6 @@ export class PartnerDetailPanel {
     const en = this.lang.lang() === 'en';
     return {
       eyebrow: en ? 'Partner detail' : 'Chi tiết đối tác',
-      close: en ? 'Close' : 'Đóng',
       active: en ? 'Active' : 'Hoạt động',
       blocked: en ? 'Blocked' : 'Bị khoá',
       taxId: en ? 'Tax ID' : 'Mã số thuế',
@@ -209,6 +210,10 @@ export class PartnerDetailPanel {
   protected readonly contactError = signal<string | null>(null);
 
   constructor() {
+    // This effect serves two purposes: (1) resetting panel state when the selected partner
+    // changes, and (2) clearing/closing the edit/add-address/add-contact forms right after a
+    // successful save — the store's immutable updates give partner() a new object identity on
+    // every mutation, so a save re-runs this effect exactly like switching partners would.
     effect(() => {
       this.partner();
       this.editing.set(false);
@@ -217,6 +222,19 @@ export class PartnerDetailPanel {
       this.addressError.set(null);
       this.showContactForm.set(false);
       this.contactError.set(null);
+
+      this.addrLine1.set('');
+      this.addrLine2.set('');
+      this.addrCity.set('');
+      this.addrState.set('');
+      this.addrPostal.set('');
+      this.addrCountry.set('');
+      this.addrPrimary.set(false);
+
+      this.contactName.set('');
+      this.contactEmail.set('');
+      this.contactPhone.set('');
+      this.contactPrimary.set(false);
     });
   }
 
