@@ -4,7 +4,8 @@ import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
 import { Partner } from '../../../core/mock-data/partners.data';
 import { screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
-import { PartnersStore } from '../../../core/state/partners-store';
+import { NewPartnerAddress, NewPartnerContact, PartnersStore } from '../../../core/state/partners-store';
+import { PartnerDetailPanel } from './partner-detail-panel';
 
 type TypeFilter = 'all' | 'supplier' | 'customer';
 
@@ -26,7 +27,7 @@ interface PartnerRow extends Record<string, unknown> {
 @Component({
   selector: 'app-office-partners',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DataPanel, DataTable, KpiCard, TextInput],
+  imports: [DataPanel, DataTable, KpiCard, PartnerDetailPanel, TextInput],
   template: `
     <div class="flex flex-col gap-6">
       <div>
@@ -54,9 +55,23 @@ interface PartnerRow extends Record<string, unknown> {
         <span class="ml-auto font-core text-[13px] text-shade-50">{{ filteredRows().length }} {{ lang.pick(strings.results) }}</span>
       </div>
 
-      <lib-data-panel [title]="t().panelTitle">
-        <lib-data-table [columns]="columns()" [rows]="filteredRows()" [emptyLabel]="t().noResults" />
-      </lib-data-panel>
+      <div class="flex items-start gap-5">
+        <div class="min-w-0 flex-1">
+          <lib-data-panel [title]="t().panelTitle">
+            <lib-data-table [columns]="columns()" [rows]="filteredRows()" [emptyLabel]="t().noResults" [clickable]="true" (rowClick)="onRowClick($event)" />
+          </lib-data-panel>
+        </div>
+        @if (selectedPartner(); as sp) {
+          <app-partner-detail-panel
+            [partner]="sp"
+            (close)="selectedCode.set(null)"
+            (toggleStatus)="onToggleStatus()"
+            (saveDetails)="onSaveDetails($event)"
+            (addAddress)="onAddAddress($event)"
+            (addContact)="onAddContact($event)"
+          />
+        }
+      </div>
     </div>
   `,
 })
@@ -119,6 +134,14 @@ export class OfficePartners {
   protected readonly query = signal('');
   protected readonly typeFilter = signal<TypeFilter>('all');
 
+  protected readonly selectedCode = signal<string | null>(null);
+
+  protected readonly selectedPartner = computed<Partner | null>(() => {
+    const code = this.selectedCode();
+    if (!code) return null;
+    return this.store.partners().find((p) => p.code === code) ?? null;
+  });
+
   protected readonly rows = computed<PartnerRow[]>(() => this.store.partners().map((p) => this.toRow(p)));
 
   protected readonly filteredRows = computed(() => {
@@ -133,6 +156,34 @@ export class OfficePartners {
 
   protected chipClasses(id: TypeFilter): string {
     return id === this.typeFilter() ? `${CHIP_BASE} ${CHIP_ACTIVE}` : `${CHIP_BASE} ${CHIP_DEFAULT}`;
+  }
+
+  protected onRowClick(row: Record<string, unknown>): void {
+    this.selectedCode.set(String(row['code']));
+  }
+
+  protected onToggleStatus(): void {
+    const p = this.selectedPartner();
+    if (!p) return;
+    this.store.setStatus(p.code, !p.isActive);
+  }
+
+  protected onSaveDetails(input: { name: string; taxId: string }): void {
+    const p = this.selectedPartner();
+    if (!p) return;
+    this.store.updatePartner(p.code, input);
+  }
+
+  protected onAddAddress(address: NewPartnerAddress): void {
+    const p = this.selectedPartner();
+    if (!p) return;
+    this.store.addAddress(p.code, address);
+  }
+
+  protected onAddContact(contact: NewPartnerContact): void {
+    const p = this.selectedPartner();
+    if (!p) return;
+    this.store.addContact(p.code, contact);
   }
 
   private toRow(p: Partner): PartnerRow {

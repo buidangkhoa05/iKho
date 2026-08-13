@@ -69,4 +69,37 @@ describe('OfficePartners', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('No partners match');
   });
+
+  it("row click opens the detail panel with the row's addresses and contacts", () => {
+    const fixture = TestBed.createComponent(OfficePartners);
+    fixture.detectChanges();
+
+    const table = (fixture.nativeElement as HTMLElement).querySelector('lib-data-table')!;
+    const firstRow = table.querySelector('tbody tr') as HTMLElement;
+    firstRow.click();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Partner detail');
+    expect(text).toContain('Eindhoven');
+  });
+
+  it("activate/deactivate flips the selected partner's status", () => {
+    const fixture = TestBed.createComponent(OfficePartners);
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      selectedCode: { set: (v: string) => void };
+      store: { partners: () => { code: string; isActive: boolean }[] };
+    };
+    instance.selectedCode.set('SUP-0142');
+    fixture.detectChanges();
+
+    const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    const deactivateButton = buttons.find((b) => b.textContent?.includes('Deactivate'));
+    deactivateButton?.click();
+    fixture.detectChanges();
+
+    expect(instance.store.partners().find((p) => p.code === 'SUP-0142')!.isActive).toBe(false);
+  });
 });
