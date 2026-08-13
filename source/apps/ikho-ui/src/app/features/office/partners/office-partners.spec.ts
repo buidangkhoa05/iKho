@@ -57,4 +57,16 @@ describe('OfficePartners', () => {
     expect(text).toContain('Vanderberg Steel');
     expect(text).not.toContain('Meijer Retail Group');
   });
+
+  it('displays bilingual empty label when search yields no results', () => {
+    const fixture = TestBed.createComponent(OfficePartners);
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as { query: { set: (v: string) => void } };
+    instance.query.set('xyznonexistentpartner');
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('No partners match');
+  });
 });

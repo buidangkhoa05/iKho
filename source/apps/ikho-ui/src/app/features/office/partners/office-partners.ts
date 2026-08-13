@@ -55,7 +55,7 @@ interface PartnerRow extends Record<string, unknown> {
       </div>
 
       <lib-data-panel [title]="t().panelTitle">
-        <lib-data-table [columns]="columns()" [rows]="filteredRows()" />
+        <lib-data-table [columns]="columns()" [rows]="filteredRows()" [emptyLabel]="t().noResults" />
       </lib-data-panel>
     </div>
   `,
@@ -79,18 +79,25 @@ export class OfficePartners {
       active: en ? 'Active' : 'Hoạt động',
       supplier: en ? 'Supplier' : 'Nhà cung cấp',
       customer: en ? 'Customer' : 'Khách hàng',
+      noResults: en ? 'No partners match' : 'Không có đối tác phù hợp',
+      colPartner: en ? 'Partner' : 'Đối tác',
+      colName: en ? 'Name' : 'Tên',
+      colType: en ? 'Type' : 'Loại',
+      colCity: en ? 'City' : 'Thành phố',
+      colContact: en ? 'Contact' : 'Liên hệ',
+      colStatus: en ? 'Status' : 'Trạng thái',
     };
   });
 
   protected readonly columns = computed<DataTableColumn[]>(() => {
-    const en = this.lang.lang() === 'en';
+    const t = this.t();
     return [
-      { key: 'code', label: en ? 'Partner' : 'Đối tác', mono: true },
-      { key: 'name', label: en ? 'Name' : 'Tên' },
-      { key: 'type', label: en ? 'Type' : 'Loại', status: true, statusLabelKey: 'typeLabel' },
-      { key: 'city', label: en ? 'City' : 'Thành phố' },
-      { key: 'contact', label: en ? 'Contact' : 'Liên hệ' },
-      { key: 'status', label: en ? 'Status' : 'Trạng thái', status: true, statusLabelKey: 'statusLabel' },
+      { key: 'code', label: t.colPartner, mono: true },
+      { key: 'name', label: t.colName },
+      { key: 'type', label: t.colType, status: true, statusLabelKey: 'typeLabel' },
+      { key: 'city', label: t.colCity },
+      { key: 'contact', label: t.colContact },
+      { key: 'status', label: t.colStatus, status: true, statusLabelKey: 'statusLabel' },
     ];
   });
 
