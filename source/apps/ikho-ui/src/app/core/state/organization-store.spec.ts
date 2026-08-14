@@ -86,7 +86,7 @@ describe('OrganizationStore', () => {
   });
 
   it('updateWarehouse updates the name of an existing warehouse', () => {
-    const outcome = store.updateWarehouse('WH-1', { name: 'Rotterdam DC (Renovated)' });
+    const outcome = store.updateWarehouse({ companyCode: 'RTM-LOG', code: 'WH-1' }, { name: 'Rotterdam DC (Renovated)' });
 
     expect(outcome).toBe('ok');
     const updated = store.warehouses().find((w) => w.code === 'WH-1')!;
@@ -94,13 +94,22 @@ describe('OrganizationStore', () => {
   });
 
   it('updateWarehouse fails for an unknown code', () => {
-    const outcome = store.updateWarehouse('WH-999', { name: 'X' });
+    const outcome = store.updateWarehouse({ companyCode: 'RTM-LOG', code: 'WH-999' }, { name: 'X' });
+
+    expect(outcome).toBe('not-found');
+  });
+
+  it('updateWarehouse fails when the code exists but under a different company', () => {
+    store.addCompany({ code: 'ANT-LOG', name: 'Antwerp Freight NV' });
+    store.addWarehouse({ code: 'WH-1', companyCode: 'ANT-LOG', name: 'Antwerp WH-1' });
+
+    const outcome = store.updateWarehouse({ companyCode: 'NO-SUCH-CO', code: 'WH-1' }, { name: 'X' });
 
     expect(outcome).toBe('not-found');
   });
 
   it('updateWarehouse rejects a blank name', () => {
-    const outcome = store.updateWarehouse('WH-1', { name: '' });
+    const outcome = store.updateWarehouse({ companyCode: 'RTM-LOG', code: 'WH-1' }, { name: '' });
 
     expect(outcome).toBe('invalid');
     const unchanged = store.warehouses().find((w) => w.code === 'WH-1')!;
@@ -108,16 +117,24 @@ describe('OrganizationStore', () => {
   });
 
   it('setWarehouseStatus flips isActive for the matching warehouse only', () => {
-    store.setWarehouseStatus('WH-1', false);
+    store.setWarehouseStatus({ companyCode: 'RTM-LOG', code: 'WH-1' }, false);
 
     expect(store.warehouses().find((w) => w.code === 'WH-1')!.isActive).toBe(false);
     expect(store.warehouses().find((w) => w.code === 'WH-2')!.isActive).toBe(true);
   });
 
+  it('setWarehouseStatus is a no-op for an unknown warehouse', () => {
+    const before = store.warehouses();
+
+    store.setWarehouseStatus({ companyCode: 'RTM-LOG', code: 'WH-999' }, false);
+
+    expect(store.warehouses()).toEqual(before);
+  });
+
   it('addZone appends a new active zone to the matching warehouse only', () => {
     const before = store.warehouses().find((w) => w.code === 'WH-1')!.zones.length;
 
-    const outcome = store.addZone('WH-1', { code: 'Z-C', name: 'Returns processing' });
+    const outcome = store.addZone({ companyCode: 'RTM-LOG', code: 'WH-1' }, { code: 'Z-C', name: 'Returns processing' });
 
     expect(outcome).toBe('ok');
     const updated = store.warehouses().find((w) => w.code === 'WH-1')!;
@@ -127,13 +144,13 @@ describe('OrganizationStore', () => {
   });
 
   it('addZone rejects a blank code or name', () => {
-    const outcome = store.addZone('WH-1', { code: '', name: 'Test' });
+    const outcome = store.addZone({ companyCode: 'RTM-LOG', code: 'WH-1' }, { code: '', name: 'Test' });
 
     expect(outcome).toBe('invalid');
   });
 
   it('addZone rejects an unknown warehouseCode', () => {
-    const outcome = store.addZone('WH-999', { code: 'Z-X', name: 'Test' });
+    const outcome = store.addZone({ companyCode: 'RTM-LOG', code: 'WH-999' }, { code: 'Z-X', name: 'Test' });
 
     expect(outcome).toBe('not-found');
   });
@@ -141,20 +158,20 @@ describe('OrganizationStore', () => {
   it('addZone rejects a duplicate code within the same warehouse', () => {
     const before = store.warehouses().find((w) => w.code === 'WH-1')!.zones.length;
 
-    const outcome = store.addZone('WH-1', { code: 'Z-A', name: 'Duplicate' });
+    const outcome = store.addZone({ companyCode: 'RTM-LOG', code: 'WH-1' }, { code: 'Z-A', name: 'Duplicate' });
 
     expect(outcome).toBe('duplicate-code');
     expect(store.warehouses().find((w) => w.code === 'WH-1')!.zones.length).toBe(before);
   });
 
   it('addZone allows the same code under a different warehouse', () => {
-    const outcome = store.addZone('WH-2', { code: 'Z-B', name: 'Second zone' });
+    const outcome = store.addZone({ companyCode: 'RTM-LOG', code: 'WH-2' }, { code: 'Z-B', name: 'Second zone' });
 
     expect(outcome).toBe('ok');
   });
 
   it('setZoneStatus flips isActive for the matching zone in the matching warehouse only', () => {
-    store.setZoneStatus('WH-1', 'Z-A', false);
+    store.setZoneStatus({ companyCode: 'RTM-LOG', code: 'WH-1' }, 'Z-A', false);
 
     const wh1 = store.warehouses().find((w) => w.code === 'WH-1')!;
     expect(wh1.zones.find((z) => z.code === 'Z-A')!.isActive).toBe(false);
@@ -162,10 +179,19 @@ describe('OrganizationStore', () => {
     expect(store.warehouses().find((w) => w.code === 'WH-2')!.zones.find((z) => z.code === 'Z-A')!.isActive).toBe(true);
   });
 
+  it('setZoneStatus is a no-op for an unknown warehouse or zone code', () => {
+    const before = store.warehouses();
+
+    store.setZoneStatus({ companyCode: 'RTM-LOG', code: 'WH-999' }, 'Z-A', false);
+    store.setZoneStatus({ companyCode: 'RTM-LOG', code: 'WH-1' }, 'Z-ZZZ', false);
+
+    expect(store.warehouses()).toEqual(before);
+  });
+
   it('addDock appends a new active dock to the matching warehouse only', () => {
     const before = store.warehouses().find((w) => w.code === 'WH-1')!.docks.length;
 
-    const outcome = store.addDock('WH-1', { code: 'D-3', name: 'Cross-dock lane' });
+    const outcome = store.addDock({ companyCode: 'RTM-LOG', code: 'WH-1' }, { code: 'D-3', name: 'Cross-dock lane' });
 
     expect(outcome).toBe('ok');
     const updated = store.warehouses().find((w) => w.code === 'WH-1')!;
@@ -174,28 +200,69 @@ describe('OrganizationStore', () => {
   });
 
   it('addDock rejects a duplicate code within the same warehouse', () => {
-    const outcome = store.addDock('WH-1', { code: 'D-1', name: 'Duplicate' });
+    const outcome = store.addDock({ companyCode: 'RTM-LOG', code: 'WH-1' }, { code: 'D-1', name: 'Duplicate' });
 
     expect(outcome).toBe('duplicate-code');
   });
 
   it('addDock rejects a blank code or name', () => {
-    const outcome = store.addDock('WH-1', { code: '', name: 'Test' });
+    const outcome = store.addDock({ companyCode: 'RTM-LOG', code: 'WH-1' }, { code: '', name: 'Test' });
 
     expect(outcome).toBe('invalid');
   });
 
   it('addDock rejects an unknown warehouseCode', () => {
-    const outcome = store.addDock('WH-999', { code: 'D-X', name: 'Test' });
+    const outcome = store.addDock({ companyCode: 'RTM-LOG', code: 'WH-999' }, { code: 'D-X', name: 'Test' });
 
     expect(outcome).toBe('not-found');
   });
 
   it('setDockStatus flips isActive for the matching dock in the matching warehouse only', () => {
-    store.setDockStatus('WH-1', 'D-1', false);
+    store.setDockStatus({ companyCode: 'RTM-LOG', code: 'WH-1' }, 'D-1', false);
 
     const wh1 = store.warehouses().find((w) => w.code === 'WH-1')!;
     expect(wh1.docks.find((d) => d.code === 'D-1')!.isActive).toBe(false);
     expect(wh1.docks.find((d) => d.code === 'D-2')!.isActive).toBe(true);
+  });
+
+  it('setDockStatus is a no-op for an unknown warehouse or dock code', () => {
+    const before = store.warehouses();
+
+    store.setDockStatus({ companyCode: 'RTM-LOG', code: 'WH-999' }, 'D-1', false);
+    store.setDockStatus({ companyCode: 'RTM-LOG', code: 'WH-1' }, 'D-ZZZ', false);
+
+    expect(store.warehouses()).toEqual(before);
+  });
+
+  describe('cross-company warehouse identity (same code, different company)', () => {
+    beforeEach(() => {
+      store.addCompany({ code: 'ANT-LOG', name: 'Antwerp Freight NV' });
+      store.addWarehouse({ code: 'WH-1', companyCode: 'ANT-LOG', name: 'Antwerp WH-1' });
+    });
+
+    it('setWarehouseStatus only flips the warehouse in the targeted company', () => {
+      store.setWarehouseStatus({ companyCode: 'ANT-LOG', code: 'WH-1' }, false);
+
+      expect(store.warehouses().find((w) => w.code === 'WH-1' && w.companyCode === 'ANT-LOG')!.isActive).toBe(false);
+      expect(store.warehouses().find((w) => w.code === 'WH-1' && w.companyCode === 'RTM-LOG')!.isActive).toBe(true);
+    });
+
+    it('updateWarehouse only renames the warehouse in the targeted company', () => {
+      const outcome = store.updateWarehouse({ companyCode: 'ANT-LOG', code: 'WH-1' }, { name: 'Antwerp WH-1 (Renamed)' });
+
+      expect(outcome).toBe('ok');
+      expect(store.warehouses().find((w) => w.code === 'WH-1' && w.companyCode === 'ANT-LOG')!.name).toBe('Antwerp WH-1 (Renamed)');
+      expect(store.warehouses().find((w) => w.code === 'WH-1' && w.companyCode === 'RTM-LOG')!.name).toBe('Rotterdam DC');
+    });
+
+    it('addZone only appends the zone to the warehouse in the targeted company', () => {
+      const outcome = store.addZone({ companyCode: 'ANT-LOG', code: 'WH-1' }, { code: 'Z-C', name: 'Antwerp zone' });
+
+      expect(outcome).toBe('ok');
+      expect(store.warehouses().find((w) => w.code === 'WH-1' && w.companyCode === 'ANT-LOG')!.zones).toEqual([
+        { code: 'Z-C', name: 'Antwerp zone', isActive: true },
+      ]);
+      expect(store.warehouses().find((w) => w.code === 'WH-1' && w.companyCode === 'RTM-LOG')!.zones.length).toBe(2);
+    });
   });
 });

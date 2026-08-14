@@ -7,6 +7,12 @@ export type UpdateWarehouseOutcome = 'ok' | 'not-found' | 'invalid';
 export type AddZoneOutcome = 'ok' | 'duplicate-code' | 'invalid' | 'not-found';
 export type AddDockOutcome = 'ok' | 'duplicate-code' | 'invalid' | 'not-found';
 
+/** Identifies a warehouse by its composite key — `code` is only unique within a company. */
+export interface WarehouseRef {
+  companyCode: string;
+  code: string;
+}
+
 export interface AddCompanyInput {
   code: string;
   name: string;
@@ -69,63 +75,67 @@ export class OrganizationStore {
     return 'ok';
   }
 
-  updateWarehouse(code: string, input: UpdateWarehouseInput): UpdateWarehouseOutcome {
+  updateWarehouse(ref: WarehouseRef, input: UpdateWarehouseInput): UpdateWarehouseOutcome {
     const name = input.name.trim();
     if (!name) return 'invalid';
-    if (!this.warehouses().some((w) => w.code === code)) return 'not-found';
+    if (!this.warehouses().some((w) => w.code === ref.code && w.companyCode === ref.companyCode)) return 'not-found';
 
-    this.warehouses.update((list) => list.map((w) => (w.code === code ? { ...w, name } : w)));
+    this.warehouses.update((list) =>
+      list.map((w) => (w.code === ref.code && w.companyCode === ref.companyCode ? { ...w, name } : w)),
+    );
     return 'ok';
   }
 
-  setWarehouseStatus(code: string, isActive: boolean): void {
-    this.warehouses.update((list) => list.map((w) => (w.code === code ? { ...w, isActive } : w)));
+  setWarehouseStatus(ref: WarehouseRef, isActive: boolean): void {
+    this.warehouses.update((list) =>
+      list.map((w) => (w.code === ref.code && w.companyCode === ref.companyCode ? { ...w, isActive } : w)),
+    );
   }
 
-  addZone(warehouseCode: string, input: AddZoneInput): AddZoneOutcome {
+  addZone(ref: WarehouseRef, input: AddZoneInput): AddZoneOutcome {
     const code = input.code.trim();
     const name = input.name.trim();
     if (!code || !name) return 'invalid';
-    const warehouse = this.warehouses().find((w) => w.code === warehouseCode);
+    const warehouse = this.warehouses().find((w) => w.code === ref.code && w.companyCode === ref.companyCode);
     if (!warehouse) return 'not-found';
     if (warehouse.zones.some((z) => z.code === code)) return 'duplicate-code';
 
     const zone: Zone = { code, name, isActive: true };
     this.warehouses.update((list) =>
-      list.map((w) => (w.code === warehouseCode ? { ...w, zones: [...w.zones, zone] } : w)),
+      list.map((w) => (w.code === ref.code && w.companyCode === ref.companyCode ? { ...w, zones: [...w.zones, zone] } : w)),
     );
     return 'ok';
   }
 
-  setZoneStatus(warehouseCode: string, zoneCode: string, isActive: boolean): void {
+  setZoneStatus(ref: WarehouseRef, zoneCode: string, isActive: boolean): void {
     this.warehouses.update((list) =>
       list.map((w) =>
-        w.code === warehouseCode
+        w.code === ref.code && w.companyCode === ref.companyCode
           ? { ...w, zones: w.zones.map((z) => (z.code === zoneCode ? { ...z, isActive } : z)) }
           : w,
       ),
     );
   }
 
-  addDock(warehouseCode: string, input: AddDockInput): AddDockOutcome {
+  addDock(ref: WarehouseRef, input: AddDockInput): AddDockOutcome {
     const code = input.code.trim();
     const name = input.name.trim();
     if (!code || !name) return 'invalid';
-    const warehouse = this.warehouses().find((w) => w.code === warehouseCode);
+    const warehouse = this.warehouses().find((w) => w.code === ref.code && w.companyCode === ref.companyCode);
     if (!warehouse) return 'not-found';
     if (warehouse.docks.some((d) => d.code === code)) return 'duplicate-code';
 
     const dock: Dock = { code, name, isActive: true };
     this.warehouses.update((list) =>
-      list.map((w) => (w.code === warehouseCode ? { ...w, docks: [...w.docks, dock] } : w)),
+      list.map((w) => (w.code === ref.code && w.companyCode === ref.companyCode ? { ...w, docks: [...w.docks, dock] } : w)),
     );
     return 'ok';
   }
 
-  setDockStatus(warehouseCode: string, dockCode: string, isActive: boolean): void {
+  setDockStatus(ref: WarehouseRef, dockCode: string, isActive: boolean): void {
     this.warehouses.update((list) =>
       list.map((w) =>
-        w.code === warehouseCode
+        w.code === ref.code && w.companyCode === ref.companyCode
           ? { ...w, docks: w.docks.map((d) => (d.code === dockCode ? { ...d, isActive } : d)) }
           : w,
       ),
