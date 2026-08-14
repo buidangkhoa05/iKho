@@ -174,7 +174,7 @@ describe('OfficeBilling', () => {
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('INV-4473');
-    expect((fixture.nativeElement as HTMLElement).querySelector('lib-data-panel[title="New invoice"]')).toBeFalsy();
+    expect((fixture.componentInstance as unknown as { showInvoiceCreateForm: () => boolean }).showInvoiceCreateForm()).toBe(false);
   });
 
   it('submitting the invoice form with no customer/warehouse shows an error and does not create a row', () => {
