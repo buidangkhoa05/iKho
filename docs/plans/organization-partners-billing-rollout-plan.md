@@ -8,6 +8,6 @@ Decomposed from the Warehouse Operations Console UI rollout's follow-up ("extend
 |---|--------|-------------|----------------------|--------|
 | 1 | Partners | [2026-08-12-partners-ui-design.md](../superpowers/specs/2026-08-12-partners-ui-design.md) | [2026-08-12-partners-ui.md](../superpowers/plans/2026-08-12-partners-ui.md) | Implemented |
 | 2 | Organization | [2026-08-13-organization-ui-design.md](../superpowers/specs/2026-08-13-organization-ui-design.md) | [2026-08-13-organization-ui.md](../superpowers/plans/2026-08-13-organization-ui.md) | Implemented |
-| 3 | Billing | — | — | Not started |
+| 3 | Billing | [2026-08-14-billing-ui-design.md](../superpowers/specs/2026-08-14-billing-ui-design.md) | [2026-08-14-billing-ui.md](../superpowers/plans/2026-08-14-billing-ui.md) | Implemented |
 
 Update the table as each module's spec and plan land.
