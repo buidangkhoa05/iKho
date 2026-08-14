@@ -27,7 +27,11 @@ describe('OfficeBilling', () => {
     expect(text).toContain('€ 61,120'); // Invoiced this month: INV-4471 + INV-4472
     expect(text).toContain('€ 65,440'); // Outstanding: 42180 + 18940 + (7320-3000)
     expect(text).toContain('€ 54,280'); // Paid this month: 38400 + 12880 + 3000
-    expect(text).toContain('1'); // Credit notes count
+
+    // Credit notes count: assert directly off the kpis() computed rather than a page-wide
+    // '1' substring search, which would also match INV-4471, WH-1, 2026-08-01, etc.
+    const kpis = (fixture.componentInstance as unknown as { kpis: () => { label: string; value: string | number }[] }).kpis();
+    expect(kpis[3].value).toBe(1);
   });
 
   it('toggling to Credit Notes shows the credit-note table instead of Invoices', () => {
@@ -156,6 +160,7 @@ describe('OfficeBilling', () => {
     const instance = fixture.componentInstance as unknown as {
       invoiceCustomerCode: { set: (v: string) => void };
       invoiceWarehouseCode: { set: (v: string) => void };
+      store: { invoices: () => { code: string }[] };
     };
     instance.invoiceCustomerCode.set('CUS-2210');
     instance.invoiceWarehouseCode.set('WH-1');
@@ -167,13 +172,24 @@ describe('OfficeBilling', () => {
     productSelect.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
+    const invoiceCodesBefore = new Set(instance.store.invoices().map((i) => i.code));
+
     (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
       if (b.textContent?.includes('Save') && !b.textContent?.includes('payment')) b.click();
     });
     fixture.detectChanges();
 
+    // Capture the code the store actually assigned rather than hardcoding 'INV-4473' — the
+    // module-level invoiceSeq counter persists for this whole spec file's run, so a hardcoded
+    // absolute code would silently break if an earlier test added one more/fewer invoice.
+    // Verifying it's a genuinely new code (not present before submit) guards against the
+    // assertion trivially passing when submission silently no-ops.
+    const createdCode = instance.store.invoices()[0].code;
+    expect(invoiceCodesBefore.has(createdCode)).toBe(false);
+    expect(createdCode).toMatch(/^INV-\d+$/);
+
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('INV-4473');
+    expect(text).toContain(createdCode);
     expect((fixture.componentInstance as unknown as { showInvoiceCreateForm: () => boolean }).showInvoiceCreateForm()).toBe(false);
   });
 
@@ -219,6 +235,57 @@ describe('OfficeBilling', () => {
     expect(instance.invoiceCustomerCode()).toBe('');
   });
 
+  it('switching sections clears a stale open create form (with error and typed values) and the selected detail panel', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+
+    // Select an invoice row so its detail panel is open.
+    const invoiceRows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    (invoiceRows.find((r) => r.textContent?.includes('INV-4471')) as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    // Open "New invoice", type a customer code, then submit with no warehouse selected so the
+    // error renders and the form stays open with the stale value — exactly the reachable
+    // sequence the fix targets.
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New invoice')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      invoiceCustomerCode: { set: (v: string) => void; (): string };
+      invoiceFormError: () => string | null;
+      showInvoiceCreateForm: () => boolean;
+      selectedInvoiceCode: () => string | null;
+    };
+    instance.invoiceCustomerCode.set('CUS-2210');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Save') && !b.textContent?.includes('payment')) b.click();
+    });
+    fixture.detectChanges();
+
+    // Sanity: the panel really is dirty before switching sections.
+    expect(instance.invoiceFormError()).not.toBeNull();
+    expect(instance.invoiceCustomerCode()).toBe('CUS-2210');
+    expect(instance.selectedInvoiceCode()).toBe('INV-4471');
+
+    // Switch to Credit Notes and back to Invoices.
+    const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    buttons.find((b) => b.textContent?.includes('Credit Notes'))?.click();
+    fixture.detectChanges();
+    Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Invoices'))
+      ?.click();
+    fixture.detectChanges();
+
+    expect(instance.showInvoiceCreateForm()).toBe(false);
+    expect(instance.invoiceFormError()).toBeNull();
+    expect(instance.invoiceCustomerCode()).toBe('');
+    expect(instance.selectedInvoiceCode()).toBeNull();
+  });
+
   it('clicking a credit note row opens its view-only detail panel', () => {
     const fixture = TestBed.createComponent(OfficeBilling);
     fixture.detectChanges();
@@ -247,7 +314,10 @@ describe('OfficeBilling', () => {
     });
     fixture.detectChanges();
 
-    const creditNoteInstance = fixture.componentInstance as unknown as { creditNoteCustomerCode: { set: (v: string) => void } };
+    const creditNoteInstance = fixture.componentInstance as unknown as {
+      creditNoteCustomerCode: { set: (v: string) => void };
+      store: { creditNotes: () => { code: string }[] };
+    };
     creditNoteInstance.creditNoteCustomerCode.set('CUS-2274');
     fixture.detectChanges();
 
@@ -257,13 +327,24 @@ describe('OfficeBilling', () => {
     productSelect.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
+    const creditNoteCodesBefore = new Set(creditNoteInstance.store.creditNotes().map((c) => c.code));
+
     (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
       if (b.textContent?.includes('Save') && !b.textContent?.includes('payment')) b.click();
     });
     fixture.detectChanges();
 
+    // Capture the code the store actually assigned rather than hardcoding 'CRN-0119' — the
+    // module-level creditNoteSeq counter persists for this whole spec file's run, so a
+    // hardcoded absolute code would silently break if an earlier test in this file added one
+    // more/fewer credit note. Verifying it's genuinely new (not present before submit) guards
+    // against the assertion trivially passing when submission silently no-ops.
+    const createdCode = creditNoteInstance.store.creditNotes()[0].code;
+    expect(creditNoteCodesBefore.has(createdCode)).toBe(false);
+    expect(createdCode).toMatch(/^CRN-\d{4,}$/);
+
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('CRN-0119');
+    expect(text).toContain(createdCode);
   });
 
   it('cancelling the credit note form clears its fields for next time', () => {

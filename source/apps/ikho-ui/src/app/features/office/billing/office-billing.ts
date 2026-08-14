@@ -286,6 +286,14 @@ export class OfficeBilling {
   protected selectSection(section: BillingSection): void {
     this.activeSection.set(section);
     this.query.set('');
+    // Switching sections must return both sides to a clean slate — otherwise an open create
+    // panel (with a stale error and stale field values) can survive a section switch, since
+    // it's only ever explicitly cleared on Save/Cancel. Reuse the same reset methods those
+    // paths already call rather than duplicating their logic.
+    this.resetInvoiceForm();
+    this.resetCreditNoteForm();
+    this.selectedInvoiceCode.set(null);
+    this.selectedCreditNoteCode.set(null);
   }
 
   protected readonly kpis = computed(() => {
