@@ -60,6 +60,31 @@ describe('LineItemsBuilder', () => {
     expect(text).toContain('€ 180');
   });
 
+  it('renders a live-computed per-row total that updates independently of the grand total', () => {
+    const fixture = TestBed.createComponent(LineItemsBuilder);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as {
+      addRow: () => void;
+      rows: () => { id: number }[];
+      updateRow: (id: number, patch: Partial<{ productCode: string; quantity: number; unitPrice: number }>) => void;
+    };
+
+    instance.addRow();
+    const [firstId, secondId] = instance.rows().map((r) => r.id);
+    instance.updateRow(firstId, { productCode: 'IKH-482910', quantity: 3, unitPrice: 60 });
+    instance.updateRow(secondId, { productCode: 'IKH-330298', quantity: 2, unitPrice: 6 });
+    fixture.detectChanges();
+
+    const rowEls = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.grid.grid-cols-\\[2fr_1fr_1fr_auto\\]'));
+    expect(rowEls[0].textContent).toContain('€ 180'); // 3 * 60, this row's total, not the 192 grand total
+    expect(rowEls[1].textContent).toContain('€ 12'); // 2 * 6
+
+    instance.updateRow(firstId, { quantity: 5 });
+    fixture.detectChanges();
+    expect(rowEls[0].textContent).toContain('€ 300'); // 5 * 60, row total tracks its own row's edits
+    expect(rowEls[1].textContent).toContain('€ 12'); // unaffected by the other row's change
+  });
+
   it('reset restores a single blank line', () => {
     const fixture = TestBed.createComponent(LineItemsBuilder);
     fixture.detectChanges();

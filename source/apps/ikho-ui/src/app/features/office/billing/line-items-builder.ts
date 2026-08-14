@@ -48,7 +48,10 @@ interface LineItemRow extends LineItemDraft {
             [value]="unitPriceValue(row)"
             (valueChange)="onUnitPriceChange(row.id, $event)"
           />
-          <lib-button variant="ghost" [disabled]="rows().length === 1" (click)="removeRow(row.id)">{{ t().removeLine }}</lib-button>
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-[13px] font-semibold text-ink">{{ rowTotal(row) }}</span>
+            <lib-button variant="ghost" [disabled]="rows().length === 1" (click)="removeRow(row.id)">{{ t().removeLine }}</lib-button>
+          </div>
         </div>
       }
       <lib-button variant="secondary" (click)="addRow()">{{ t().addLine }}</lib-button>
@@ -81,6 +84,11 @@ export class LineItemsBuilder {
 
   protected readonly total = computed(() => this.rows().reduce((sum, r) => sum + r.quantity * r.unitPrice, 0));
   protected readonly totalDisplay = computed(() => formatCurrency(this.total()));
+
+  /** Live-computed, read-only per-row total shown next to each line's remove button. */
+  protected rowTotal(row: LineItemRow): string {
+    return formatCurrency(row.quantity * row.unitPrice);
+  }
 
   private blankRow(): LineItemRow {
     return { id: this.nextId++, productCode: '', quantity: 1, unitPrice: 0 };
