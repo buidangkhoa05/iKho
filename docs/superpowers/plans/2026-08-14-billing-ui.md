@@ -1824,13 +1824,11 @@ with:
         </div>
         @if (activeSection() === 'invoices') {
           <lib-button variant="primary" (click)="showInvoiceCreateForm.set(true)">{{ t().newInvoiceAction }}</lib-button>
-        } @else {
-          <lib-button variant="primary" (click)="showCreditNoteCreateForm.set(true)">{{ t().newCreditNoteAction }}</lib-button>
         }
       </div>
 ```
 
-(`showCreditNoteCreateForm` is added by Task 6 — its reference here is forward-declared in the template now so Task 6 only needs to add the signal itself, not touch this block again.)
+(Only the Invoices-section button is added here. Task 6 adds the `@else` branch with the "New credit note" button at the same time it defines `showCreditNoteCreateForm` — the signal doesn't exist yet at the end of this task, so referencing it now would fail Angular's template type-check.)
 
 Then, immediately above the Invoices section's search box (`<div class="min-w-60 max-w-md"> ... searchInvoicesPlaceholder ...`), inside the `@if (activeSection() === 'invoices') {` branch, add:
 
@@ -2150,6 +2148,16 @@ Expected: all tests PASS.
 
 In `office-billing.ts`:
 - Add `import { CreditNoteDetailPanel } from './credit-note-detail-panel';` and add `CreditNoteDetailPanel` to the `@Component` `imports` array.
+- Add the "New credit note" header button. Task 5 left the header's `@if (activeSection() === 'invoices') { ... }` block with no `@else` — add one now:
+
+```html
+        @if (activeSection() === 'invoices') {
+          <lib-button variant="primary" (click)="showInvoiceCreateForm.set(true)">{{ t().newInvoiceAction }}</lib-button>
+        } @else {
+          <lib-button variant="primary" (click)="showCreditNoteCreateForm.set(true)">{{ t().newCreditNoteAction }}</lib-button>
+        }
+```
+
 - Replace the Credit Notes branch's `lib-data-panel` block:
 
 ```html
