@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Button, DataPanel, DataTable, DataTableColumn, KpiCard, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { PARTNERS } from '../../../core/mock-data/partners.data';
@@ -7,6 +7,7 @@ import { CreditNote, Invoice, InvoiceStatus, CreditNoteStatus } from '../../../c
 import { OrganizationStore } from '../../../core/state/organization-store';
 import { BillingStore } from '../../../core/state/billing-store';
 import { formatCurrency } from './billing-format.util';
+import { InvoiceDetailPanel } from './invoice-detail-panel';
 
 type BillingSection = 'invoices' | 'credit-notes';
 
@@ -37,7 +38,7 @@ function isThisMonth(iso: string, now: Date): boolean {
 @Component({
   selector: 'app-office-billing',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, DataPanel, DataTable, KpiCard, TextInput],
+  imports: [Button, DataPanel, DataTable, InvoiceDetailPanel, KpiCard, TextInput],
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -62,10 +63,23 @@ function isThisMonth(iso: string, now: Date): boolean {
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchInvoicesPlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
         </div>
-        <lib-data-panel [title]="t().invoicesPanelTitle">
-          <lib-data-table [columns]="invoiceColumns()" [rows]="filteredInvoiceRows()" [emptyLabel]="t().noInvoices" />
-        </lib-data-panel>
-        <!-- INVOICE_SECTION_EXTRA -->
+        <div class="flex items-start gap-5">
+          <div class="min-w-0 flex-1">
+            <lib-data-panel [title]="t().invoicesPanelTitle">
+              <lib-data-table [columns]="invoiceColumns()" [rows]="filteredInvoiceRows()" [emptyLabel]="t().noInvoices" [clickable]="true" (rowClick)="onInvoiceRowClick($event)" />
+            </lib-data-panel>
+          </div>
+          @if (selectedInvoice(); as inv) {
+            <app-invoice-detail-panel
+              #invoiceDetailPanel
+              [invoice]="inv"
+              [customerName]="nameOfCustomer(inv.customerCode)"
+              [warehouseName]="nameOfWarehouse(inv.warehouseCode)"
+              (closePanel)="selectedInvoiceCode.set(null)"
+              (recordPayment)="onRecordPayment($event)"
+            />
+          }
+        </div>
       } @else {
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchCreditNotesPlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
@@ -112,11 +126,23 @@ export class OfficeBilling {
       statusPartiallyPaid: en ? 'Partially paid' : 'Thanh toán một phần',
       statusPaid: en ? 'Paid' : 'Đã thanh toán',
       statusVoid: en ? 'Void' : 'Đã huỷ',
+      paymentInvalidError: en ? 'Amount and Method are required.' : 'Cần nhập số tiền và hình thức.',
+      paymentInvoiceVoidError: en ? 'This invoice has been voided and cannot accept payments.' : 'Hoá đơn đã bị huỷ và không thể nhận thanh toán.',
+      paymentExceedsTotalError: en ? 'This payment would exceed the invoice total.' : 'Khoản thanh toán này vượt quá tổng tiền hoá đơn.',
     };
   });
 
   protected readonly activeSection = signal<BillingSection>('invoices');
   protected readonly query = signal('');
+
+  protected readonly selectedInvoiceCode = signal<string | null>(null);
+  protected readonly invoiceDetailPanel = viewChild<InvoiceDetailPanel>('invoiceDetailPanel');
+
+  protected readonly selectedInvoice = computed<Invoice | null>(() => {
+    const code = this.selectedInvoiceCode();
+    if (!code) return null;
+    return this.store.invoices().find((i) => i.code === code) ?? null;
+  });
 
   protected selectSection(section: BillingSection): void {
     this.activeSection.set(section);
@@ -174,6 +200,25 @@ export class OfficeBilling {
 
   protected nameOfWarehouse(code: string): string {
     return this.organizationStore.warehouses().find((w) => w.code === code)?.name ?? '—';
+  }
+
+  protected onInvoiceRowClick(row: Record<string, unknown>): void {
+    this.selectedInvoiceCode.set(String(row['code']));
+  }
+
+  protected onRecordPayment(event: { amount: number; method: string; referenceNote?: string }): void {
+    const invoice = this.selectedInvoice();
+    if (!invoice) return;
+    const outcome = this.store.recordPayment(invoice.code, event);
+    if (outcome === 'invalid') {
+      this.invoiceDetailPanel()?.setPaymentError(this.t().paymentInvalidError);
+    } else if (outcome === 'invoice-void') {
+      this.invoiceDetailPanel()?.setPaymentError(this.t().paymentInvoiceVoidError);
+    } else if (outcome === 'exceeds-total') {
+      this.invoiceDetailPanel()?.setPaymentError(this.t().paymentExceedsTotalError);
+    }
+    // 'invoice-not-found' is unreachable via the UI — recordPayment is only ever invoked
+    // for the currently selected, real invoice.
   }
 
   private invoiceStatusBadge(status: InvoiceStatus): { status: InvoiceRow['status']; statusLabel: string } {

@@ -65,4 +65,77 @@ describe('OfficeBilling', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('No invoices match');
   });
+
+  it('clicking an invoice row opens its detail panel with lines and payments', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const invoiceRow = rows.find((r) => r.textContent?.includes('INV-4471'));
+    (invoiceRow as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Steel shelving bracket, 400mm');
+  });
+
+  it('recording a valid payment updates the invoice status and appears in the Payments list', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { selectedInvoiceCode: { set: (v: string) => void } };
+    instance.selectedInvoiceCode.set('INV-4471');
+    fixture.detectChanges();
+
+    const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    buttons.find((b) => b.textContent?.includes('Record payment'))?.click();
+    fixture.detectChanges();
+
+    const inputs = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input'));
+    const amountInput = inputs.find((i) => i.type === 'number');
+    const methodInput = inputs[inputs.indexOf(amountInput!) + 1];
+    amountInput!.value = '20000';
+    amountInput!.dispatchEvent(new Event('input'));
+    methodInput!.value = 'Bank transfer';
+    methodInput!.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Save payment')) b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Partially paid');
+    expect(text).toContain('€ 20,000');
+  });
+
+  it('recording a payment that exceeds the invoice total shows an error and does not close the form', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { selectedInvoiceCode: { set: (v: string) => void } };
+    instance.selectedInvoiceCode.set('INV-4471'); // total 42180
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Record payment')) b.click();
+    });
+    fixture.detectChanges();
+
+    const inputs = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input'));
+    const amountInput = inputs.find((i) => i.type === 'number');
+    amountInput!.value = '999999';
+    amountInput!.dispatchEvent(new Event('input'));
+    const methodInput = inputs[inputs.indexOf(amountInput!) + 1];
+    methodInput!.value = 'Bank transfer';
+    methodInput!.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Save payment')) b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('exceed the invoice total');
+    expect(text).toContain('Save payment'); // form is still open
+  });
 });
