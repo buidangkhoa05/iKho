@@ -103,8 +103,13 @@ describe('OfficeBilling', () => {
     });
     fixture.detectChanges();
 
+    // Scoped to the detail panel's own <aside> — the Invoices table always renders every
+    // row's status (including seeded INV-4455, which is already "Partially paid"), so an
+    // unscoped page-wide search for that text would pass even if onRecordPayment did nothing.
+    const panelText = (fixture.nativeElement as HTMLElement).querySelector('aside')?.textContent ?? '';
+    expect(panelText).toContain('Partially paid');
+
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Partially paid');
     expect(text).toContain('€ 20,000');
   });
 
