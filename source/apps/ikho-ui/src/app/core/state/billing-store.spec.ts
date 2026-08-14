@@ -82,7 +82,11 @@ describe('BillingStore', () => {
       expect(store.invoices().length).toBe(before + 1);
 
       const created = store.invoices()[0];
-      expect(created.code).toBe('INV-4473');
+      // Code format/monotonicity, not a hardcoded absolute value — the module-level invoiceSeq
+      // counter persists across this file's whole run, so an absolute code like 'INV-4473' would
+      // silently start failing (pointing nowhere useful) if an earlier test in this file created
+      // one more or one fewer invoice.
+      expect(created.code).toMatch(/^INV-\d+$/);
       expect(created.status).toBe('issued');
       expect(created.totalAmount).toBe(138); // 2*60 + 3*6
       expect(created.payments).toEqual([]);
@@ -92,10 +96,22 @@ describe('BillingStore', () => {
     });
 
     it('assigns sequential INV codes across multiple creations', () => {
+      const preExistingCodes = new Set(store.invoices().map((i) => i.code));
+
       store.addInvoice({ customerCode: 'CUS-2210', warehouseCode: 'WH-1', lines: validLines });
       store.addInvoice({ customerCode: 'CUS-2210', warehouseCode: 'WH-1', lines: validLines });
-      const codes = store.invoices().slice(0, 2).map((i) => i.code);
-      expect(codes).toEqual(['INV-4475', 'INV-4474']);
+
+      // New invoices are prepended, so invoices()[0] is the second call's result and
+      // invoices()[1] is the first call's result — relative assertions only, robust to
+      // however many invoices earlier tests in this file already created.
+      const [secondCreated, firstCreated] = store.invoices().slice(0, 2).map((i) => i.code);
+      expect(preExistingCodes.has(firstCreated)).toBe(false);
+      expect(preExistingCodes.has(secondCreated)).toBe(false);
+      expect(firstCreated).toMatch(/^INV-\d+$/);
+      expect(secondCreated).toMatch(/^INV-\d+$/);
+      const firstNum = Number(firstCreated.replace('INV-', ''));
+      const secondNum = Number(secondCreated.replace('INV-', ''));
+      expect(secondNum).toBe(firstNum + 1);
     });
   });
 
@@ -133,7 +149,10 @@ describe('BillingStore', () => {
       const outcome = store.addCreditNote({ customerCode: 'CUS-2274', lines: validLines });
       expect(outcome).toBe('ok');
       const created = store.creditNotes()[0];
-      expect(created.code).toBe('CRN-0119');
+      // Format/zero-padding, not a hardcoded absolute value — the module-level creditNoteSeq
+      // counter persists across this file's whole run (see the INV-code test above for the
+      // same reasoning).
+      expect(created.code).toMatch(/^CRN-\d{4,}$/);
       expect(created.status).toBe('issued');
       expect(created.totalAmount).toBe(70);
     });
