@@ -143,4 +143,79 @@ describe('OfficeBilling', () => {
     expect(text).toContain('exceed the invoice total');
     expect(text).toContain('Save payment'); // form is still open
   });
+
+  it('creating an invoice with a valid form adds a row and clears the form', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New invoice')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      invoiceCustomerCode: { set: (v: string) => void };
+      invoiceWarehouseCode: { set: (v: string) => void };
+    };
+    instance.invoiceCustomerCode.set('CUS-2210');
+    instance.invoiceWarehouseCode.set('WH-1');
+    fixture.detectChanges();
+
+    const selects = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('select'));
+    const productSelect = selects[selects.length - 1];
+    productSelect.value = 'IKH-482910';
+    productSelect.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Save') && !b.textContent?.includes('payment')) b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('INV-4473');
+    expect((fixture.nativeElement as HTMLElement).querySelector('lib-data-panel[title="New invoice"]')).toBeFalsy();
+  });
+
+  it('submitting the invoice form with no customer/warehouse shows an error and does not create a row', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New invoice')) b.click();
+    });
+    fixture.detectChanges();
+
+    const before = (fixture.componentInstance as unknown as { store: { invoices: () => unknown[] } }).store.invoices().length;
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Save') && !b.textContent?.includes('payment')) b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Customer and Warehouse are required.');
+    expect((fixture.componentInstance as unknown as { store: { invoices: () => unknown[] } }).store.invoices().length).toBe(before);
+  });
+
+  it('cancelling the invoice form clears its fields for next time', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New invoice')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      invoiceCustomerCode: { set: (v: string) => void; (): string };
+    };
+    instance.invoiceCustomerCode.set('CUS-2210');
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Cancel')) b.click();
+    });
+    fixture.detectChanges();
+
+    expect(instance.invoiceCustomerCode()).toBe('');
+  });
 });

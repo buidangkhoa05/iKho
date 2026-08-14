@@ -8,6 +8,7 @@ import { OrganizationStore } from '../../../core/state/organization-store';
 import { BillingStore } from '../../../core/state/billing-store';
 import { formatCurrency } from './billing-format.util';
 import { InvoiceDetailPanel } from './invoice-detail-panel';
+import { LineItemsBuilder } from './line-items-builder';
 
 type BillingSection = 'invoices' | 'credit-notes';
 
@@ -38,7 +39,7 @@ function isThisMonth(iso: string, now: Date): boolean {
 @Component({
   selector: 'app-office-billing',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, DataPanel, DataTable, InvoiceDetailPanel, KpiCard, TextInput],
+  imports: [Button, DataPanel, DataTable, InvoiceDetailPanel, KpiCard, LineItemsBuilder, TextInput],
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -46,6 +47,9 @@ function isThisMonth(iso: string, now: Date): boolean {
           <div class="font-core text-2xl font-bold tracking-[-0.4px] text-ink">{{ title() }}</div>
           <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
         </div>
+        @if (activeSection() === 'invoices') {
+          <lib-button variant="primary" (click)="showInvoiceCreateForm.set(true)">{{ t().newInvoiceAction }}</lib-button>
+        }
       </div>
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
@@ -60,6 +64,52 @@ function isThisMonth(iso: string, now: Date): boolean {
       </div>
 
       @if (activeSection() === 'invoices') {
+        @if (showInvoiceCreateForm()) {
+          <lib-data-panel [title]="t().newInvoiceTitle" [subtitle]="t().newInvoiceSubtitle">
+            <div class="flex flex-col gap-4">
+              <div class="grid grid-cols-2 gap-4">
+                <label class="flex flex-col gap-1.5">
+                  <span class="font-core text-[13px] font-semibold text-ink">{{ t().customer }}</span>
+                  <select
+                    class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                    [value]="invoiceCustomerCode()"
+                    (change)="invoiceCustomerCode.set($any($event.target).value)"
+                  >
+                    <option value="" disabled>{{ t().selectCustomer }}</option>
+                    @for (c of activeCustomers(); track c.code) {
+                      <option [value]="c.code">{{ c.name }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="flex flex-col gap-1.5">
+                  <span class="font-core text-[13px] font-semibold text-ink">{{ t().warehouse }}</span>
+                  <select
+                    class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                    [value]="invoiceWarehouseCode()"
+                    (change)="invoiceWarehouseCode.set($any($event.target).value)"
+                  >
+                    <option value="" disabled>{{ t().selectWarehouse }}</option>
+                    @for (w of activeWarehouses(); track w.code) {
+                      <option [value]="w.code">{{ w.name }}</option>
+                    }
+                  </select>
+                </label>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <lib-text-input [label]="t().sourceReferenceType" [value]="invoiceSourceType()" (valueChange)="invoiceSourceType.set($event)" />
+                <lib-text-input [label]="t().sourceReferenceId" [value]="invoiceSourceId()" (valueChange)="invoiceSourceId.set($event)" />
+              </div>
+              <app-line-items-builder #invoiceLinesBuilder />
+              @if (invoiceFormError(); as err) {
+                <span class="font-core text-xs text-status-out-of-stock">{{ err }}</span>
+              }
+              <div class="flex gap-3">
+                <lib-button variant="primary" (click)="submitInvoice()">{{ t().save }}</lib-button>
+                <lib-button variant="ghost" (click)="cancelInvoiceCreate()">{{ t().cancel }}</lib-button>
+              </div>
+            </div>
+          </lib-data-panel>
+        }
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchInvoicesPlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
         </div>
@@ -129,6 +179,21 @@ export class OfficeBilling {
       paymentInvalidError: en ? 'Amount and Method are required.' : 'Cần nhập số tiền và hình thức.',
       paymentInvoiceVoidError: en ? 'This invoice has been voided and cannot accept payments.' : 'Hoá đơn đã bị huỷ và không thể nhận thanh toán.',
       paymentExceedsTotalError: en ? 'This payment would exceed the invoice total.' : 'Khoản thanh toán này vượt quá tổng tiền hoá đơn.',
+      newInvoiceAction: en ? 'New invoice' : 'Hoá đơn mới',
+      newInvoiceTitle: en ? 'New invoice' : 'Hoá đơn mới',
+      newInvoiceSubtitle: en ? 'Customer, warehouse, and product lines' : 'Khách hàng, kho và các dòng sản phẩm',
+      customer: en ? 'Customer' : 'Khách hàng',
+      selectCustomer: en ? 'Select a customer' : 'Chọn khách hàng',
+      warehouse: en ? 'Warehouse' : 'Kho',
+      selectWarehouse: en ? 'Select a warehouse' : 'Chọn kho',
+      sourceReferenceType: en ? 'Source reference type (optional)' : 'Loại chứng từ nguồn (tuỳ chọn)',
+      sourceReferenceId: en ? 'Source reference id (optional)' : 'Mã chứng từ nguồn (tuỳ chọn)',
+      save: en ? 'Save' : 'Lưu',
+      cancel: en ? 'Cancel' : 'Huỷ',
+      selectCustomerAndWarehouseError: en ? 'Customer and Warehouse are required.' : 'Cần chọn khách hàng và kho.',
+      invoiceLinesInvalidError: en ? 'At least one valid line is required.' : 'Cần ít nhất một dòng hợp lệ.',
+      customerNotFoundError: en ? 'This customer could not be found or is inactive.' : 'Không tìm thấy khách hàng hoặc khách hàng ngừng hoạt động.',
+      productNotFoundError: en ? 'One or more selected products could not be found.' : 'Không tìm thấy một hoặc nhiều sản phẩm đã chọn.',
     };
   });
 
@@ -143,6 +208,17 @@ export class OfficeBilling {
     if (!code) return null;
     return this.store.invoices().find((i) => i.code === code) ?? null;
   });
+
+  protected readonly showInvoiceCreateForm = signal(false);
+  protected readonly invoiceCustomerCode = signal('');
+  protected readonly invoiceWarehouseCode = signal('');
+  protected readonly invoiceSourceType = signal('');
+  protected readonly invoiceSourceId = signal('');
+  protected readonly invoiceFormError = signal<string | null>(null);
+  protected readonly invoiceLinesBuilder = viewChild<LineItemsBuilder>('invoiceLinesBuilder');
+
+  protected readonly activeCustomers = computed(() => PARTNERS.filter((p) => p.type === 'customer' && p.isActive));
+  protected readonly activeWarehouses = computed(() => this.organizationStore.warehouses().filter((w) => w.isActive));
 
   protected selectSection(section: BillingSection): void {
     this.activeSection.set(section);
@@ -219,6 +295,53 @@ export class OfficeBilling {
     }
     // 'invoice-not-found' is unreachable via the UI — recordPayment is only ever invoked
     // for the currently selected, real invoice.
+  }
+
+  protected submitInvoice(): void {
+    const customerCode = this.invoiceCustomerCode();
+    const warehouseCode = this.invoiceWarehouseCode();
+    if (!customerCode || !warehouseCode) {
+      this.invoiceFormError.set(this.t().selectCustomerAndWarehouseError);
+      return;
+    }
+
+    const lines = this.invoiceLinesBuilder()?.getLines() ?? [];
+    const outcome = this.store.addInvoice({
+      customerCode,
+      warehouseCode,
+      sourceReferenceType: this.invoiceSourceType().trim() || undefined,
+      sourceReferenceId: this.invoiceSourceId().trim() || undefined,
+      lines,
+    });
+
+    if (outcome === 'invalid') {
+      this.invoiceFormError.set(this.t().invoiceLinesInvalidError);
+      return;
+    }
+    if (outcome === 'customer-not-found') {
+      this.invoiceFormError.set(this.t().customerNotFoundError);
+      return;
+    }
+    if (outcome === 'product-not-found') {
+      this.invoiceFormError.set(this.t().productNotFoundError);
+      return;
+    }
+
+    this.resetInvoiceForm();
+  }
+
+  protected cancelInvoiceCreate(): void {
+    this.resetInvoiceForm();
+  }
+
+  private resetInvoiceForm(): void {
+    this.invoiceFormError.set(null);
+    this.invoiceCustomerCode.set('');
+    this.invoiceWarehouseCode.set('');
+    this.invoiceSourceType.set('');
+    this.invoiceSourceId.set('');
+    this.invoiceLinesBuilder()?.reset();
+    this.showInvoiceCreateForm.set(false);
   }
 
   private invoiceStatusBadge(status: InvoiceStatus): { status: InvoiceRow['status']; statusLabel: string } {
