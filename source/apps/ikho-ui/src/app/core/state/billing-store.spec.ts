@@ -5,7 +5,7 @@ import { BillingStore } from './billing-store';
 describe('BillingStore', () => {
   let store: BillingStore;
 
-  beforeAll(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({});
     store = TestBed.inject(BillingStore);
   });
@@ -179,9 +179,21 @@ describe('BillingStore', () => {
     });
 
     it('assigns sequential PAY codes', () => {
-      store.recordPayment('INV-4471', { amount: 100, method: 'Cash' });
-      const invoice = store.invoices().find((i) => i.code === 'INV-4471');
-      expect(invoice?.payments[0].id).toBe('PAY-2217');
+      // Record two payments in this test to verify sequential assignment
+      const outcome1 = store.recordPayment('INV-4471', { amount: 100, method: 'Cash' });
+      expect(outcome1).toBe('ok');
+      const invoice1 = store.invoices().find((i) => i.code === 'INV-4471');
+      const firstPaymentId = invoice1?.payments[0].id || '';
+
+      const outcome2 = store.recordPayment('INV-4472', { amount: 100, method: 'Cash' });
+      expect(outcome2).toBe('ok');
+      const invoice2 = store.invoices().find((i) => i.code === 'INV-4472');
+      const secondPaymentId = invoice2?.payments[0].id || '';
+
+      // Extract numeric parts and verify they're sequential (second is exactly one greater than first)
+      const firstNum = parseInt(firstPaymentId.replace('PAY-', ''));
+      const secondNum = parseInt(secondPaymentId.replace('PAY-', ''));
+      expect(secondNum).toBe(firstNum + 1);
     });
   });
 });
