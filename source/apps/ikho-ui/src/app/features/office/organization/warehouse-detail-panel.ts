@@ -85,7 +85,7 @@ import { Warehouse } from '../../../core/mock-data/organization.data';
             }
             <div class="flex gap-2">
               <lib-button variant="primary" (click)="submitZone()">{{ t().saveZone }}</lib-button>
-              <lib-button variant="ghost" (click)="showZoneForm.set(false)">{{ t().cancel }}</lib-button>
+              <lib-button variant="ghost" (click)="cancelZone()">{{ t().cancel }}</lib-button>
             </div>
           </div>
         } @else {
@@ -122,7 +122,7 @@ import { Warehouse } from '../../../core/mock-data/organization.data';
             }
             <div class="flex gap-2">
               <lib-button variant="primary" (click)="submitDock()">{{ t().saveDock }}</lib-button>
-              <lib-button variant="ghost" (click)="showDockForm.set(false)">{{ t().cancel }}</lib-button>
+              <lib-button variant="ghost" (click)="cancelDock()">{{ t().cancel }}</lib-button>
             </div>
           </div>
         } @else {
@@ -235,6 +235,13 @@ export class WarehouseDetailPanel {
     this.addZone.emit({ code, name });
   }
 
+  protected cancelZone(): void {
+    this.showZoneForm.set(false);
+    this.zoneCode.set('');
+    this.zoneName.set('');
+    this.zoneError.set(null);
+  }
+
   protected submitDock(): void {
     const code = this.dockCode().trim();
     const name = this.dockName().trim();
@@ -243,5 +250,27 @@ export class WarehouseDetailPanel {
       return;
     }
     this.addDock.emit({ code, name });
+  }
+
+  protected cancelDock(): void {
+    this.showDockForm.set(false);
+    this.dockCode.set('');
+    this.dockName.set('');
+    this.dockError.set(null);
+  }
+
+  /** Lets the parent surface a store-side outcome (e.g. duplicate code) for the open "edit details" form. */
+  setDetailsError(message: string): void {
+    this.editError.set(message);
+  }
+
+  /** Lets the parent surface a store-side outcome (e.g. duplicate code) for the open "add zone" form. */
+  setZoneError(message: string): void {
+    this.zoneError.set(message);
+  }
+
+  /** Lets the parent surface a store-side outcome (e.g. duplicate code) for the open "add dock" form. */
+  setDockError(message: string): void {
+    this.dockError.set(message);
   }
 }

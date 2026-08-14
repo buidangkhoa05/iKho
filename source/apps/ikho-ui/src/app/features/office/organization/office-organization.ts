@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Button, DataPanel, DataTable, DataTableColumn, KpiCard, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
 import { Warehouse } from '../../../core/mock-data/organization.data';
 import { screenMeta, screenTitle, SCREENS } from '../../../core/mock-data/screens.data';
-import { OrganizationStore } from '../../../core/state/organization-store';
+import { OrganizationStore, WarehouseRef } from '../../../core/state/organization-store';
 import { WarehouseDetailPanel } from './warehouse-detail-panel';
 
 interface WarehouseRow extends Record<string, unknown> {
   code: string;
+  companyCode: string;
   name: string;
   companyName: string;
   zonesCount: number;
@@ -49,17 +50,19 @@ interface WarehouseRow extends Record<string, unknown> {
               </div>
             } @else {
               <div class="flex flex-col gap-2">
-                <span class="font-core text-[13px] text-shade-50">{{ t().company }}</span>
-                <select
-                  class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
-                  [value]="formCompanyCode()"
-                  (change)="formCompanyCode.set($any($event.target).value)"
-                >
-                  <option value="" disabled>{{ t().selectCompany }}</option>
-                  @for (c of store.companies(); track c.code) {
-                    <option [value]="c.code">{{ c.name }}</option>
-                  }
-                </select>
+                <label class="flex flex-col gap-2">
+                  <span class="font-core text-[13px] text-shade-50">{{ t().company }}</span>
+                  <select
+                    class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                    [value]="formCompanyCode()"
+                    (change)="formCompanyCode.set($any($event.target).value)"
+                  >
+                    <option value="" disabled>{{ t().selectCompany }}</option>
+                    @for (c of store.companies(); track c.code) {
+                      <option [value]="c.code">{{ c.name }}</option>
+                    }
+                  </select>
+                </label>
                 <lib-button variant="ghost" (click)="showNewCompanyForm.set(true)">{{ t().newCompany }}</lib-button>
               </div>
             }
@@ -96,9 +99,10 @@ interface WarehouseRow extends Record<string, unknown> {
         </div>
         @if (selectedWarehouse(); as sw) {
           <app-warehouse-detail-panel
+            #detailPanel
             [warehouse]="sw"
             [companyName]="selectedCompanyName()"
-            (closePanel)="selectedCode.set(null)"
+            (closePanel)="selectedRef.set(null)"
             (toggleStatus)="onToggleStatus()"
             (saveDetails)="onSaveDetails($event)"
             (addZone)="onAddZone($event)"
@@ -151,6 +155,9 @@ export class OfficeOrganization {
       duplicateError: (code: string) => (en ? `Warehouse code '${code}' is already in use for this company.` : `Mã kho '${code}' đã được sử dụng cho công ty này.`),
       companyRequiredError: en ? 'Company code and name are required.' : 'Cần nhập mã và tên công ty.',
       companyDuplicateError: (code: string) => (en ? `Company code '${code}' is already in use.` : `Mã công ty '${code}' đã được sử dụng.`),
+      zoneDuplicateError: (code: string) => (en ? `Zone code '${code}' is already in use in this warehouse.` : `Mã khu '${code}' đã được sử dụng trong kho này.`),
+      dockDuplicateError: (code: string) => (en ? `Dock code '${code}' is already in use in this warehouse.` : `Mã cửa kho '${code}' đã được sử dụng trong kho này.`),
+      warehouseNotFoundError: en ? 'This warehouse could not be found. It may have been removed.' : 'Không tìm thấy kho này. Có thể đã bị xoá.',
     };
   });
 
@@ -177,12 +184,13 @@ export class OfficeOrganization {
 
   protected readonly query = signal('');
 
-  protected readonly selectedCode = signal<string | null>(null);
+  protected readonly selectedRef = signal<WarehouseRef | null>(null);
+  protected readonly detailPanel = viewChild<WarehouseDetailPanel>('detailPanel');
 
   protected readonly selectedWarehouse = computed<Warehouse | null>(() => {
-    const code = this.selectedCode();
-    if (!code) return null;
-    return this.store.warehouses().find((w) => w.code === code) ?? null;
+    const ref = this.selectedRef();
+    if (!ref) return null;
+    return this.store.warehouses().find((w) => w.code === ref.code && w.companyCode === ref.companyCode) ?? null;
   });
 
   protected readonly selectedCompanyName = computed<string>(() => {
@@ -214,6 +222,7 @@ export class OfficeOrganization {
   private toRow(w: Warehouse, companyName: string): WarehouseRow {
     return {
       code: w.code,
+      companyCode: w.companyCode,
       name: w.name,
       companyName,
       zonesCount: w.zones.length,
@@ -224,78 +233,112 @@ export class OfficeOrganization {
   }
 
   protected onRowClick(row: Record<string, unknown>): void {
-    this.selectedCode.set(String(row['code']));
+    this.selectedRef.set({ companyCode: String(row['companyCode']), code: String(row['code']) });
+  }
+
+  private refOf(w: Warehouse): WarehouseRef {
+    return { companyCode: w.companyCode, code: w.code };
   }
 
   protected onToggleStatus(): void {
     const w = this.selectedWarehouse();
     if (!w) return;
-    this.store.setWarehouseStatus(w.code, !w.isActive);
+    this.store.setWarehouseStatus(this.refOf(w), !w.isActive);
   }
 
   protected onSaveDetails(input: { name: string }): void {
     const w = this.selectedWarehouse();
     if (!w) return;
-    this.store.updateWarehouse(w.code, input);
+    const outcome = this.store.updateWarehouse(this.refOf(w), input);
+    if (outcome === 'not-found') {
+      this.detailPanel()?.setDetailsError(this.t().warehouseNotFoundError);
+    }
   }
 
   protected onAddZone(zone: { code: string; name: string }): void {
     const w = this.selectedWarehouse();
     if (!w) return;
-    this.store.addZone(w.code, zone);
+    const outcome = this.store.addZone(this.refOf(w), zone);
+    if (outcome === 'duplicate-code') {
+      this.detailPanel()?.setZoneError(this.t().zoneDuplicateError(zone.code));
+    } else if (outcome === 'not-found') {
+      this.detailPanel()?.setZoneError(this.t().warehouseNotFoundError);
+    }
   }
 
   protected onToggleZoneStatus(event: { zoneCode: string; isActive: boolean }): void {
     const w = this.selectedWarehouse();
     if (!w) return;
-    this.store.setZoneStatus(w.code, event.zoneCode, event.isActive);
+    this.store.setZoneStatus(this.refOf(w), event.zoneCode, event.isActive);
   }
 
   protected onAddDock(dock: { code: string; name: string }): void {
     const w = this.selectedWarehouse();
     if (!w) return;
-    this.store.addDock(w.code, dock);
+    const outcome = this.store.addDock(this.refOf(w), dock);
+    if (outcome === 'duplicate-code') {
+      this.detailPanel()?.setDockError(this.t().dockDuplicateError(dock.code));
+    } else if (outcome === 'not-found') {
+      this.detailPanel()?.setDockError(this.t().warehouseNotFoundError);
+    }
   }
 
   protected onToggleDockStatus(event: { dockCode: string; isActive: boolean }): void {
     const w = this.selectedWarehouse();
     if (!w) return;
-    this.store.setDockStatus(w.code, event.dockCode, event.isActive);
+    this.store.setDockStatus(this.refOf(w), event.dockCode, event.isActive);
   }
 
   protected submitCreate(): void {
+    const code = this.formCode().trim();
+    const name = this.formName().trim();
     let companyCode = this.formCompanyCode();
 
     if (this.showNewCompanyForm()) {
-      const code = this.newCompanyCode().trim();
-      const name = this.newCompanyName().trim();
-      if (!code || !name) {
+      const newCode = this.newCompanyCode().trim();
+      const newName = this.newCompanyName().trim();
+      if (!newCode || !newName) {
         this.formError.set(this.t().companyRequiredError);
         return;
       }
-      const companyOutcome = this.store.addCompany({ code, name });
-      if (companyOutcome === 'duplicate-code') {
-        this.formError.set(this.t().companyDuplicateError(code));
+      // Validate the warehouse fields *before* creating the company, so a bad
+      // warehouse code/name doesn't leave an orphaned company behind on retry.
+      if (!code || !name) {
+        this.formError.set(this.t().requiredError);
         return;
       }
-      companyCode = code;
+
+      const companyOutcome = this.store.addCompany({ code: newCode, name: newName });
+      if (companyOutcome === 'duplicate-code') {
+        this.formError.set(this.t().companyDuplicateError(newCode));
+        return;
+      }
+      if (companyOutcome === 'invalid') {
+        this.formError.set(this.t().companyRequiredError);
+        return;
+      }
+      companyCode = newCode;
     }
 
-    const outcome = this.store.addWarehouse({
-      code: this.formCode(),
-      companyCode,
-      name: this.formName(),
-    });
+    const outcome = this.store.addWarehouse({ code, companyCode, name });
 
     if (outcome === 'invalid' || outcome === 'company-not-found') {
       this.formError.set(this.t().requiredError);
       return;
     }
     if (outcome === 'duplicate-code') {
-      this.formError.set(this.t().duplicateError(this.formCode().trim()));
+      this.formError.set(this.t().duplicateError(code));
       return;
     }
 
+    this.resetCreateForm();
+  }
+
+  protected cancelCreate(): void {
+    this.resetCreateForm();
+  }
+
+  private resetCreateForm(): void {
     this.formError.set(null);
     this.formCode.set('');
     this.formName.set('');
@@ -303,11 +346,6 @@ export class OfficeOrganization {
     this.showNewCompanyForm.set(false);
     this.newCompanyCode.set('');
     this.newCompanyName.set('');
-    this.showCreateForm.set(false);
-  }
-
-  protected cancelCreate(): void {
-    this.formError.set(null);
     this.showCreateForm.set(false);
   }
 }
