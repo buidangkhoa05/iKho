@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, ou
 import { Button, Icon, StatusBadge, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
-import { Invoice, InvoiceStatus } from '../../../core/mock-data/billing.data';
+import { Invoice, InvoiceStatus, PaymentStatus } from '../../../core/mock-data/billing.data';
 import { formatCurrency } from './billing-format.util';
 
 function statusBadgeOf(status: InvoiceStatus): 'in-stock' | 'low-stock' | 'inbound' | 'out-of-stock' {
@@ -16,6 +16,10 @@ function statusBadgeOf(status: InvoiceStatus): 'in-stock' | 'low-stock' | 'inbou
     default:
       return 'inbound';
   }
+}
+
+function paymentStatusBadgeOf(status: PaymentStatus): 'in-stock' | 'out-of-stock' {
+  return status === 'reversed' ? 'out-of-stock' : 'in-stock';
 }
 
 @Component({
@@ -79,7 +83,10 @@ function statusBadgeOf(status: InvoiceStatus): 'in-stock' | 'low-stock' | 'inbou
               <span class="font-core text-[13px] text-text-body">{{ p.method }}</span>
               <span class="font-mono text-[11px] text-shade-50">{{ p.paidOnUtc.slice(0, 10) }}</span>
             </div>
-            <span class="font-mono text-[13px] font-semibold text-text-body">{{ formatCurrency(p.amount) }}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[13px] font-semibold text-text-body">{{ formatCurrency(p.amount) }}</span>
+              <lib-status-badge [status]="paymentStatusBadge(p.status)" [label]="paymentStatusLabel(p.status)" />
+            </div>
           </div>
         } @empty {
           <span class="font-core text-[13px] text-shade-50">{{ t().noPayments }}</span>
@@ -117,6 +124,14 @@ export class InvoiceDetailPanel {
   readonly recordPayment = output<{ amount: number; method: string; referenceNote?: string }>();
 
   protected readonly statusBadge = computed(() => statusBadgeOf(this.invoice().status));
+
+  protected paymentStatusBadge(status: PaymentStatus): 'in-stock' | 'out-of-stock' {
+    return paymentStatusBadgeOf(status);
+  }
+
+  protected paymentStatusLabel(status: PaymentStatus): string {
+    return status === 'reversed' ? this.t().paymentStatusReversed : this.t().paymentStatusRecorded;
+  }
   protected readonly statusLabel = computed(() => {
     const t = this.t();
     switch (this.invoice().status) {
@@ -152,6 +167,8 @@ export class InvoiceDetailPanel {
       statusPartiallyPaid: en ? 'Partially paid' : 'Thanh toán một phần',
       statusPaid: en ? 'Paid' : 'Đã thanh toán',
       statusVoid: en ? 'Void' : 'Đã huỷ',
+      paymentStatusRecorded: en ? 'Recorded' : 'Đã ghi nhận',
+      paymentStatusReversed: en ? 'Reversed' : 'Đã hoàn tác',
     };
   });
 

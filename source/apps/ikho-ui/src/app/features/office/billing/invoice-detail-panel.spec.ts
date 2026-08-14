@@ -51,6 +51,19 @@ describe('InvoiceDetailPanel', () => {
     expect(text).toContain('Bank transfer');
   });
 
+  it('shows a status indicator per payment row: recorded vs. reversed', () => {
+    const fixture = create({
+      ...TEST_INVOICE,
+      payments: [
+        { id: 'PAY-2214', amount: 38400, paidOnUtc: '2026-08-05T09:00:00Z', method: 'Bank transfer', status: 'recorded' },
+        { id: 'PAY-2215', amount: 1000, paidOnUtc: '2026-08-06T09:00:00Z', method: 'Cash', status: 'reversed' },
+      ],
+    });
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Recorded');
+    expect(text).toContain('Reversed');
+  });
+
   it('closePanel emits when the close button is clicked', () => {
     const fixture = create();
     let emitted = false;
@@ -96,18 +109,18 @@ describe('InvoiceDetailPanel', () => {
   it('resets the payment form when the invoice input changes identity', () => {
     const fixture = create();
     const instance = fixture.componentInstance as unknown as {
-      showPaymentForm: { set: (v: boolean) => void };
-      paymentAmount: { set: (v: string) => void };
+      showPaymentForm: { set: (v: boolean) => void; (): boolean };
+      paymentAmount: { set: (v: string) => void; (): string };
     };
     instance.showPaymentForm.set(true);
     instance.paymentAmount.set('500');
+    expect(instance.showPaymentForm()).toBe(true);
+    expect(instance.paymentAmount()).toBe('500');
 
     fixture.componentRef.setInput('invoice', { ...TEST_INVOICE, totalAmount: 99999 });
     fixture.detectChanges();
 
-    const loose = fixture.componentInstance as unknown as { getLines?: () => unknown };
-    expect(loose.getLines?.()).toBeUndefined(); // sanity: no stray API
-    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).not.toContain('500');
+    expect(instance.showPaymentForm()).toBe(false);
+    expect(instance.paymentAmount()).toBe('');
   });
 });
