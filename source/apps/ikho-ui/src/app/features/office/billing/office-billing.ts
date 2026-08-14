@@ -7,6 +7,7 @@ import { CreditNote, Invoice, InvoiceStatus, CreditNoteStatus } from '../../../c
 import { OrganizationStore } from '../../../core/state/organization-store';
 import { BillingStore } from '../../../core/state/billing-store';
 import { formatCurrency } from './billing-format.util';
+import { CreditNoteDetailPanel } from './credit-note-detail-panel';
 import { InvoiceDetailPanel } from './invoice-detail-panel';
 import { LineItemsBuilder } from './line-items-builder';
 
@@ -39,7 +40,7 @@ function isThisMonth(iso: string, now: Date): boolean {
 @Component({
   selector: 'app-office-billing',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, DataPanel, DataTable, InvoiceDetailPanel, KpiCard, LineItemsBuilder, TextInput],
+  imports: [Button, CreditNoteDetailPanel, DataPanel, DataTable, InvoiceDetailPanel, KpiCard, LineItemsBuilder, TextInput],
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -49,6 +50,8 @@ function isThisMonth(iso: string, now: Date): boolean {
         </div>
         @if (activeSection() === 'invoices') {
           <lib-button variant="primary" (click)="showInvoiceCreateForm.set(true)">{{ t().newInvoiceAction }}</lib-button>
+        } @else {
+          <lib-button variant="primary" (click)="showCreditNoteCreateForm.set(true)">{{ t().newCreditNoteAction }}</lib-button>
         }
       </div>
 
@@ -131,13 +134,54 @@ function isThisMonth(iso: string, now: Date): boolean {
           }
         </div>
       } @else {
+        @if (showCreditNoteCreateForm()) {
+          <lib-data-panel [title]="t().newCreditNoteTitle" [subtitle]="t().newCreditNoteSubtitle">
+            <div class="flex flex-col gap-4">
+              <label class="flex flex-col gap-1.5">
+                <span class="font-core text-[13px] font-semibold text-ink">{{ t().customer }}</span>
+                <select
+                  class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                  [value]="creditNoteCustomerCode()"
+                  (change)="creditNoteCustomerCode.set($any($event.target).value)"
+                >
+                  <option value="" disabled>{{ t().selectCustomer }}</option>
+                  @for (c of activeCustomers(); track c.code) {
+                    <option [value]="c.code">{{ c.name }}</option>
+                  }
+                </select>
+              </label>
+              <div class="grid grid-cols-2 gap-4">
+                <lib-text-input [label]="t().sourceReferenceType" [value]="creditNoteSourceType()" (valueChange)="creditNoteSourceType.set($event)" />
+                <lib-text-input [label]="t().sourceReferenceId" [value]="creditNoteSourceId()" (valueChange)="creditNoteSourceId.set($event)" />
+              </div>
+              <app-line-items-builder #creditNoteLinesBuilder />
+              @if (creditNoteFormError(); as err) {
+                <span class="font-core text-xs text-status-out-of-stock">{{ err }}</span>
+              }
+              <div class="flex gap-3">
+                <lib-button variant="primary" (click)="submitCreditNote()">{{ t().save }}</lib-button>
+                <lib-button variant="ghost" (click)="cancelCreditNoteCreate()">{{ t().cancel }}</lib-button>
+              </div>
+            </div>
+          </lib-data-panel>
+        }
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchCreditNotesPlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
         </div>
-        <lib-data-panel [title]="t().creditNotesPanelTitle">
-          <lib-data-table [columns]="creditNoteColumns()" [rows]="filteredCreditNoteRows()" [emptyLabel]="t().noCreditNotes" />
-        </lib-data-panel>
-        <!-- CREDIT_NOTE_SECTION_EXTRA -->
+        <div class="flex items-start gap-5">
+          <div class="min-w-0 flex-1">
+            <lib-data-panel [title]="t().creditNotesPanelTitle">
+              <lib-data-table [columns]="creditNoteColumns()" [rows]="filteredCreditNoteRows()" [emptyLabel]="t().noCreditNotes" [clickable]="true" (rowClick)="onCreditNoteRowClick($event)" />
+            </lib-data-panel>
+          </div>
+          @if (selectedCreditNote(); as cn) {
+            <app-credit-note-detail-panel
+              [creditNote]="cn"
+              [customerName]="nameOfCustomer(cn.customerCode)"
+              (closePanel)="selectedCreditNoteCode.set(null)"
+            />
+          }
+        </div>
       }
     </div>
   `,
@@ -182,6 +226,10 @@ export class OfficeBilling {
       newInvoiceAction: en ? 'New invoice' : 'Hoá đơn mới',
       newInvoiceTitle: en ? 'New invoice' : 'Hoá đơn mới',
       newInvoiceSubtitle: en ? 'Customer, warehouse, and product lines' : 'Khách hàng, kho và các dòng sản phẩm',
+      newCreditNoteAction: en ? 'New credit note' : 'Giấy báo có mới',
+      newCreditNoteTitle: en ? 'New credit note' : 'Giấy báo có mới',
+      newCreditNoteSubtitle: en ? 'Customer and product lines' : 'Khách hàng và các dòng sản phẩm',
+      selectCustomerError: en ? 'Customer is required.' : 'Cần chọn khách hàng.',
       customer: en ? 'Customer' : 'Khách hàng',
       selectCustomer: en ? 'Select a customer' : 'Chọn khách hàng',
       warehouse: en ? 'Warehouse' : 'Kho',
@@ -219,6 +267,21 @@ export class OfficeBilling {
 
   protected readonly activeCustomers = computed(() => PARTNERS.filter((p) => p.type === 'customer' && p.isActive));
   protected readonly activeWarehouses = computed(() => this.organizationStore.warehouses().filter((w) => w.isActive));
+
+  protected readonly selectedCreditNoteCode = signal<string | null>(null);
+
+  protected readonly selectedCreditNote = computed<CreditNote | null>(() => {
+    const code = this.selectedCreditNoteCode();
+    if (!code) return null;
+    return this.store.creditNotes().find((c) => c.code === code) ?? null;
+  });
+
+  protected readonly showCreditNoteCreateForm = signal(false);
+  protected readonly creditNoteCustomerCode = signal('');
+  protected readonly creditNoteSourceType = signal('');
+  protected readonly creditNoteSourceId = signal('');
+  protected readonly creditNoteFormError = signal<string | null>(null);
+  protected readonly creditNoteLinesBuilder = viewChild<LineItemsBuilder>('creditNoteLinesBuilder');
 
   protected selectSection(section: BillingSection): void {
     this.activeSection.set(section);
@@ -342,6 +405,54 @@ export class OfficeBilling {
     this.invoiceSourceId.set('');
     this.invoiceLinesBuilder()?.reset();
     this.showInvoiceCreateForm.set(false);
+  }
+
+  protected onCreditNoteRowClick(row: Record<string, unknown>): void {
+    this.selectedCreditNoteCode.set(String(row['code']));
+  }
+
+  protected submitCreditNote(): void {
+    const customerCode = this.creditNoteCustomerCode();
+    if (!customerCode) {
+      this.creditNoteFormError.set(this.t().selectCustomerError);
+      return;
+    }
+
+    const lines = this.creditNoteLinesBuilder()?.getLines() ?? [];
+    const outcome = this.store.addCreditNote({
+      customerCode,
+      sourceReferenceType: this.creditNoteSourceType().trim() || undefined,
+      sourceReferenceId: this.creditNoteSourceId().trim() || undefined,
+      lines,
+    });
+
+    if (outcome === 'invalid') {
+      this.creditNoteFormError.set(this.t().invoiceLinesInvalidError);
+      return;
+    }
+    if (outcome === 'customer-not-found') {
+      this.creditNoteFormError.set(this.t().customerNotFoundError);
+      return;
+    }
+    if (outcome === 'product-not-found') {
+      this.creditNoteFormError.set(this.t().productNotFoundError);
+      return;
+    }
+
+    this.resetCreditNoteForm();
+  }
+
+  protected cancelCreditNoteCreate(): void {
+    this.resetCreditNoteForm();
+  }
+
+  private resetCreditNoteForm(): void {
+    this.creditNoteFormError.set(null);
+    this.creditNoteCustomerCode.set('');
+    this.creditNoteSourceType.set('');
+    this.creditNoteSourceId.set('');
+    this.creditNoteLinesBuilder()?.reset();
+    this.showCreditNoteCreateForm.set(false);
   }
 
   private invoiceStatusBadge(status: InvoiceStatus): { status: InvoiceRow['status']; statusLabel: string } {

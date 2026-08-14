@@ -218,4 +218,74 @@ describe('OfficeBilling', () => {
 
     expect(instance.invoiceCustomerCode()).toBe('');
   });
+
+  it('clicking a credit note row opens its view-only detail panel', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { activeSection: { set: (v: string) => void } };
+    instance.activeSection.set('credit-notes');
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('CRN-0118'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Shelf divider, 600mm');
+  });
+
+  it('creating a credit note with a valid form appends a row and clears the form', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { activeSection: { set: (v: string) => void } };
+    instance.activeSection.set('credit-notes');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New credit note')) b.click();
+    });
+    fixture.detectChanges();
+
+    const creditNoteInstance = fixture.componentInstance as unknown as { creditNoteCustomerCode: { set: (v: string) => void } };
+    creditNoteInstance.creditNoteCustomerCode.set('CUS-2274');
+    fixture.detectChanges();
+
+    const selects = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('select'));
+    const productSelect = selects[selects.length - 1];
+    productSelect.value = 'IKH-318440';
+    productSelect.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Save') && !b.textContent?.includes('payment')) b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('CRN-0119');
+  });
+
+  it('cancelling the credit note form clears its fields for next time', () => {
+    const fixture = TestBed.createComponent(OfficeBilling);
+    fixture.detectChanges();
+    const sectionInstance = fixture.componentInstance as unknown as { activeSection: { set: (v: string) => void } };
+    sectionInstance.activeSection.set('credit-notes');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New credit note')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as { creditNoteCustomerCode: { set: (v: string) => void; (): string } };
+    instance.creditNoteCustomerCode.set('CUS-2274');
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Cancel')) b.click();
+    });
+    fixture.detectChanges();
+
+    expect(instance.creditNoteCustomerCode()).toBe('');
+  });
 });
