@@ -1,12 +1,5 @@
 import { Route } from '@angular/router';
 
-const genericScreen = (screenId: string): Route => ({
-  path: screenId,
-  loadComponent: () =>
-    import('./generic-screen/office-generic-screen').then((m) => m.OfficeGenericScreen),
-  data: { screenId },
-});
-
 export const officeRoutes: Route[] = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
