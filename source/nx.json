@@ -61,7 +61,7 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/dotnet",
+      "plugin": "./tools/nx-plugins/optional-dotnet.js",
       "options": {
         "build": {
           "dependsOn": ["restore", "^build"]
