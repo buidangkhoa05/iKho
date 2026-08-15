@@ -145,4 +145,98 @@ describe('OfficeCatalogue', () => {
     const catalogStore = (fixture.componentInstance as unknown as { store: { products: () => { sku: string; barcodes: { code: string }[] }[] } }).store;
     expect(catalogStore.products().find((p) => p.sku === 'IKH-482910')?.barcodes.length).toBe(1);
   });
+
+  it('creating a product with a valid form adds a row and clears the form', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New product')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      productSku: { set: (v: string) => void };
+      productName: { set: (v: string) => void };
+      showProductCreateForm: () => boolean;
+    };
+    instance.productSku.set('IKH-111111');
+    instance.productName.set('Test Widget');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('IKH-111111');
+    expect(instance.showProductCreateForm()).toBe(false);
+  });
+
+  it('submitting the product form with no sku/name shows an error and does not create a row', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New product')) b.click();
+    });
+    fixture.detectChanges();
+
+    const before = (fixture.componentInstance as unknown as { store: { products: () => unknown[] } }).store.products().length;
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('required');
+    expect((fixture.componentInstance as unknown as { store: { products: () => unknown[] } }).store.products().length).toBe(before);
+  });
+
+  it('cancelling the product form clears its fields for next time', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New product')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as { productSku: { set: (v: string) => void; (): string } };
+    instance.productSku.set('IKH-222222');
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Cancel') b.click();
+    });
+    fixture.detectChanges();
+
+    expect(instance.productSku()).toBe('');
+  });
+
+  it('submitting a duplicate sku shows a duplicate-sku error', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New product')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      productSku: { set: (v: string) => void };
+      productName: { set: (v: string) => void };
+    };
+    instance.productSku.set('IKH-482910'); // already seeded
+    instance.productName.set('Duplicate');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('already in use');
+  });
 });

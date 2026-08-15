@@ -36,6 +36,9 @@ interface CodeNameRow extends Record<string, unknown> {
           <div class="font-core text-2xl font-bold tracking-[-0.4px] text-ink">{{ title() }}</div>
           <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
         </div>
+        @if (activeSection() === 'products') {
+          <lib-button variant="primary" (click)="showProductCreateForm.set(true)">{{ t().newProductAction }}</lib-button>
+        }
       </div>
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
@@ -52,6 +55,79 @@ interface CodeNameRow extends Record<string, unknown> {
       </div>
 
       @if (activeSection() === 'products') {
+        @if (showProductCreateForm()) {
+          <lib-data-panel [title]="t().newProductTitle" [subtitle]="t().newProductSubtitle">
+            <div class="flex flex-col gap-4">
+              <div class="grid grid-cols-2 gap-4">
+                <lib-text-input [label]="t().sku" [value]="productSku()" (valueChange)="productSku.set($event)" />
+                <lib-text-input [label]="t().name" [value]="productName()" (valueChange)="productName.set($event)" />
+              </div>
+              <lib-text-input [label]="t().description" [value]="productDescription()" (valueChange)="productDescription.set($event)" />
+              <div class="grid grid-cols-3 gap-4">
+                <label class="flex flex-col gap-1.5">
+                  <span class="font-core text-[13px] font-semibold text-ink">{{ t().category }}</span>
+                  <select
+                    class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                    [value]="productCategoryCode()"
+                    (change)="productCategoryCode.set($any($event.target).value)"
+                  >
+                    <option value="">{{ t().none }}</option>
+                    @for (c of store.categories(); track c.code) {
+                      @if (c.isActive) {
+                        <option [value]="c.code">{{ c.name }}</option>
+                      }
+                    }
+                  </select>
+                </label>
+                <label class="flex flex-col gap-1.5">
+                  <span class="font-core text-[13px] font-semibold text-ink">{{ t().brand }}</span>
+                  <select
+                    class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                    [value]="productBrandCode()"
+                    (change)="productBrandCode.set($any($event.target).value)"
+                  >
+                    <option value="">{{ t().none }}</option>
+                    @for (b of store.brands(); track b.code) {
+                      @if (b.isActive) {
+                        <option [value]="b.code">{{ b.name }}</option>
+                      }
+                    }
+                  </select>
+                </label>
+                <label class="flex flex-col gap-1.5">
+                  <span class="font-core text-[13px] font-semibold text-ink">{{ t().uom }}</span>
+                  <select
+                    class="h-10 rounded-md border border-hairline-light bg-canvas-light px-3 font-core text-[13px] text-text-body"
+                    [value]="productUomCode()"
+                    (change)="productUomCode.set($any($event.target).value)"
+                  >
+                    <option value="">{{ t().none }}</option>
+                    @for (u of store.unitsOfMeasure(); track u.code) {
+                      @if (u.isActive) {
+                        <option [value]="u.code">{{ u.name }}</option>
+                      }
+                    }
+                  </select>
+                </label>
+              </div>
+              <label class="flex items-center gap-2 font-core text-[13px] text-text-body">
+                <input type="checkbox" [checked]="productIsLotControlled()" (change)="productIsLotControlled.set($any($event.target).checked)" />
+                {{ t().lotControlled }}
+              </label>
+              <label class="flex items-center gap-2 font-core text-[13px] text-text-body">
+                <input type="checkbox" [checked]="productIsSerialControlled()" (change)="productIsSerialControlled.set($any($event.target).checked)" />
+                {{ t().serialControlled }}
+              </label>
+              @if (productFormError(); as err) {
+                <span class="font-core text-xs text-status-out-of-stock">{{ err }}</span>
+              }
+              <div class="flex gap-3">
+                <lib-button variant="primary" (click)="submitProductCreate()">{{ t().save }}</lib-button>
+                <lib-button variant="ghost" (click)="cancelProductCreate()">{{ t().cancel }}</lib-button>
+              </div>
+            </div>
+          </lib-data-panel>
+        }
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchProductsPlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
         </div>
@@ -146,6 +222,21 @@ export class OfficeCatalogue {
       brandNotFoundError: en ? 'The selected brand could not be found.' : 'Không tìm thấy thương hiệu đã chọn.',
       uomNotFoundError: en ? 'The selected unit of measure could not be found.' : 'Không tìm thấy đơn vị tính đã chọn.',
       duplicateBarcodeError: en ? 'This barcode is already registered to a product.' : 'Mã vạch này đã được đăng ký cho một sản phẩm.',
+      newProductAction: en ? 'New product' : 'Sản phẩm mới',
+      newProductTitle: en ? 'New product' : 'Sản phẩm mới',
+      newProductSubtitle: en ? 'SKU, name, and classification' : 'SKU, tên và phân loại',
+      sku: en ? 'SKU' : 'SKU',
+      name: en ? 'Name' : 'Tên',
+      description: en ? 'Description' : 'Mô tả',
+      category: en ? 'Category' : 'Nhóm',
+      brand: en ? 'Brand' : 'Thương hiệu',
+      uom: en ? 'Unit of measure' : 'Đơn vị tính',
+      lotControlled: en ? 'Lot-controlled' : 'Theo lô',
+      serialControlled: en ? 'Serial-controlled' : 'Theo serial',
+      save: en ? 'Save' : 'Lưu',
+      cancel: en ? 'Cancel' : 'Huỷ',
+      skuNameRequiredError: en ? 'SKU and Name are required.' : 'Cần nhập SKU và tên.',
+      duplicateSkuError: (sku: string) => (en ? `SKU '${sku}' is already in use.` : `SKU '${sku}' đã được sử dụng.`),
     };
   });
 
@@ -165,6 +256,17 @@ export class OfficeCatalogue {
     if (!sku) return null;
     return this.store.products().find((p) => p.sku === sku) ?? null;
   });
+
+  protected readonly showProductCreateForm = signal(false);
+  protected readonly productSku = signal('');
+  protected readonly productName = signal('');
+  protected readonly productDescription = signal('');
+  protected readonly productCategoryCode = signal('');
+  protected readonly productBrandCode = signal('');
+  protected readonly productUomCode = signal('');
+  protected readonly productIsLotControlled = signal(false);
+  protected readonly productIsSerialControlled = signal(false);
+  protected readonly productFormError = signal<string | null>(null);
 
   protected readonly kpis = computed(() => {
     const products = this.store.products();
@@ -304,5 +406,65 @@ export class OfficeCatalogue {
     } else if (outcome === 'not-found') {
       this.productDetailPanel()?.setBarcodeError(this.t().productNotFoundError);
     }
+  }
+
+  protected submitProductCreate(): void {
+    const sku = this.productSku().trim();
+    const name = this.productName().trim();
+    if (!sku || !name) {
+      this.productFormError.set(this.t().skuNameRequiredError);
+      return;
+    }
+
+    const outcome = this.store.addProduct({
+      sku,
+      name,
+      description: this.productDescription().trim(),
+      categoryCode: this.productCategoryCode() || undefined,
+      brandCode: this.productBrandCode() || undefined,
+      defaultUomCode: this.productUomCode() || undefined,
+      isLotControlled: this.productIsLotControlled(),
+      isSerialControlled: this.productIsSerialControlled(),
+    });
+
+    if (outcome === 'invalid') {
+      this.productFormError.set(this.t().skuNameRequiredError);
+      return;
+    }
+    if (outcome === 'category-not-found') {
+      this.productFormError.set(this.t().categoryNotFoundError);
+      return;
+    }
+    if (outcome === 'brand-not-found') {
+      this.productFormError.set(this.t().brandNotFoundError);
+      return;
+    }
+    if (outcome === 'uom-not-found') {
+      this.productFormError.set(this.t().uomNotFoundError);
+      return;
+    }
+    if (outcome === 'duplicate-sku') {
+      this.productFormError.set(this.t().duplicateSkuError(sku));
+      return;
+    }
+
+    this.resetProductCreateForm();
+  }
+
+  protected cancelProductCreate(): void {
+    this.resetProductCreateForm();
+  }
+
+  private resetProductCreateForm(): void {
+    this.productFormError.set(null);
+    this.productSku.set('');
+    this.productName.set('');
+    this.productDescription.set('');
+    this.productCategoryCode.set('');
+    this.productBrandCode.set('');
+    this.productUomCode.set('');
+    this.productIsLotControlled.set(false);
+    this.productIsSerialControlled.set(false);
+    this.showProductCreateForm.set(false);
   }
 }
