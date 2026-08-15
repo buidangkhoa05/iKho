@@ -50,10 +50,10 @@ export interface ProductDetailsSave {
               [value]="editCategoryCode()"
               (change)="editCategoryCode.set($any($event.target).value)"
             >
-              <option value="">{{ t().none }}</option>
+              <option value="" [selected]="!editCategoryCode()">{{ t().none }}</option>
               @for (c of categories(); track c.code) {
-                @if (c.isActive) {
-                  <option [value]="c.code">{{ c.name }}</option>
+                @if (c.isActive || c.code === editCategoryCode()) {
+                  <option [value]="c.code" [selected]="c.code === editCategoryCode()">{{ c.name }}</option>
                 }
               }
             </select>
@@ -65,10 +65,10 @@ export interface ProductDetailsSave {
               [value]="editBrandCode()"
               (change)="editBrandCode.set($any($event.target).value)"
             >
-              <option value="">{{ t().none }}</option>
+              <option value="" [selected]="!editBrandCode()">{{ t().none }}</option>
               @for (b of brands(); track b.code) {
-                @if (b.isActive) {
-                  <option [value]="b.code">{{ b.name }}</option>
+                @if (b.isActive || b.code === editBrandCode()) {
+                  <option [value]="b.code" [selected]="b.code === editBrandCode()">{{ b.name }}</option>
                 }
               }
             </select>
@@ -80,10 +80,10 @@ export interface ProductDetailsSave {
               [value]="editUomCode()"
               (change)="editUomCode.set($any($event.target).value)"
             >
-              <option value="">{{ t().none }}</option>
+              <option value="" [selected]="!editUomCode()">{{ t().none }}</option>
               @for (u of unitsOfMeasure(); track u.code) {
-                @if (u.isActive) {
-                  <option [value]="u.code">{{ u.name }}</option>
+                @if (u.isActive || u.code === editUomCode()) {
+                  <option [value]="u.code" [selected]="u.code === editUomCode()">{{ u.name }}</option>
                 }
               }
             </select>

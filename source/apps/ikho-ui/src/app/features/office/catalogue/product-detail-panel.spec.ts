@@ -131,4 +131,39 @@ describe('ProductDetailPanel', () => {
       isSerialControlled: false,
     });
   });
+
+  it('pre-fills the rendered category/brand/uom selects with the product\'s current values, not just the underlying signal', () => {
+    // Regression test: the signal alone being correct is not sufficient — a native <select>
+    // with dynamically-generated <option>s via @for needs [selected] on each option, or the
+    // browser silently shows a blank selection even when [value] on the <select> is correct.
+    // Caught only by checking the rendered <select>.value, exactly as manual smoke testing did.
+    const fixture = create();
+    const instance = fixture.componentInstance as unknown as { startEdit: () => void };
+    instance.startEdit();
+    fixture.detectChanges();
+
+    const selects = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('select'));
+    const [categorySelect, brandSelect, uomSelect] = selects;
+    expect(categorySelect.value).toBe('RACK');
+    expect(brandSelect.value).toBe('VDB');
+    expect(uomSelect.value).toBe('EA');
+  });
+
+  it('still offers the product\'s current category as a selectable, pre-selected option even if that category is now inactive', () => {
+    const fixture = create({
+      ...TEST_PRODUCT,
+      categoryCode: 'EQIP',
+    });
+    fixture.componentRef.setInput('categories', [{ code: 'EQIP', name: 'Equipment', isActive: false }]);
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as { startEdit: () => void };
+    instance.startEdit();
+    fixture.detectChanges();
+
+    const categorySelect = (fixture.nativeElement as HTMLElement).querySelector('select') as HTMLSelectElement;
+    expect(categorySelect.value).toBe('EQIP');
+    const options = Array.from(categorySelect.querySelectorAll('option')).map((o) => o.value);
+    expect(options).toContain('EQIP');
+  });
 });
