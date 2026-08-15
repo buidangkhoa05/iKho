@@ -239,4 +239,182 @@ describe('OfficeCatalogue', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('already in use');
   });
+
+  it('clicking a category row opens its detail panel', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { activeSection: { set: (v: string) => void } };
+    instance.activeSection.set('categories');
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('RACK'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Category detail');
+  });
+
+  it('deactivating a category from its detail panel flips its status in the store', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as {
+      activeSection: { set: (v: string) => void };
+      selectedCategoryCode: { set: (v: string) => void };
+      store: { categories: () => { code: string; isActive: boolean }[] };
+    };
+    instance.activeSection.set('categories');
+    instance.selectedCategoryCode.set('RACK');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Deactivate')) b.click();
+    });
+    fixture.detectChanges();
+
+    expect(instance.store.categories().find((c) => c.code === 'RACK')?.isActive).toBe(false);
+  });
+
+  it('creating a category with a valid form adds a row and clears the form', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const sectionInstance = fixture.componentInstance as unknown as { activeSection: { set: (v: string) => void } };
+    sectionInstance.activeSection.set('categories');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New category')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      categoryCode: { set: (v: string) => void };
+      categoryName: { set: (v: string) => void };
+      showCategoryCreateForm: () => boolean;
+    };
+    instance.categoryCode.set('ELEC');
+    instance.categoryName.set('Electronics');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('ELEC');
+    expect(instance.showCategoryCreateForm()).toBe(false);
+  });
+
+  it('clicking a brand row opens its detail panel and creating a brand works', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const sectionInstance = fixture.componentInstance as unknown as { activeSection: { set: (v: string) => void } };
+    sectionInstance.activeSection.set('brands');
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('VDB'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Brand detail');
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New brand')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      brandCode: { set: (v: string) => void };
+      brandName: { set: (v: string) => void };
+    };
+    instance.brandCode.set('ACME');
+    instance.brandName.set('Acme Co');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('ACME');
+  });
+
+  it('clicking a UoM row opens its detail panel and creating a UoM works', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const sectionInstance = fixture.componentInstance as unknown as { activeSection: { set: (v: string) => void } };
+    sectionInstance.activeSection.set('uom');
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('EA'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Unit of measure detail');
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New unit of measure')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      uomCode: { set: (v: string) => void };
+      uomName: { set: (v: string) => void };
+    };
+    instance.uomCode.set('KG');
+    instance.uomName.set('Kilogram');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('KG');
+  });
+
+  it('switching sections clears a stale open create form and the selected detail panel', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    (rows.find((r) => r.textContent?.includes('IKH-482910')) as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('New product')) b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      productSku: { set: (v: string) => void };
+      productFormError: () => string | null;
+      showProductCreateForm: () => boolean;
+      selectedProductSku: () => string | null;
+    };
+    instance.productSku.set('IKH-333333');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent === 'Save') b.click(); // missing name -> error, form stays open with stale sku
+    });
+    fixture.detectChanges();
+    expect(instance.showProductCreateForm()).toBe(true);
+    expect(instance.selectedProductSku()).toBe('IKH-482910');
+
+    // Click the actual section-toggle buttons (not the activeSection signal directly) — the
+    // reset-on-switch behavior lives in selectSection(), which only runs on a real button click.
+    const clickTab = (label: string) => {
+      const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+      buttons.find((b) => b.textContent?.trim() === label)?.click();
+      fixture.detectChanges();
+    };
+    clickTab('Categories');
+    clickTab('Products');
+
+    expect(instance.showProductCreateForm()).toBe(false);
+    expect(instance.selectedProductSku()).toBeNull();
+  });
 });
