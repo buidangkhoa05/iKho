@@ -84,4 +84,65 @@ describe('OfficeCatalogue', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('No products match');
   });
+
+  it('clicking a product row opens its detail panel with resolved category/brand/uom names and barcodes', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('IKH-482910'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('8712345482910');
+    expect(text).toContain('Lot-controlled');
+  });
+
+  it('deactivating a product from its detail panel flips its status badge in the table', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { selectedProductSku: { set: (v: string) => void } };
+    instance.selectedProductSku.set('IKH-482910');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Deactivate')) b.click();
+    });
+    fixture.detectChanges();
+
+    const catalogStore = (fixture.componentInstance as unknown as { store: { products: () => { sku: string; isActive: boolean }[] } }).store;
+    expect(catalogStore.products().find((p) => p.sku === 'IKH-482910')?.isActive).toBe(false);
+  });
+
+  it('adding a barcode with a code already used by a different product shows a duplicate error and does not add it', () => {
+    const fixture = TestBed.createComponent(OfficeCatalogue);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { selectedProductSku: { set: (v: string) => void } };
+    instance.selectedProductSku.set('IKH-482910');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Add barcode')) b.click();
+    });
+    fixture.detectChanges();
+
+    // Filter to type="text" specifically — the page's own Products search box (type="search",
+    // always rendered above the table) would otherwise be matched first by a looser selector.
+    const inputs = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input'));
+    const barcodeInput = inputs.find((i) => i.type === 'text');
+    barcodeInput!.value = '8712345330298'; // belongs to IKH-330298
+    barcodeInput!.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.includes('Save barcode')) b.click();
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('already registered');
+
+    const catalogStore = (fixture.componentInstance as unknown as { store: { products: () => { sku: string; barcodes: { code: string }[] }[] } }).store;
+    expect(catalogStore.products().find((p) => p.sku === 'IKH-482910')?.barcodes.length).toBe(1);
+  });
 });

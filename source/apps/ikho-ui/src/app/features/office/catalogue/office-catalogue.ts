@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Button, DataPanel, DataTable, DataTableColumn, KpiCard, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
 import { Brand, Category, Product, UnitOfMeasure } from '../../../core/mock-data/catalogue.data';
 import { CatalogStore } from '../../../core/state/catalogue-store';
+import { ProductDetailPanel } from './product-detail-panel';
 
 type CatalogueSection = 'products' | 'categories' | 'brands' | 'uom';
 
@@ -27,7 +28,7 @@ interface CodeNameRow extends Record<string, unknown> {
 @Component({
   selector: 'app-office-catalogue',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, DataPanel, DataTable, KpiCard, TextInput],
+  imports: [Button, DataPanel, DataTable, KpiCard, TextInput, ProductDetailPanel],
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -54,10 +55,26 @@ interface CodeNameRow extends Record<string, unknown> {
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchProductsPlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
         </div>
-        <lib-data-panel [title]="t().productsPanelTitle">
-          <lib-data-table [columns]="productColumns()" [rows]="filteredProductRows()" [emptyLabel]="t().noProducts" />
-        </lib-data-panel>
-        <!-- PRODUCTS_SECTION_EXTRA -->
+        <div class="flex items-start gap-5">
+          <div class="min-w-0 flex-1">
+            <lib-data-panel [title]="t().productsPanelTitle">
+              <lib-data-table [columns]="productColumns()" [rows]="filteredProductRows()" [emptyLabel]="t().noProducts" [clickable]="true" (rowClick)="onProductRowClick($event)" />
+            </lib-data-panel>
+          </div>
+          @if (selectedProduct(); as p) {
+            <app-product-detail-panel
+              #productDetailPanel
+              [product]="p"
+              [categories]="store.categories()"
+              [brands]="store.brands()"
+              [unitsOfMeasure]="store.unitsOfMeasure()"
+              (closePanel)="selectedProductSku.set(null)"
+              (toggleStatus)="onToggleProductStatus()"
+              (saveDetails)="onSaveProductDetails($event)"
+              (addBarcode)="onAddBarcode($event)"
+            />
+          }
+        </div>
       } @else if (activeSection() === 'categories') {
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchCodeNamePlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
@@ -124,6 +141,11 @@ export class OfficeCatalogue {
       active: en ? 'Active' : 'Hoạt động',
       inactive: en ? 'Inactive' : 'Ngừng hoạt động',
       none: en ? '—' : '—',
+      productNotFoundError: en ? 'This product could not be found. It may have been removed.' : 'Không tìm thấy sản phẩm này. Có thể đã bị xoá.',
+      categoryNotFoundError: en ? 'The selected category could not be found.' : 'Không tìm thấy nhóm đã chọn.',
+      brandNotFoundError: en ? 'The selected brand could not be found.' : 'Không tìm thấy thương hiệu đã chọn.',
+      uomNotFoundError: en ? 'The selected unit of measure could not be found.' : 'Không tìm thấy đơn vị tính đã chọn.',
+      duplicateBarcodeError: en ? 'This barcode is already registered to a product.' : 'Mã vạch này đã được đăng ký cho một sản phẩm.',
     };
   });
 
@@ -134,6 +156,15 @@ export class OfficeCatalogue {
     this.activeSection.set(section);
     this.query.set('');
   }
+
+  protected readonly selectedProductSku = signal<string | null>(null);
+  protected readonly productDetailPanel = viewChild<ProductDetailPanel>('productDetailPanel');
+
+  protected readonly selectedProduct = computed<Product | null>(() => {
+    const sku = this.selectedProductSku();
+    if (!sku) return null;
+    return this.store.products().find((p) => p.sku === sku) ?? null;
+  });
 
   protected readonly kpis = computed(() => {
     const products = this.store.products();
@@ -230,4 +261,48 @@ export class OfficeCatalogue {
     if (!q) return this.uomRows();
     return this.uomRows().filter((row) => [row.code, row.name].join(' ').toLowerCase().includes(q));
   });
+
+  protected onProductRowClick(row: Record<string, unknown>): void {
+    this.selectedProductSku.set(String(row['sku']));
+  }
+
+  protected onToggleProductStatus(): void {
+    const p = this.selectedProduct();
+    if (!p) return;
+    this.store.setProductStatus(p.sku, !p.isActive);
+  }
+
+  protected onSaveProductDetails(input: {
+    name: string;
+    description: string;
+    categoryCode?: string;
+    brandCode?: string;
+    defaultUomCode?: string;
+    isLotControlled: boolean;
+    isSerialControlled: boolean;
+  }): void {
+    const p = this.selectedProduct();
+    if (!p) return;
+    const outcome = this.store.updateProduct(p.sku, input);
+    if (outcome === 'not-found') {
+      this.productDetailPanel()?.setDetailsError(this.t().productNotFoundError);
+    } else if (outcome === 'category-not-found') {
+      this.productDetailPanel()?.setDetailsError(this.t().categoryNotFoundError);
+    } else if (outcome === 'brand-not-found') {
+      this.productDetailPanel()?.setDetailsError(this.t().brandNotFoundError);
+    } else if (outcome === 'uom-not-found') {
+      this.productDetailPanel()?.setDetailsError(this.t().uomNotFoundError);
+    }
+  }
+
+  protected onAddBarcode(event: { code: string }): void {
+    const p = this.selectedProduct();
+    if (!p) return;
+    const outcome = this.store.addBarcode(p.sku, event);
+    if (outcome === 'duplicate-code') {
+      this.productDetailPanel()?.setBarcodeError(this.t().duplicateBarcodeError);
+    } else if (outcome === 'not-found') {
+      this.productDetailPanel()?.setBarcodeError(this.t().productNotFoundError);
+    }
+  }
 }
