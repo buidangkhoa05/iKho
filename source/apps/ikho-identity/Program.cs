@@ -1,3 +1,4 @@
+using Ikho.Identity.Features.ClaimsSync;
 using Ikho.Identity.Features.RoleAssignments;
 using Ikho.Identity.Features.Webhooks;
 using Ikho.Identity.Shared;
@@ -7,6 +8,7 @@ using Ikho.Identity.Shared.Organization;
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
 using Ikho.SharedLibrary.Authentication;
+using Ikho.SharedLibrary.Events;
 using Ikho.SharedLibrary.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +42,9 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddSingleton<IAuthorizationHandler, CompanyOfficeAuthorizationHandler>();
 
 builder.Services.AddScoped<RoleAssignmentService>();
+
+builder.Services.AddKafkaConsumer<IdentityDbContext, UserClaimsSyncRequestedEvent, ClaimsSyncHandler>(
+    "identity.UserClaimsSyncRequestedEvent", nameof(UserClaimsSyncRequestedEvent), "Ikho.Identity.ClaimsSync");
 
 var app = builder.Build();
 
