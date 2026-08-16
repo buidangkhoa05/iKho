@@ -37,7 +37,10 @@ export const operatorRoutes: Route[] = [
     path: 'outbound/dispatch/:soId',
     loadComponent: () => import('./outbound/operator-outbound-dispatch').then((m) => m.OperatorOutboundDispatch),
   },
-  outlinedScreen('inventory'),
+  {
+    path: 'inventory',
+    loadComponent: () => import('./inventory/operator-inventory').then((m) => m.OperatorInventory),
+  },
   {
     path: 'returns',
     loadComponent: () => import('./returns/operator-returns-entry').then((m) => m.OperatorReturnsEntry),
