@@ -343,12 +343,15 @@ services:
     environment:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_identity;Username=ikho;Password=ikho
       MessageBroker__BootstrapServers: kafka:29092
+      Services__Organization__BaseUrl: http://warehouse-organization:8080
     ports:
       - "5160:8080"
     depends_on:
       postgres:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      warehouse-organization:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/live"]
