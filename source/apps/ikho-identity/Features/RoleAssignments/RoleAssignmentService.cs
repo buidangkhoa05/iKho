@@ -73,11 +73,16 @@ public sealed class RoleAssignmentService(IdentityDbContext db, IOrganizationLoo
 
     public async Task<IReadOnlyList<RoleAssignmentResponse>> GetByCompanyAsync(Guid companyId, CancellationToken cancellationToken)
     {
-        var assignments = await db.RoleAssignments
+        var roleAssignments = await db.RoleAssignments
             .Where(a => a.CompanyId == companyId)
-            .Join(db.Roles, a => a.RoleId, r => r.Id, (a, r) => new RoleAssignmentResponse(a.Id, a.UserId, a.CompanyId, a.WarehouseId, r.Name, a.CreatedAtUtc))
             .ToListAsync(cancellationToken);
 
-        return assignments;
+        // Resolve role names from the closed, compile-time-known role set rather than joining
+        // against Roles - see IdentityDbContext.ResolveRoleName for why.
+        return roleAssignments
+            .Select(a => (Assignment: a, RoleName: IdentityDbContext.ResolveRoleName(a.RoleId)))
+            .Where(x => x.RoleName is not null)
+            .Select(x => new RoleAssignmentResponse(x.Assignment.Id, x.Assignment.UserId, x.Assignment.CompanyId, x.Assignment.WarehouseId, x.RoleName!, x.Assignment.CreatedAtUtc))
+            .ToList();
     }
 }

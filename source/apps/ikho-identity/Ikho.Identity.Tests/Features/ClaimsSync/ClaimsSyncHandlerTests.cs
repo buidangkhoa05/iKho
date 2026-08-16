@@ -25,7 +25,6 @@ public class ClaimsSyncHandlerTests
         db.Users.Add(user);
         var companyId = Guid.NewGuid();
         db.RoleAssignments.Add(new RoleAssignment { UserId = user.Id, CompanyId = companyId, WarehouseId = null, RoleId = IdentityDbContext.OfficeRoleId });
-        db.Roles.Add(new Role { Id = IdentityDbContext.OfficeRoleId, Name = RoleNames.Office });
         await db.SaveChangesAsync();
 
         var fakeProvider = new FakeIdentityProvider();

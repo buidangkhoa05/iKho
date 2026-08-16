@@ -27,6 +27,24 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 
     public DbSet<RoleAssignment> RoleAssignments => Set<RoleAssignment>();
 
+    /// <summary>
+    /// Resolves a role id to its <see cref="RoleNames"/> value via equality checks against
+    /// <see cref="OfficeRoleId"/>/<see cref="OperatorRoleId"/>, instead of joining against
+    /// <see cref="Roles"/>. This repo has no EF Core migrations tooling, so the <c>Roles</c>
+    /// table's <c>HasData</c> seed below never materializes against a real (unmigrated) Postgres
+    /// database - an inner join against it would silently return zero rows there. The role set is
+    /// a closed, compile-time-known two-value set, so consumers that need a role's name from its
+    /// id (<see cref="Ikho.Identity.Features.ClaimsSync.ClaimsSyncHandler"/>,
+    /// <see cref="Ikho.Identity.Features.RoleAssignments.RoleAssignmentService.GetByCompanyAsync"/>)
+    /// should resolve it here instead.
+    /// </summary>
+    public static string? ResolveRoleName(Guid roleId) => roleId switch
+    {
+        _ when roleId == OfficeRoleId => RoleNames.Office,
+        _ when roleId == OperatorRoleId => RoleNames.Operator,
+        _ => null,
+    };
+
     /// <inheritdoc />
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
