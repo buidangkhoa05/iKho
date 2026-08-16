@@ -104,7 +104,7 @@ This path-based split keeps the frontend stable because all service calls still 
 - `Authority` / `Audience` are **placeholders** — no identity provider has been selected yet.
 - Authentication middleware is registered and JWT bearer validation is wired up, but no routes
   currently require `[Authorize]`, so the gateway works today with these values blank.
-- See [Shared/Authentication/JwtAuthenticationExtensions.cs](../../source/apps/ikho-api-gateway/Shared/Authentication/JwtAuthenticationExtensions.cs).
+- See [Ikho.SharedLibrary/Authentication/JwtBearerAuthenticationExtensions.cs](../../source/libs/ikho-shared-library/Authentication/JwtBearerAuthenticationExtensions.cs) — shared with `Ikho.Identity`, which also registers its own JWT bearer auth for `[Authorize]`-protected endpoints.
 
 ### Rate limiting (`RateLimiting` section)
 
@@ -139,7 +139,7 @@ source/apps/ikho-api-gateway/
   Properties/launchSettings.json      # 5080 (http) / 7080 (https)
   Shared/
     Cors/CorsExtensions.cs
-    Authentication/JwtAuthenticationExtensions.cs
+    (JWT bearer auth now lives in Ikho.SharedLibrary/Authentication/JwtBearerAuthenticationExtensions.cs)
     RateLimiting/RateLimitingExtensions.cs
     Middleware/CorrelationIdMiddleware.cs
     Middleware/RequestLoggingMiddleware.cs

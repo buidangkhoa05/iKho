@@ -1,4 +1,4 @@
-using Ikho.ApiGateway.Shared.Authentication;
+using Ikho.SharedLibrary.Authentication;
 using Ikho.ApiGateway.Shared.Cors;
 using Ikho.ApiGateway.Shared.Middleware;
 using Ikho.ApiGateway.Shared.RateLimiting;
@@ -10,7 +10,7 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddGatewayCors(builder.Configuration);
-builder.Services.AddGatewayAuthentication(builder.Configuration);
+builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddGatewayRateLimiting(builder.Configuration);
 
 var app = builder.Build();
