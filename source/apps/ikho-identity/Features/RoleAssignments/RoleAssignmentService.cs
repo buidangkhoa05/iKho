@@ -13,6 +13,7 @@ public enum CreateRoleAssignmentOutcome
     Created,
     ValidationFailed,
     UserNotFound,
+    UserNotMember,
     WarehouseNotFound,
 }
 
@@ -36,6 +37,14 @@ public sealed class RoleAssignmentService(IdentityDbContext db, IOrganizationLoo
         if (!userExists)
         {
             return (CreateRoleAssignmentOutcome.UserNotFound, null);
+        }
+
+        var isActiveMember = await db.CompanyMemberships.AnyAsync(
+            m => m.UserId == request.UserId && m.CompanyId == request.CompanyId && m.Status == CompanyMembershipStatus.Active,
+            cancellationToken);
+        if (!isActiveMember)
+        {
+            return (CreateRoleAssignmentOutcome.UserNotMember, null);
         }
 
         if (request.WarehouseId is { } warehouseId &&

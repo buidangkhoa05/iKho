@@ -29,6 +29,7 @@ public static class RoleAssignmentEndpoints
             {
                 CreateRoleAssignmentOutcome.ValidationFailed => TypedResults.BadRequest("RoleName must be 'Office' or 'Operator'."),
                 CreateRoleAssignmentOutcome.UserNotFound => TypedResults.NotFound("User not found."),
+                CreateRoleAssignmentOutcome.UserNotMember => TypedResults.NotFound("User is not an active member of this company."),
                 CreateRoleAssignmentOutcome.WarehouseNotFound => TypedResults.NotFound("Warehouse not found for this company."),
                 _ => TypedResults.Created($"/api/identity/role-assignments/{assignment!.Id}", assignment),
             };

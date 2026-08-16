@@ -39,6 +39,13 @@ public class RoleAssignmentEndpointsTests(IdentityWebApplicationFactory factory)
         var db = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
         var targetUser = new Ikho.Identity.Domain.User { ExternalUserId = "user_target", Email = "target@example.com", DisplayName = "Target" };
         db.Users.Add(targetUser);
+        db.CompanyMemberships.Add(new Ikho.Identity.Domain.CompanyMembership
+        {
+            UserId = targetUser.Id,
+            CompanyId = companyId,
+            ExternalOrgId = "org_target",
+            Status = Ikho.Identity.Domain.CompanyMembershipStatus.Active,
+        });
         await db.SaveChangesAsync();
 
         var client = factory.CreateClient();
@@ -53,5 +60,54 @@ public class RoleAssignmentEndpointsTests(IdentityWebApplicationFactory factory)
         var verifyDb = verifyScope.ServiceProvider.GetRequiredService<IdentityDbContext>();
         var assignment = await verifyDb.RoleAssignments.SingleAsync(a => a.UserId == targetUser.Id && a.CompanyId == companyId);
         Assert.Equal(IdentityDbContext.OfficeRoleId, assignment.RoleId);
+    }
+
+    [Fact]
+    public async Task CreateRoleAssignment_TargetUserHasNoActiveCompanyMembership_ReturnsNotFound()
+    {
+        var companyId = Guid.NewGuid();
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        var targetUser = new Ikho.Identity.Domain.User { ExternalUserId = "user_no_membership", Email = "nomember@example.com", DisplayName = "No Membership" };
+        db.Users.Add(targetUser);
+        await db.SaveChangesAsync();
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", IssueOfficeJwt(companyId));
+
+        var response = await client.PostAsJsonAsync("/api/identity/role-assignments", new CreateRoleAssignmentRequest(
+            companyId, targetUser.Id, null, RoleNames.Office));
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        using var verifyScope = factory.Services.CreateScope();
+        var verifyDb = verifyScope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        Assert.False(await verifyDb.RoleAssignments.AnyAsync(a => a.UserId == targetUser.Id && a.CompanyId == companyId));
+    }
+
+    [Fact]
+    public async Task CreateRoleAssignment_TargetUserHasRemovedCompanyMembership_ReturnsNotFound()
+    {
+        var companyId = Guid.NewGuid();
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        var targetUser = new Ikho.Identity.Domain.User { ExternalUserId = "user_removed_membership", Email = "removed@example.com", DisplayName = "Removed" };
+        db.Users.Add(targetUser);
+        db.CompanyMemberships.Add(new Ikho.Identity.Domain.CompanyMembership
+        {
+            UserId = targetUser.Id,
+            CompanyId = companyId,
+            ExternalOrgId = "org_removed",
+            Status = Ikho.Identity.Domain.CompanyMembershipStatus.Removed,
+        });
+        await db.SaveChangesAsync();
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", IssueOfficeJwt(companyId));
+
+        var response = await client.PostAsJsonAsync("/api/identity/role-assignments", new CreateRoleAssignmentRequest(
+            companyId, targetUser.Id, null, RoleNames.Office));
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }
