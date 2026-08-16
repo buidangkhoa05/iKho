@@ -10,3 +10,4 @@ CREATE DATABASE ikho_warehouse_outbound OWNER ikho;
 CREATE DATABASE ikho_warehouse_returns OWNER ikho;
 CREATE DATABASE ikho_warehouse_billing OWNER ikho;
 CREATE DATABASE ikho_warehouse_reporting OWNER ikho;
+CREATE DATABASE ikho_identity OWNER ikho;

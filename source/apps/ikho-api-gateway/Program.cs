@@ -1,4 +1,4 @@
-using Ikho.ApiGateway.Shared.Authentication;
+using Ikho.SharedLibrary.Authentication;
 using Ikho.ApiGateway.Shared.Cors;
 using Ikho.ApiGateway.Shared.Middleware;
 using Ikho.ApiGateway.Shared.RateLimiting;
@@ -10,7 +10,7 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddGatewayCors(builder.Configuration);
-builder.Services.AddGatewayAuthentication(builder.Configuration);
+builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddGatewayRateLimiting(builder.Configuration);
 
 var app = builder.Build();
@@ -37,7 +37,8 @@ app.MapScalarApiReference("/docs", options =>
         .AddDocument("outbound", "Outbound", "/api/warehouse/outbound/openapi/v1.json")
         .AddDocument("returns", "Returns", "/api/warehouse/returns/openapi/v1.json")
         .AddDocument("billing", "Billing", "/api/warehouse/billing/openapi/v1.json")
-        .AddDocument("reporting", "Reporting", "/api/warehouse/reporting/openapi/v1.json");
+        .AddDocument("reporting", "Reporting", "/api/warehouse/reporting/openapi/v1.json")
+        .AddDocument("identity", "Identity", "/api/identity/openapi/v1.json");
 });
 
 app.MapReverseProxy().RequireRateLimiting(RateLimitingExtensions.PolicyName);

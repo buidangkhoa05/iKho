@@ -105,6 +105,7 @@ public sealed class CompaniesService(ICompanyRepository repository, IOutboxWrite
 
         company.Name = request.Name;
         company.IsActive = request.IsActive;
+        company.ExternalOrgId = request.ExternalOrgId;
 
         await repository.SaveChangesAsync(cancellationToken);
 

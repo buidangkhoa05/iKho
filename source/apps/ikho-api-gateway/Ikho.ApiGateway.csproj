@@ -12,4 +12,8 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../../libs/ikho-shared-library/Ikho.SharedLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

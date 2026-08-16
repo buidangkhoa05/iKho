@@ -59,6 +59,15 @@ public static class CompaniesEndpoints
             return company is null ? TypedResults.NotFound() : TypedResults.Ok(company);
         });
 
+        group.MapGet("/by-external-org/{externalOrgId}", async Task<Results<Ok<CompanyResponse>, NotFound>> (
+            string externalOrgId,
+            ICompanyRepository repository,
+            CancellationToken cancellationToken) =>
+        {
+            var company = await repository.GetByExternalOrgIdAsync(externalOrgId, cancellationToken);
+            return company is null ? TypedResults.NotFound() : TypedResults.Ok(CompanyResponse.FromEntity(company));
+        });
+
         group.MapGet("/", async (CompaniesService service, CancellationToken cancellationToken) =>
             TypedResults.Ok(await service.GetAllAsync(cancellationToken)));
 

@@ -4,7 +4,7 @@
   "projectType": "application",
   "prefix": "app",
   "sourceRoot": "apps/ikho-ui/src",
-  "tags": [],
+  "tags": ["frontend"],
   "targets": {
     "build": {
       "executor": "@angular/build:application",

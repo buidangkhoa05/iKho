@@ -27,16 +27,18 @@ C4Context
 
     System(ikho, "iKho System", "Warehouse / inventory management platform")
 
-    System_Ext(idp, "Identity Provider", "Not yet selected (Entra ID / Auth0 / custom). Will issue JWTs once chosen.")
+    System_Ext(idp, "Clerk", "Identity provider selected for Ikho.Identity. Issues JWTs; receives webhook subscriptions for user/org lifecycle events.")
 
     Rel(user, ikho, "Uses", "HTTPS")
-    Rel(ikho, idp, "Validates tokens against (planned, not wired up yet)", "OIDC/JWT")
+    Rel(ikho, idp, "Validates tokens against / ingests webhooks from", "OIDC/JWT + webhooks")
 
     UpdateRelStyle(ikho, idp, $offsetY="-10")
 ```
 
-- The **Identity Provider** is aspirational — the API Gateway has JWT validation scaffolding
-  in place, but no provider has been selected yet (see
+- **Clerk** is the identity provider selected for `Ikho.Identity`, wired in via its
+  `IIdentityProvider` abstraction (webhook ingestion, role assignment, claims push). The API
+  Gateway's own `Jwt:Authority`/`Jwt:Audience` remain placeholders until real Clerk instance
+  values are provisioned (see
   [api-gateway.md § Open questions](./api-gateway.md#open-questions)).
 
 ## 2. Container Diagram
@@ -62,6 +64,7 @@ C4Container
         Container(returnssvc, "Ikho.Warehouse.Returns", ".NET 10 Minimal API", "Reverse-logistics and disposition service")
         Container(billingsvc, "Ikho.Warehouse.Billing", ".NET 10 Minimal API", "Billing and financial snapshot service")
         Container(reportingsvc, "Ikho.Warehouse.Reporting", ".NET 10 Minimal API", "Kafka-driven projection/read-model service for dashboards and analytics")
+        Container(identitysvc, "Ikho.Identity", ".NET 10 Minimal API", "Roles, company membership, and Clerk-backed authentication")
     }
 
     Rel(user, ui, "Uses", "HTTPS")
@@ -78,6 +81,7 @@ C4Container
     Rel(gateway, returnssvc, "/api/warehouse/returns/*", "HTTP/JSON")
     Rel(gateway, billingsvc, "/api/warehouse/billing/*", "HTTP/JSON")
     Rel(gateway, reportingsvc, "/api/warehouse/reporting/*", "HTTP/JSON")
+    Rel(gateway, identitysvc, "/api/identity/*", "HTTP/JSON")
     Rel(schema, orgsvc, "Contract reference", "Project reference")
     Rel(schema, catalogsvc, "Contract reference", "Project reference")
     Rel(schema, partnersvc, "Contract reference", "Project reference")
@@ -105,6 +109,7 @@ C4Container
 | `Ikho.Warehouse.Returns` | [source/apps/ikho-warehouse-returns](../../source/apps/ikho-warehouse-returns) | 5157 |
 | `Ikho.Warehouse.Billing` | [source/apps/ikho-warehouse-billing](../../source/apps/ikho-warehouse-billing) | 5158 |
 | `Ikho.Warehouse.Reporting` | [source/apps/ikho-warehouse-reporting](../../source/apps/ikho-warehouse-reporting) | 5159 |
+| `Ikho.Identity` | [source/apps/ikho-identity](../../source/apps/ikho-identity) | 5160 |
 
 ### Running the containers
 

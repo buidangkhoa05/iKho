@@ -104,7 +104,7 @@ This path-based split keeps the frontend stable because all service calls still 
 - `Authority` / `Audience` are **placeholders** — no identity provider has been selected yet.
 - Authentication middleware is registered and JWT bearer validation is wired up, but no routes
   currently require `[Authorize]`, so the gateway works today with these values blank.
-- See [Shared/Authentication/JwtAuthenticationExtensions.cs](../../source/apps/ikho-api-gateway/Shared/Authentication/JwtAuthenticationExtensions.cs).
+- See [Ikho.SharedLibrary/Authentication/JwtBearerAuthenticationExtensions.cs](../../source/libs/ikho-shared-library/Authentication/JwtBearerAuthenticationExtensions.cs) — shared with `Ikho.Identity`, which also registers its own JWT bearer auth for `[Authorize]`-protected endpoints.
 
 ### Rate limiting (`RateLimiting` section)
 
@@ -139,7 +139,7 @@ source/apps/ikho-api-gateway/
   Properties/launchSettings.json      # 5080 (http) / 7080 (https)
   Shared/
     Cors/CorsExtensions.cs
-    Authentication/JwtAuthenticationExtensions.cs
+    (JWT bearer auth now lives in Ikho.SharedLibrary/Authentication/JwtBearerAuthenticationExtensions.cs)
     RateLimiting/RateLimitingExtensions.cs
     Middleware/CorrelationIdMiddleware.cs
     Middleware/RequestLoggingMiddleware.cs
@@ -177,6 +177,10 @@ All nine warehouse services are implemented and routed:
 8. `Ikho.Warehouse.Billing` — `:5158`
 9. `Ikho.Warehouse.Reporting` — `:5159`
 
+`Ikho.Identity` is also implemented and routed, alongside the nine warehouse services:
+
+- `Ikho.Identity` — `:5160`, routed at `/api/identity/*`
+
 Related planning docs:
 
 1. [warehouse-domain-model.md](./warehouse-domain-model.md)
@@ -186,8 +190,10 @@ Related planning docs:
 
 ## Open questions
 
-1. **Identity provider** — not yet chosen. `Jwt:Authority`/`Jwt:Audience` remain empty until
-   decided.
+1. **Identity provider** — Clerk is now wired in as the first identity provider via
+   `Ikho.Identity`'s `IIdentityProvider` abstraction (webhook ingestion, role sync, and claims
+   push). `Jwt:Authority`/`Jwt:Audience` here and in `Ikho.Identity`'s own config are still
+   placeholders pending real Clerk instance values.
 2. **Production CORS origins** — placeholder empty array; must be populated before any
    non-local deployment.
 3. **Production reverse-proxy destinations** — `shared-library-cluster` currently always

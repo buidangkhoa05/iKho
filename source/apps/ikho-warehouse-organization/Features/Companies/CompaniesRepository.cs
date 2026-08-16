@@ -16,6 +16,12 @@ public interface ICompanyRepository
     Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Finds a company by its linked identity-provider organization id, or <see langword="null"/>
+    /// if no company is linked to it.
+    /// </summary>
+    Task<Company?> GetByExternalOrgIdAsync(string externalOrgId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Returns all companies ordered by code.
     /// </summary>
     Task<List<Company>> GetAllAsync(CancellationToken cancellationToken);
@@ -48,6 +54,10 @@ public sealed class CompanyRepository(OrganizationDbContext dbContext) : ICompan
     /// <inheritdoc />
     public Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
         dbContext.Companies.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<Company?> GetByExternalOrgIdAsync(string externalOrgId, CancellationToken cancellationToken) =>
+        dbContext.Companies.SingleOrDefaultAsync(c => c.ExternalOrgId == externalOrgId, cancellationToken);
 
     /// <inheritdoc />
     public Task<List<Company>> GetAllAsync(CancellationToken cancellationToken) =>
