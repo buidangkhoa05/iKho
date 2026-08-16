@@ -602,7 +602,7 @@ git commit -m "feat(ikho-identity): scaffold Ikho.Identity service, data model, 
 - Create: `source/apps/ikho-identity/Ikho.Identity.Tests/TestDoubles/FakeOrganizationLookupClient.cs`
 
 **Interfaces:**
-- Produces: `IOrganizationLookupClient.GetCompanyIdByExternalOrgIdAsync(string externalOrgId, CancellationToken) : Task<Guid?>` and `IOrganizationLookupClient.WarehouseExistsAsync(Guid companyId, Guid warehouseId, CancellationToken) : Task<bool>`. Consumed by webhook ingestion (Task 4) and role assignment (Task 8).
+- Produces: `IOrganizationLookupClient.GetCompanyIdByExternalOrgIdAsync(string externalOrgId, CancellationToken) : Task<Guid?>` and `IOrganizationLookupClient.WarehouseExistsAsync(Guid companyId, Guid warehouseId, CancellationToken) : Task<bool>`. Consumed by webhook ingestion (Task 4) and role assignment (Task 7).
 - Consumes: `Ikho.Identity.Shared.Organization` namespace only depends on `System.Net.Http.Json` and standard config binding — no new shared-library types.
 
 Organization owns `Company` and is the only service allowed to write it — this task adds the Clerk org id as a field on `Company` (Organization's own schema, additive) plus a lookup endpoint, rather than duplicating the mapping inside Identity.
@@ -1536,7 +1536,7 @@ git commit -m "feat(ikho-identity): add ClerkIdentityProvider with Svix signatur
 - Modify: `source/apps/ikho-identity/Ikho.Identity.Tests/Ikho.Identity.Tests.csproj`
 
 **Interfaces:**
-- Produces: `"CompanyOffice"` authorization policy — call `IAuthorizationService.AuthorizeAsync(ClaimsPrincipal user, Guid companyId, "CompanyOffice")` from any endpoint that needs to check "does this user hold the `Office` role for this company." Consumed by role assignment (Task 8).
+- Produces: `"CompanyOffice"` authorization policy — call `IAuthorizationService.AuthorizeAsync(ClaimsPrincipal user, Guid companyId, "CompanyOffice")` from any endpoint that needs to check "does this user hold the `Office` role for this company." Consumed by role assignment (Task 7).
 - Consumes: `AddJwtBearerAuthentication` (Task 1), `RoleClaim`/`RoleNames.Office` (Tasks 2, 4).
 
 The `ikho_roles` JWT claim (a JSON array of `RoleClaim`, per Global Constraints) is what Clerk's JWT template projects from the `public_metadata` this service pushes (Task 5). This task adds the ASP.NET Core side that reads it.
@@ -1683,12 +1683,12 @@ public class CompanyOfficeAuthorizationTests(IdentityWebApplicationFactory facto
 }
 ```
 
-This test references `GET /api/identity/role-assignments`, which does not exist until Task 8 — leave this test file in place but skip running it until Task 8 wires the endpoint (Task 8's steps re-run the full suite, which will then include this file passing).
+This test references `GET /api/identity/role-assignments`, which does not exist until Task 7 — leave this test file in place but skip running it until Task 7 wires the endpoint (Task 7's steps re-run the full suite, which will then include this file passing).
 
 - [ ] **Step 5: Build to verify everything compiles**
 
 Run: `cd source && dotnet build apps/ikho-identity/Ikho.Identity.csproj && dotnet build apps/ikho-identity/Ikho.Identity.Tests/Ikho.Identity.Tests.csproj`
-Expected: Both succeed. The two new tests will fail with 404 (endpoint doesn't exist yet) rather than passing — that's expected until Task 8; do not fix that in this task.
+Expected: Both succeed. The two new tests will fail with 404 (endpoint doesn't exist yet) rather than passing — that's expected until Task 7; do not fix that in this task.
 
 - [ ] **Step 6: Commit**
 
