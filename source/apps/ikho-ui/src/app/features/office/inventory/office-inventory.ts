@@ -8,6 +8,7 @@ import { screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
 import { CatalogStore } from '../../../core/state/catalogue-store';
 import { InventoryStore } from '../../../core/state/inventory-store';
 import { OrganizationStore } from '../../../core/state/organization-store';
+import { availableOf, lotOrSerialOf, productNameOf, referenceOf, reservationBadge, warehouseNameOf } from './inventory-format.util';
 import { ReservationDetailPanel } from './reservation-detail-panel';
 import { StockItemDetailPanel } from './stock-item-detail-panel';
 
@@ -50,7 +51,7 @@ interface ReservationRow extends Record<string, unknown> {
           <div class="mt-0.5 font-core text-[13px] text-shade-50">{{ meta() }}</div>
         </div>
         @if (activeSection() === 'stock-positions') {
-          <lib-button variant="primary" (click)="showReceiveForm.set(!showReceiveForm())">{{ t().receiveStock }}</lib-button>
+          <lib-button variant="primary" (click)="showReceiveForm() ? cancelReceive() : showReceiveForm.set(true)">{{ t().receiveStock }}</lib-button>
         }
       </div>
 
@@ -104,16 +105,12 @@ interface ReservationRow extends Record<string, unknown> {
               </label>
               <lib-text-input [label]="t().bin" [value]="receiveBin()" (valueChange)="receiveBin.set($event)" />
               <lib-text-input [label]="t().quantity" type="number" [value]="receiveQuantity()" (valueChange)="receiveQuantity.set($event)" />
-              @if (receiveProductIsLotControlled(); as isLot) {
-                @if (isLot) {
-                  <lib-text-input [label]="t().lotNumber" [value]="receiveLotNumber()" (valueChange)="receiveLotNumber.set($event)" />
-                  <lib-text-input [label]="t().expirationDate" type="text" [placeholder]="t().expirationDatePlaceholder" [value]="receiveExpirationDate()" (valueChange)="receiveExpirationDate.set($event)" />
-                }
+              @if (receiveProductIsLotControlled()) {
+                <lib-text-input [label]="t().lotNumber" [value]="receiveLotNumber()" (valueChange)="receiveLotNumber.set($event)" />
+                <lib-text-input [label]="t().expirationDate" type="text" [placeholder]="t().expirationDatePlaceholder" [value]="receiveExpirationDate()" (valueChange)="receiveExpirationDate.set($event)" />
               }
-              @if (receiveProductIsSerialControlled(); as isSerial) {
-                @if (isSerial) {
-                  <lib-text-input [label]="t().serialNumbers" [hint]="t().serialNumbersHint" [value]="receiveSerialNumbers()" (valueChange)="receiveSerialNumbers.set($event)" />
-                }
+              @if (receiveProductIsSerialControlled()) {
+                <lib-text-input [label]="t().serialNumbers" [hint]="t().serialNumbersHint" [value]="receiveSerialNumbers()" (valueChange)="receiveSerialNumbers.set($event)" />
               }
               @if (receiveError(); as err) {
                 <span class="font-core text-xs text-status-out-of-stock">{{ err }}</span>
@@ -203,9 +200,6 @@ export class OfficeInventory {
       colStatus: en ? 'Status' : 'Trạng thái',
       colQuantity: en ? 'Quantity' : 'Số lượng',
       colReference: en ? 'Reference' : 'Tham chiếu',
-      active: en ? 'Active' : 'Đang giữ',
-      released: en ? 'Released' : 'Đã nhả',
-      fulfilled: en ? 'Fulfilled' : 'Đã hoàn tất',
       none: en ? '—' : '—',
       receiveStock: en ? 'Receive stock' : 'Nhập kho',
       product: en ? 'Product' : 'Sản phẩm',
@@ -229,6 +223,7 @@ export class OfficeInventory {
       duplicateSerialError: en ? 'Serial numbers must not contain duplicates.' : 'Số serial không được trùng lặp.',
       stockItemNotFoundError: en ? 'This stock item could not be found. It may have changed.' : 'Không tìm thấy vị trí tồn kho này. Có thể đã thay đổi.',
       wouldGoNegativeError: en ? 'This change would leave on-hand quantity negative.' : 'Thay đổi này sẽ khiến tồn thực âm.',
+      adjustInvalidError: en ? 'A reason and a non-zero quantity change are required.' : 'Cần nhập lý do và số lượng thay đổi khác 0.',
       reservationNotFoundError: en ? 'This reservation could not be found. It may have changed.' : 'Không tìm thấy giữ hàng này. Có thể đã thay đổi.',
       reservationNotActiveError: en ? 'This reservation is no longer active.' : 'Giữ hàng này không còn hiệu lực.',
     };
@@ -249,7 +244,10 @@ export class OfficeInventory {
   protected readonly selectedStockItemLedger = computed(() => {
     const id = this.selectedStockItemId();
     if (!id) return [];
-    return this.store.ledger().filter((e) => e.stockItemId === id);
+    return this.store
+      .ledger()
+      .filter((e) => e.stockItemId === id)
+      .sort((a, b) => b.occurredOnUtc.localeCompare(a.occurredOnUtc));
   });
 
   protected readonly selectedReservationId = signal<string | null>(null);
@@ -285,7 +283,7 @@ export class OfficeInventory {
   protected readonly kpis = computed(() => {
     const items = this.store.stockItems();
     const totalOnHand = items.reduce((sum, i) => sum + i.onHand, 0);
-    const totalAvailable = items.reduce((sum, i) => sum + (i.onHand - i.reserved - i.damaged - i.quarantine), 0);
+    const totalAvailable = items.reduce((sum, i) => sum + availableOf(i), 0);
     const totalReserved = items.reduce((sum, i) => sum + i.reserved, 0);
     const activeReservations = this.store.reservations().filter((r) => r.status === 'active').length;
     return [
@@ -324,11 +322,11 @@ export class OfficeInventory {
   });
 
   protected nameOfProduct(sku: string): string {
-    return this.catalog.products().find((p) => p.sku === sku)?.name ?? sku;
+    return productNameOf(this.catalog.products(), sku);
   }
 
   protected nameOfWarehouse(code: string): string {
-    return this.organization.warehouses().find((w) => w.code === code)?.name ?? code;
+    return warehouseNameOf(this.organization.warehouses(), code);
   }
 
   private toStockPositionRow(item: StockItem): StockPositionRow {
@@ -338,24 +336,17 @@ export class OfficeInventory {
       productName: this.nameOfProduct(item.sku),
       warehouseName: this.nameOfWarehouse(item.warehouseCode),
       bin: item.bin,
-      lotOrSerial: item.lot?.lotNumber ?? item.serial?.serialValue ?? this.t().none,
+      lotOrSerial: lotOrSerialOf(item, this.t().none),
       onHand: item.onHand,
       reserved: item.reserved,
-      available: item.onHand - item.reserved - item.damaged - item.quarantine,
+      available: availableOf(item),
       status: item.status,
       statusLabel: resolveStatusLabel({ status: item.status }, this.lang.lang()),
     };
   }
 
-  private reservationStatusBadge(status: StockReservation['status']): { status: 'in-stock' | 'out-of-stock' | 'outbound'; label: string } {
-    const t = this.t();
-    if (status === 'active') return { status: 'in-stock', label: t.active };
-    if (status === 'fulfilled') return { status: 'outbound', label: t.fulfilled };
-    return { status: 'out-of-stock', label: t.released };
-  }
-
   private toReservationRow(r: StockReservation): ReservationRow {
-    const badge = this.reservationStatusBadge(r.status);
+    const badge = reservationBadge(r.status, this.lang.lang());
     return {
       id: r.id,
       sku: r.sku,
@@ -364,7 +355,7 @@ export class OfficeInventory {
       quantity: r.quantity,
       status: badge.status,
       statusLabel: badge.label,
-      reference: r.referenceType && r.referenceId ? `${r.referenceType} ${r.referenceId}` : this.t().none,
+      reference: referenceOf(r, this.t().none),
     };
   }
 
@@ -397,6 +388,8 @@ export class OfficeInventory {
       this.stockItemDetailPanel()?.setAdjustError(this.t().stockItemNotFoundError);
     } else if (outcome === 'would-go-negative') {
       this.stockItemDetailPanel()?.setAdjustError(this.t().wouldGoNegativeError);
+    } else if (outcome === 'invalid') {
+      this.stockItemDetailPanel()?.setAdjustError(this.t().adjustInvalidError);
     }
   }
 

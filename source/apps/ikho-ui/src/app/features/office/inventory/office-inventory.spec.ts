@@ -86,6 +86,24 @@ describe('OfficeInventory', () => {
     expect(text).toContain('Receipt');
   });
 
+  it('ledger entries render newest-first for a stock item with multiple movements', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+    // SI-3 (IKH-770145) has a receipt on 2024-03-01 followed by a shrinkage adjustment on
+    // 2024-07-10 — the newer adjustment must render before the older receipt.
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('IKH-770145'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    const adjustmentIndex = text.indexOf('Adjustment');
+    const receiptIndex = text.indexOf('Receipt');
+    expect(adjustmentIndex).toBeGreaterThanOrEqual(0);
+    expect(receiptIndex).toBeGreaterThanOrEqual(0);
+    expect(adjustmentIndex).toBeLessThan(receiptIndex);
+  });
+
   it('adjusting a stock item from its detail panel updates on-hand in the table', () => {
     const fixture = TestBed.createComponent(OfficeInventory);
     fixture.detectChanges();
@@ -154,6 +172,56 @@ describe('OfficeInventory', () => {
     expect(store.stockItems().length).toBe(before);
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('lot-controlled');
+  });
+
+  it('clicking the header Receive stock button while the form is open clears it rather than just hiding it', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+
+    const clickReceiveHeaderButton = () => {
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+        if (b.textContent?.trim() === 'Receive stock') b.click();
+      });
+    };
+
+    clickReceiveHeaderButton(); // open
+    fixture.detectChanges();
+
+    const productSelect = (fixture.nativeElement as HTMLElement).querySelectorAll('select')[0] as HTMLSelectElement;
+    productSelect.value = 'IKH-330298';
+    productSelect.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    // Trigger a validation error by saving with no warehouse/bin/quantity filled in.
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.trim() === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    const instance = fixture.componentInstance as unknown as {
+      receiveSku: () => string;
+      receiveError: () => string | null;
+      showReceiveForm: () => boolean;
+    };
+    expect(instance.receiveSku()).toBe('IKH-330298');
+    expect(instance.receiveError()).not.toBeNull();
+
+    clickReceiveHeaderButton(); // click again while open -> clears the form and closes it
+    fixture.detectChanges();
+
+    expect(instance.showReceiveForm()).toBe(false);
+    expect(instance.receiveSku()).toBe('');
+    expect(instance.receiveError()).toBeNull();
+
+    clickReceiveHeaderButton(); // reopen -> must be blank, not the stale state from before
+    fixture.detectChanges();
+
+    expect(instance.showReceiveForm()).toBe(true);
+    expect(instance.receiveSku()).toBe('');
+    const reopenedSelect = (fixture.nativeElement as HTMLElement).querySelectorAll('select')[0] as HTMLSelectElement;
+    expect(reopenedSelect.value).toBe('');
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).not.toContain('Select a product and warehouse');
   });
 
   it('switching sections clears the receive form and the selected stock item', () => {

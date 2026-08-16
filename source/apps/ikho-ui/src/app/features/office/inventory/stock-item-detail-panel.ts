@@ -3,6 +3,7 @@ import { Button, Icon, StatusBadge, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { resolveStatusLabel } from '../../../core/i18n/status-label.util';
 import { StockItem, StockLedgerEntry } from '../../../core/mock-data/inventory.data';
+import { availableOf } from './inventory-format.util';
 
 const MOVEMENT_LABEL: Record<StockLedgerEntry['movementType'], { en: string; vi: string }> = {
   receipt: { en: 'Receipt', vi: 'Nhập kho' },
@@ -175,10 +176,7 @@ export class StockItemDetailPanel {
   });
 
   protected readonly statusLabel = computed(() => resolveStatusLabel({ status: this.stockItem().status }, this.lang.lang()));
-  protected readonly available = computed(() => {
-    const s = this.stockItem();
-    return s.onHand - s.reserved - s.damaged - s.quarantine;
-  });
+  protected readonly available = computed(() => availableOf(this.stockItem()));
 
   protected readonly adjusting = signal(false);
   protected readonly adjustDelta = signal('');

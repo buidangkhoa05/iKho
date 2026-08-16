@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, ou
 import { Button, Icon, StatusBadge } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { StockReservation } from '../../../core/mock-data/inventory.data';
+import { referenceOf, reservationBadge } from './inventory-format.util';
 
 @Component({
   selector: 'app-reservation-detail-panel',
@@ -70,26 +71,14 @@ export class ReservationDetailPanel {
       warehouse: en ? 'Warehouse' : 'Kho',
       quantity: en ? 'Quantity' : 'Số lượng',
       reference: en ? 'Reference' : 'Tham chiếu',
-      active: en ? 'Active' : 'Đang giữ',
-      released: en ? 'Released' : 'Đã nhả',
-      fulfilled: en ? 'Fulfilled' : 'Đã hoàn tất',
       none: en ? '—' : '—',
       release: en ? 'Release' : 'Nhả giữ',
     };
   });
 
-  protected readonly referenceText = computed(() => {
-    const r = this.reservation();
-    return r.referenceType && r.referenceId ? `${r.referenceType} ${r.referenceId}` : this.t().none;
-  });
+  protected readonly referenceText = computed(() => referenceOf(this.reservation(), this.t().none));
 
-  protected readonly statusBadge = computed(() => {
-    const status = this.reservation().status;
-    const t = this.t();
-    if (status === 'active') return { status: 'in-stock' as const, label: t.active };
-    if (status === 'fulfilled') return { status: 'outbound' as const, label: t.fulfilled };
-    return { status: 'out-of-stock' as const, label: t.released };
-  });
+  protected readonly statusBadge = computed(() => reservationBadge(this.reservation().status, this.lang.lang()));
 
   protected readonly releaseError = signal<string | null>(null);
 
