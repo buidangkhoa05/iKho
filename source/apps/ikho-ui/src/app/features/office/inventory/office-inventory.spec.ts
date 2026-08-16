@@ -72,4 +72,112 @@ describe('OfficeInventory', () => {
     expect(text).toContain('SO-3288');
     expect(text).not.toContain('SO-3301');
   });
+
+  it('clicking a stock position row opens its detail panel with resolved names and ledger history', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('IKH-330298'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('LOT-2026-0392');
+    expect(text).toContain('Receipt');
+  });
+
+  it('adjusting a stock item from its detail panel updates on-hand in the table', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as { selectedStockItemId: { set: (v: string) => void } };
+    instance.selectedStockItemId.set('SI-1');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.trim() === 'Adjust') b.click();
+    });
+    fixture.detectChanges();
+
+    const numberInput = (fixture.nativeElement as HTMLElement).querySelector('input[type="number"]') as HTMLInputElement;
+    numberInput.value = '10';
+    numberInput.dispatchEvent(new Event('input'));
+    const select = (fixture.nativeElement as HTMLElement).querySelector('select') as HTMLSelectElement;
+    select.value = 'FOUND';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.trim() === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    const store = (fixture.componentInstance as unknown as { store: { stockItems: () => { id: string; onHand: number }[] } }).store;
+    expect(store.stockItems().find((s) => s.id === 'SI-1')?.onHand).toBe(250);
+  });
+
+  it('receiving stock for a lot-controlled product without a lot number shows an error and does not create a row', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+    const before = (fixture.componentInstance as unknown as { store: { stockItems: () => unknown[] } }).store.stockItems().length;
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.trim() === 'Receive stock') b.click();
+    });
+    fixture.detectChanges();
+
+    const selects = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('select'));
+    const productSelect = selects[0];
+    productSelect.value = 'IKH-330298'; // lot-controlled
+    productSelect.dispatchEvent(new Event('change'));
+    const warehouseSelect = selects[1];
+    warehouseSelect.value = 'WH-1';
+    warehouseSelect.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const inputs = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input'));
+    // The page's own search box is type="search" — the receive form's Bin field defaults to
+    // type="text", so filtering to exactly 'text' (not 'search') targets the right input.
+    const binInput = inputs.find((i) => i.type === 'text');
+    binInput!.value = 'A-04-09';
+    binInput!.dispatchEvent(new Event('input'));
+    const qtyInput = inputs.find((i) => i.type === 'number');
+    qtyInput!.value = '5';
+    qtyInput!.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.trim() === 'Save') b.click();
+    });
+    fixture.detectChanges();
+
+    const store = (fixture.componentInstance as unknown as { store: { stockItems: () => unknown[] } }).store;
+    expect(store.stockItems().length).toBe(before);
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('lot-controlled');
+  });
+
+  it('switching sections clears the receive form and the selected stock item', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance as unknown as {
+      selectedStockItemId: { set: (v: string) => void };
+      showReceiveForm: { set: (v: boolean) => void; (): boolean };
+    };
+    instance.selectedStockItemId.set('SI-1');
+    instance.showReceiveForm.set(true);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.trim() === 'Reservations') b.click();
+    });
+    fixture.detectChanges();
+    (fixture.nativeElement as HTMLElement).querySelectorAll('button').forEach((b) => {
+      if (b.textContent?.trim() === 'Stock Positions') b.click();
+    });
+    fixture.detectChanges();
+
+    expect(instance.showReceiveForm()).toBe(false);
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).not.toContain('Ledger');
+  });
 });
