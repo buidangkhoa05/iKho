@@ -19,7 +19,18 @@ public sealed class CompanyOfficeAuthorizationHandler : AuthorizationHandler<Com
         var claimValue = context.User.FindFirst("ikho_roles")?.Value;
         if (!string.IsNullOrEmpty(claimValue))
         {
-            var assignments = JsonSerializer.Deserialize<List<RoleClaim>>(claimValue) ?? [];
+            List<RoleClaim> assignments;
+            try
+            {
+                assignments = JsonSerializer.Deserialize<List<RoleClaim>>(claimValue) ?? [];
+            }
+            catch (JsonException)
+            {
+                // Malformed ikho_roles claim (corrupted token, JWT-template regression, etc.) -
+                // fail closed the same way as a missing claim, rather than surfacing a raw 500.
+                return Task.CompletedTask;
+            }
+
             if (assignments.Any(a => a.CompanyId == companyId && a.RoleName == RoleNames.Office))
             {
                 context.Succeed(requirement);
