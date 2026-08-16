@@ -63,4 +63,25 @@ describe('ReservationDetailPanel', () => {
     (fixture.nativeElement as HTMLElement).querySelector('button[aria-label]')?.dispatchEvent(new Event('click', { bubbles: true }));
     expect(emitted).toBe(true);
   });
+
+  it('setReleaseError surfaces a store-side outcome on the panel', () => {
+    const fixture = create();
+    fixture.componentInstance.setReleaseError('This reservation could not be found.');
+    fixture.detectChanges();
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('This reservation could not be found.');
+  });
+
+  it('resets the release error when the reservation input changes identity, including after a successful release', () => {
+    const fixture = create(ACTIVE);
+    const instance = fixture.componentInstance as unknown as { releaseError: () => string | null };
+    fixture.componentInstance.setReleaseError('This reservation could not be found.');
+    fixture.detectChanges();
+    expect(instance.releaseError()).toBe('This reservation could not be found.');
+
+    fixture.componentRef.setInput('reservation', { ...ACTIVE, status: 'released' as const, releasedOnUtc: '2024-08-02T09:00:00Z' });
+    fixture.detectChanges();
+
+    expect(instance.releaseError()).toBeNull();
+  });
 });
