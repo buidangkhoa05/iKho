@@ -15,6 +15,6 @@ Catalogue → Inventory. Inventory's stock ledger (on-hand/reserved/damaged/quar
 | # | Module | Design spec | Implementation plan | Status |
 |---|--------|-------------|----------------------|--------|
 | 1 | Catalogue | [2026-08-15-catalogue-ui-design.md](../superpowers/specs/2026-08-15-catalogue-ui-design.md) | [2026-08-15-catalogue-ui.md](../superpowers/plans/2026-08-15-catalogue-ui.md) | Implemented |
-| 2 | Inventory | [2026-08-15-inventory-office-operator-ui-design.md](../superpowers/specs/2026-08-15-inventory-office-operator-ui-design.md) | — | Spec written |
+| 2 | Inventory | [2026-08-15-inventory-office-operator-ui-design.md](../superpowers/specs/2026-08-15-inventory-office-operator-ui-design.md) | [2026-08-15-inventory-office-operator-ui.md](../superpowers/plans/2026-08-15-inventory-office-operator-ui.md) | Implemented |
 
 Update the table as each module's spec and plan land.
