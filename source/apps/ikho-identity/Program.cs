@@ -1,3 +1,4 @@
+using Ikho.Identity.Features.RoleAssignments;
 using Ikho.Identity.Features.Webhooks;
 using Ikho.Identity.Shared;
 using Ikho.Identity.Shared.Authorization;
@@ -38,6 +39,8 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("CompanyOffice", policy => policy.Requirements.Add(new CompanyOfficeRequirement()));
 builder.Services.AddSingleton<IAuthorizationHandler, CompanyOfficeAuthorizationHandler>();
 
+builder.Services.AddScoped<RoleAssignmentService>();
+
 var app = builder.Build();
 
 app.UseAuthentication();
@@ -46,6 +49,7 @@ app.UseAuthorization();
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
 app.MapServiceApiDocs("/api/identity");
 app.MapWebhookEndpoints();
+app.MapRoleAssignmentEndpoints();
 
 app.Run();
 
