@@ -180,4 +180,40 @@ describe('OfficeInventory', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).not.toContain('Ledger');
   });
+
+  it('clicking an active reservation row shows a Release button, and releasing it updates its status', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+    const buttons1 = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    buttons1.find((b) => b.textContent?.trim() === 'Reservations')?.click();
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('SO-3301'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const buttons2 = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    (buttons2.find((b) => b.textContent?.includes('Release')) as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const store = (fixture.componentInstance as unknown as { store: { reservations: () => { id: string; status: string }[] } }).store;
+    expect(store.reservations().find((r) => r.id === 'RES-1')?.status).toBe('released');
+  });
+
+  it('an already-released reservation shows no Release button', () => {
+    const fixture = TestBed.createComponent(OfficeInventory);
+    fixture.detectChanges();
+    const buttons1 = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    buttons1.find((b) => b.textContent?.trim() === 'Reservations')?.click();
+    fixture.detectChanges();
+
+    const rows = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="button"]'));
+    const row = rows.find((r) => r.textContent?.includes('SO-3288'));
+    (row as HTMLElement)?.click();
+    fixture.detectChanges();
+
+    const buttons2 = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    expect(buttons2.some((b) => b.textContent?.includes('Release'))).toBe(false);
+  });
 });

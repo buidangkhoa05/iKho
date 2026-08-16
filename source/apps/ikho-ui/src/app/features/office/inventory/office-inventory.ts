@@ -8,6 +8,7 @@ import { screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
 import { CatalogStore } from '../../../core/state/catalogue-store';
 import { InventoryStore } from '../../../core/state/inventory-store';
 import { OrganizationStore } from '../../../core/state/organization-store';
+import { ReservationDetailPanel } from './reservation-detail-panel';
 import { StockItemDetailPanel } from './stock-item-detail-panel';
 
 type InventorySection = 'stock-positions' | 'reservations';
@@ -40,7 +41,7 @@ interface ReservationRow extends Record<string, unknown> {
 @Component({
   selector: 'app-office-inventory',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, DataPanel, DataTable, KpiCard, StockItemDetailPanel, TextInput],
+  imports: [Button, DataPanel, DataTable, KpiCard, ReservationDetailPanel, StockItemDetailPanel, TextInput],
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -146,10 +147,23 @@ interface ReservationRow extends Record<string, unknown> {
         <div class="min-w-60 max-w-md">
           <lib-text-input [placeholder]="t().searchReservationsPlaceholder" type="search" [value]="query()" (valueChange)="query.set($event)" />
         </div>
-        <lib-data-panel [title]="t().reservationsPanelTitle">
-          <lib-data-table [columns]="reservationColumns()" [rows]="filteredReservationRows()" [emptyLabel]="t().noReservations" />
-        </lib-data-panel>
-        <!-- RESERVATIONS_EXTRA -->
+        <div class="flex items-start gap-5">
+          <div class="min-w-0 flex-1">
+            <lib-data-panel [title]="t().reservationsPanelTitle">
+              <lib-data-table [columns]="reservationColumns()" [rows]="filteredReservationRows()" [emptyLabel]="t().noReservations" [clickable]="true" (rowClick)="onReservationRowClick($event)" />
+            </lib-data-panel>
+          </div>
+          @if (selectedReservation(); as r) {
+            <app-reservation-detail-panel
+              #reservationDetailPanel
+              [reservation]="r"
+              [productName]="nameOfProduct(r.sku)"
+              [warehouseName]="nameOfWarehouse(r.warehouseCode)"
+              (closePanel)="selectedReservationId.set(null)"
+              (release)="onReleaseReservation()"
+            />
+          }
+        </div>
       }
     </div>
   `,
@@ -215,6 +229,8 @@ export class OfficeInventory {
       duplicateSerialError: en ? 'Serial numbers must not contain duplicates.' : 'Số serial không được trùng lặp.',
       stockItemNotFoundError: en ? 'This stock item could not be found. It may have changed.' : 'Không tìm thấy vị trí tồn kho này. Có thể đã thay đổi.',
       wouldGoNegativeError: en ? 'This change would leave on-hand quantity negative.' : 'Thay đổi này sẽ khiến tồn thực âm.',
+      reservationNotFoundError: en ? 'This reservation could not be found. It may have changed.' : 'Không tìm thấy giữ hàng này. Có thể đã thay đổi.',
+      reservationNotActiveError: en ? 'This reservation is no longer active.' : 'Giữ hàng này không còn hiệu lực.',
     };
   });
 
@@ -236,6 +252,15 @@ export class OfficeInventory {
     return this.store.ledger().filter((e) => e.stockItemId === id);
   });
 
+  protected readonly selectedReservationId = signal<string | null>(null);
+  protected readonly reservationDetailPanel = viewChild<ReservationDetailPanel>('reservationDetailPanel');
+
+  protected readonly selectedReservation = computed<StockReservation | null>(() => {
+    const id = this.selectedReservationId();
+    if (!id) return null;
+    return this.store.reservations().find((r) => r.id === id) ?? null;
+  });
+
   protected readonly showReceiveForm = signal(false);
   protected readonly receiveSku = signal('');
   protected readonly receiveWarehouseCode = signal('');
@@ -253,6 +278,7 @@ export class OfficeInventory {
     this.activeSection.set(section);
     this.query.set('');
     this.selectedStockItemId.set(null);
+    this.selectedReservationId.set(null);
     this.cancelReceive();
   }
 
@@ -418,5 +444,20 @@ export class OfficeInventory {
     this.receiveExpirationDate.set('');
     this.receiveSerialNumbers.set('');
     this.receiveError.set(null);
+  }
+
+  protected onReservationRowClick(row: Record<string, unknown>): void {
+    this.selectedReservationId.set(String(row['id']));
+  }
+
+  protected onReleaseReservation(): void {
+    const r = this.selectedReservation();
+    if (!r) return;
+    const outcome = this.store.releaseReservation(r.id);
+    if (outcome === 'not-found') {
+      this.reservationDetailPanel()?.setReleaseError(this.t().reservationNotFoundError);
+    } else if (outcome === 'not-active') {
+      this.reservationDetailPanel()?.setReleaseError(this.t().reservationNotActiveError);
+    }
   }
 }
