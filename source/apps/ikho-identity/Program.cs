@@ -1,3 +1,4 @@
+using Ikho.Identity.Features.Webhooks;
 using Ikho.Identity.Shared;
 using Ikho.Identity.Shared.Organization;
 using Ikho.SharedLibrary;
@@ -20,10 +21,13 @@ builder.Services.AddHttpClient<IOrganizationLookupClient, OrganizationLookupClie
     client.BaseAddress = new Uri(baseUrl);
 });
 
+builder.Services.AddScoped<WebhookService>();
+
 var app = builder.Build();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
 app.MapServiceApiDocs("/api/identity");
+app.MapWebhookEndpoints();
 
 app.Run();
 
