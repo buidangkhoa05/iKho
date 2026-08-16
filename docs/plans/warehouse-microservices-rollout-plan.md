@@ -39,7 +39,7 @@ The recommended service naming convention uses warehouse-qualified service names
 
 | Capability | Proposed Service | Primary Responsibility | Execution Priority |
 |---|---|---|---|
-| Identity / Access | `Ikho.Identity` | Users, roles, authentication, authorization | Existing / separate concern |
+| Identity / Access | `Ikho.Identity` | Users, roles, authentication, authorization | Implemented (Clerk-backed, see docs/superpowers/specs/2026-08-16-identity-service-design.md) |
 | Organization | `Ikho.WarehouseOrganization` | Companies, warehouses, location hierarchy | Early |
 | Catalog | `Ikho.WarehouseCatalog` | Product master data and classification | Early |
 | Partner | `Ikho.WarehousePartner` | Suppliers, customers, contacts, addresses | Early |

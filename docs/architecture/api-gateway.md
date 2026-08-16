@@ -177,6 +177,10 @@ All nine warehouse services are implemented and routed:
 8. `Ikho.Warehouse.Billing` — `:5158`
 9. `Ikho.Warehouse.Reporting` — `:5159`
 
+`Ikho.Identity` is also implemented and routed, alongside the nine warehouse services:
+
+- `Ikho.Identity` — `:5160`, routed at `/api/identity/*`
+
 Related planning docs:
 
 1. [warehouse-domain-model.md](./warehouse-domain-model.md)
@@ -186,8 +190,10 @@ Related planning docs:
 
 ## Open questions
 
-1. **Identity provider** — not yet chosen. `Jwt:Authority`/`Jwt:Audience` remain empty until
-   decided.
+1. **Identity provider** — Clerk is now wired in as the first identity provider via
+   `Ikho.Identity`'s `IIdentityProvider` abstraction (webhook ingestion, role sync, and claims
+   push). `Jwt:Authority`/`Jwt:Audience` here and in `Ikho.Identity`'s own config are still
+   placeholders pending real Clerk instance values.
 2. **Production CORS origins** — placeholder empty array; must be populated before any
    non-local deployment.
 3. **Production reverse-proxy destinations** — `shared-library-cluster` currently always

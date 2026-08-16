@@ -37,7 +37,8 @@ app.MapScalarApiReference("/docs", options =>
         .AddDocument("outbound", "Outbound", "/api/warehouse/outbound/openapi/v1.json")
         .AddDocument("returns", "Returns", "/api/warehouse/returns/openapi/v1.json")
         .AddDocument("billing", "Billing", "/api/warehouse/billing/openapi/v1.json")
-        .AddDocument("reporting", "Reporting", "/api/warehouse/reporting/openapi/v1.json");
+        .AddDocument("reporting", "Reporting", "/api/warehouse/reporting/openapi/v1.json")
+        .AddDocument("identity", "Identity", "/api/identity/openapi/v1.json");
 });
 
 app.MapReverseProxy().RequireRateLimiting(RateLimitingExtensions.PolicyName);

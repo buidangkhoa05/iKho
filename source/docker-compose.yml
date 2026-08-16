@@ -332,6 +332,31 @@ services:
       retries: 5
       start_period: 15s
 
+  identity:
+    build:
+      context: .
+      dockerfile: docker/dotnet.Dockerfile
+      args:
+        PROJECT_PATH: apps/ikho-identity/Ikho.Identity.csproj
+        ASSEMBLY_NAME: Ikho.Identity
+    container_name: ikho-identity
+    environment:
+      Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_identity;Username=ikho;Password=ikho
+      MessageBroker__BootstrapServers: kafka:29092
+    ports:
+      - "5160:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   api-gateway:
     build:
       context: .
@@ -350,6 +375,7 @@ services:
       ReverseProxy__Clusters__warehouse-returns-cluster__Destinations__destination1__Address: http://warehouse-returns:8080
       ReverseProxy__Clusters__warehouse-billing-cluster__Destinations__destination1__Address: http://warehouse-billing:8080
       ReverseProxy__Clusters__warehouse-reporting-cluster__Destinations__destination1__Address: http://warehouse-reporting:8080
+      ReverseProxy__Clusters__identity-cluster__Destinations__destination1__Address: http://identity:8080
     ports:
       - "5080:8080"
     depends_on:
@@ -370,6 +396,8 @@ services:
       warehouse-billing:
         condition: service_healthy
       warehouse-reporting:
+        condition: service_healthy
+      identity:
         condition: service_healthy
 
   ui:
