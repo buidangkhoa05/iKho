@@ -1,10 +1,13 @@
 using Ikho.Identity.Features.Webhooks;
 using Ikho.Identity.Shared;
+using Ikho.Identity.Shared.Authorization;
 using Ikho.Identity.Shared.IdentityProvider;
 using Ikho.Identity.Shared.Organization;
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
+using Ikho.SharedLibrary.Authentication;
 using Ikho.SharedLibrary.Options;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +33,15 @@ builder.Services.AddHttpClient<IIdentityProvider, ClerkIdentityProvider>(client 
     client.BaseAddress = new Uri("https://api.clerk.com");
 });
 
+builder.Services.AddJwtBearerAuthentication(builder.Configuration);
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("CompanyOffice", policy => policy.Requirements.Add(new CompanyOfficeRequirement()));
+builder.Services.AddSingleton<IAuthorizationHandler, CompanyOfficeAuthorizationHandler>();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseServiceDefaults(); // correlation id -> request logging -> health check endpoints
 app.MapServiceApiDocs("/api/identity");

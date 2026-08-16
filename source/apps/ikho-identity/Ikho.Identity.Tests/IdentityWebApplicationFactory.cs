@@ -2,12 +2,15 @@ using Ikho.Identity.Shared;
 using Ikho.Identity.Shared.IdentityProvider;
 using Ikho.Identity.Shared.Organization;
 using Ikho.Identity.Tests.TestDoubles;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Ikho.Identity.Tests;
 
@@ -18,6 +21,8 @@ namespace Ikho.Identity.Tests;
 /// </summary>
 public class IdentityWebApplicationFactory : WebApplicationFactory<Program>
 {
+    public const string TestSigningKey = "test-signing-key-at-least-256-bits-long-for-hmac-sha256!!";
+
     private readonly string _databaseName = Guid.NewGuid().ToString();
 
     public FakeIdentityProvider IdentityProvider { get; } = new();
@@ -41,6 +46,19 @@ public class IdentityWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<IOrganizationLookupClient>();
             services.AddSingleton<IOrganizationLookupClient>(OrganizationLookup);
+
+            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.Authority = null;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(TestSigningKey)),
+                };
+            });
         });
     }
 }
