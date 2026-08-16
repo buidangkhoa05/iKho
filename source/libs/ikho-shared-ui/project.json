@@ -4,7 +4,7 @@
   "sourceRoot": "libs/ikho-shared-ui/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": [],
+  "tags": ["frontend"],
   "targets": {
     "build": {
       "executor": "@nx/angular:ng-packagr-lite",

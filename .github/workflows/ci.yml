@@ -45,7 +45,14 @@ jobs:
           restore-keys: |
             nx-frontend-${{ hashFiles('source/pnpm-lock.yaml') }}-
 
-      - run: pnpm exec nx affected -t lint test build --parallel=3
+      # frontend-ci has no .NET SDK setup (unlike backend-ci) and this workspace's .NET projects
+      # (auto-detected by tools/nx-plugins/optional-dotnet.js purely from *.csproj files whenever
+      # a `dotnet` binary is on PATH, which GitHub-hosted ubuntu-latest runners ship by default)
+      # also register `build`/`test` targets. --exclude scopes this job to the two Angular
+      # projects (tagged "frontend" in their project.json) so a .NET project affected by the same
+      # PR isn't built/tested here, redundantly and against whatever SDK happens to be preinstalled
+      # rather than backend-ci's pinned dotnet-version.
+      - run: pnpm exec nx affected -t lint test build --parallel=3 --exclude='*,!tag:frontend'
 
   backend-ci:
     name: Backend (.NET build)
@@ -84,7 +91,7 @@ jobs:
           restore-keys: |
             nuget-
 
-      - run: pnpm exec nx affected -t build --parallel=3
+      - run: pnpm exec nx affected -t build test --parallel=3
 
   ci-success:
     name: CI success
@@ -125,6 +132,13 @@ jobs:
             dockerfile: apps/ikho-ui/Dockerfile
             build_args: ""
             repo: buidangkhoa05/ikho-ui
+          - key: identity
+            nx_project: Ikho.Identity
+            dockerfile: docker/dotnet.Dockerfile
+            build_args: |
+              PROJECT_PATH=apps/ikho-identity/Ikho.Identity.csproj
+              ASSEMBLY_NAME=Ikho.Identity
+            repo: buidangkhoa05/ikho-identity
           - key: warehouse-billing
             nx_project: Ikho.Warehouse.Billing
             dockerfile: docker/dotnet.Dockerfile
