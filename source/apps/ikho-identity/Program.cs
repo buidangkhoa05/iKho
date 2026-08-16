@@ -1,5 +1,6 @@
 using Ikho.Identity.Features.Webhooks;
 using Ikho.Identity.Shared;
+using Ikho.Identity.Shared.IdentityProvider;
 using Ikho.Identity.Shared.Organization;
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
@@ -22,6 +23,12 @@ builder.Services.AddHttpClient<IOrganizationLookupClient, OrganizationLookupClie
 });
 
 builder.Services.AddScoped<WebhookService>();
+
+builder.Services.Configure<ClerkOptions>(builder.Configuration.GetSection(ClerkOptions.SectionName));
+builder.Services.AddHttpClient<IIdentityProvider, ClerkIdentityProvider>(client =>
+{
+    client.BaseAddress = new Uri("https://api.clerk.com");
+});
 
 var app = builder.Build();
 
