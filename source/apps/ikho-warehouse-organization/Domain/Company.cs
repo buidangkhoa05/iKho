@@ -22,6 +22,13 @@ public sealed class Company
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
+    /// The linked identity provider's organization id (Clerk's <c>org_...</c> id), or
+    /// <see langword="null"/> if this company has not been linked to an identity-provider
+    /// organization yet. Set once via <c>PUT .../companies/{id}</c>.
+    /// </summary>
+    public string? ExternalOrgId { get; set; }
+
+    /// <summary>
     /// Whether the company is currently active. Inactive companies reject new warehouse
     /// operations but retain historical data.
     /// </summary>

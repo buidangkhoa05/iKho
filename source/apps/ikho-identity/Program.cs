@@ -1,4 +1,5 @@
 using Ikho.Identity.Shared;
+using Ikho.Identity.Shared.Organization;
 using Ikho.SharedLibrary;
 using Ikho.SharedLibrary.ApiDocs;
 using Ikho.SharedLibrary.Options;
@@ -12,6 +13,12 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 
 builder.Services.AddServiceDefaults<IdentityDbContext>(builder.Configuration);
 builder.Services.AddServiceApiDocs();
+
+builder.Services.AddHttpClient<IOrganizationLookupClient, OrganizationLookupClient>(client =>
+{
+    var baseUrl = builder.Configuration["Services:Organization:BaseUrl"] ?? "http://localhost:5151";
+    client.BaseAddress = new Uri(baseUrl);
+});
 
 var app = builder.Build();
 

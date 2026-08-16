@@ -62,6 +62,8 @@ public sealed class OrganizationDbContext(DbContextOptions<OrganizationDbContext
             entity.Property(c => c.Code).IsRequired().HasMaxLength(32);
             entity.Property(c => c.Name).IsRequired().HasMaxLength(256);
             entity.HasIndex(c => c.Code).IsUnique();
+            entity.Property(c => c.ExternalOrgId).HasMaxLength(128);
+            entity.HasIndex(c => c.ExternalOrgId).IsUnique().HasFilter("\"ExternalOrgId\" IS NOT NULL");
         });
 
         modelBuilder.Entity<Domain.Warehouse>(entity =>
