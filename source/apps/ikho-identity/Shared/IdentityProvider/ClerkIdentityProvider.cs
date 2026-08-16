@@ -110,23 +110,27 @@ public sealed class ClerkIdentityProvider(HttpClient httpClient, IOptions<ClerkO
     /// <inheritdoc />
     public async Task PushUserClaimsAsync(string externalUserId, UserClaimsPayload claims, CancellationToken cancellationToken)
     {
-        var metadata = new
-        {
-            public_metadata = new
-            {
-                ikho_roles = claims.Assignments.Select(a => new { companyId = a.CompanyId, warehouseId = a.WarehouseId, roleName = a.RoleName }),
-            },
-        };
+        // Serialize claims.Assignments (the actual IReadOnlyList<RoleClaim>) through the same
+        // UserClaimsPayload.ClaimJsonOptions that CompanyOfficeAuthorizationHandler deserializes
+        // the ikho_roles JWT claim with, so the outbound JSON keys are produced by one shared
+        // contract rather than a hand-typed anonymous type that can silently drift from it.
+        var metadata = new ClerkMetadataUpdateRequest(new ClerkPublicMetadata(claims.Assignments));
 
         using var request = new HttpRequestMessage(HttpMethod.Patch, $"/v1/users/{externalUserId}/metadata")
         {
-            Content = JsonContent.Create(metadata),
+            Content = JsonContent.Create(metadata, options: UserClaimsPayload.ClaimJsonOptions),
         };
         request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _options.SecretKey);
 
         var response = await httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
+
+    private sealed record ClerkMetadataUpdateRequest(
+        [property: JsonPropertyName("public_metadata")] ClerkPublicMetadata PublicMetadata);
+
+    private sealed record ClerkPublicMetadata(
+        [property: JsonPropertyName("ikho_roles")] IReadOnlyList<RoleClaim> IkhoRoles);
 
     private sealed record ClerkWebhookPayload(
         [property: JsonPropertyName("type")] string Type,

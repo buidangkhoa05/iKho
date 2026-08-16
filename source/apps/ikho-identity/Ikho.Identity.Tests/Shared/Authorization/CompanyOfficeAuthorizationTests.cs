@@ -73,4 +73,51 @@ public class CompanyOfficeAuthorizationTests(IdentityWebApplicationFactory facto
         Assert.Null(exception);
         Assert.False(context.HasSucceeded);
     }
+
+    /// <summary>
+    /// .NET's JWT handlers are known to split a genuinely array-valued JSON claim into multiple
+    /// same-named <see cref="Claim"/>s rather than delivering it as one claim whose value is the
+    /// full JSON array - this is the most likely real-world encoding once Clerk's JWT template
+    /// projects `public_metadata.ikho_roles` (an actual JSON array) into the session token. The
+    /// handler must be able to read that shape too, not just the single-array-claim shape the
+    /// other tests in this file construct.
+    /// </summary>
+    [Fact]
+    public async Task MultipleSameNamedRolesClaims_EachASingleJsonObject_AreAllConsidered()
+    {
+        var handler = new CompanyOfficeAuthorizationHandler();
+        var companyId = Guid.NewGuid();
+        var otherCompanyId = Guid.NewGuid();
+        var identity = new ClaimsIdentity(
+            [
+                new Claim("ikho_roles", JsonSerializer.Serialize(new RoleClaim(otherCompanyId, null, RoleNames.Operator), UserClaimsPayload.ClaimJsonOptions)),
+                new Claim("ikho_roles", JsonSerializer.Serialize(new RoleClaim(companyId, null, RoleNames.Office), UserClaimsPayload.ClaimJsonOptions)),
+            ],
+            authenticationType: "Test");
+        var principal = new ClaimsPrincipal(identity);
+        var context = new AuthorizationHandlerContext([new CompanyOfficeRequirement()], principal, companyId);
+
+        await handler.HandleAsync(context);
+
+        Assert.True(context.HasSucceeded);
+    }
+
+    [Fact]
+    public async Task MultipleSameNamedRolesClaims_NoneMatchTargetCompanyAsOffice_FailsRequirement()
+    {
+        var handler = new CompanyOfficeAuthorizationHandler();
+        var companyId = Guid.NewGuid();
+        var identity = new ClaimsIdentity(
+            [
+                new Claim("ikho_roles", JsonSerializer.Serialize(new RoleClaim(companyId, null, RoleNames.Operator), UserClaimsPayload.ClaimJsonOptions)),
+                new Claim("ikho_roles", JsonSerializer.Serialize(new RoleClaim(Guid.NewGuid(), null, RoleNames.Office), UserClaimsPayload.ClaimJsonOptions)),
+            ],
+            authenticationType: "Test");
+        var principal = new ClaimsPrincipal(identity);
+        var context = new AuthorizationHandlerContext([new CompanyOfficeRequirement()], principal, companyId);
+
+        await handler.HandleAsync(context);
+
+        Assert.False(context.HasSucceeded);
+    }
 }
