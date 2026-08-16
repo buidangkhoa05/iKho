@@ -69,4 +69,54 @@ public class ClerkIdentityProviderTests
         await Assert.ThrowsAsync<InvalidWebhookSignatureException>(
             () => CreateProvider().ParseWebhookAsync(context.Request, CancellationToken.None));
     }
+
+    [Fact]
+    public void IsValidSignature_SvixKnownAnswerVector_ReturnsTrue()
+    {
+        // Independently-known-correct vector published by Svix itself (not derived from this
+        // test file's own signing helper), so this catches a regression in the signed-content
+        // format (e.g. field order) that a self-referential test could miss. The timestamp is
+        // from 2021, so this goes through IsValidSignature directly rather than
+        // ParseWebhookAsync, to bypass the (unrelated) freshness check.
+        var provider = new ClerkIdentityProvider(
+            new HttpClient(),
+            Options.Create(new ClerkOptions { WebhookSigningSecret = WebhookSecret, SecretKey = "sk_test" }));
+
+        var isValid = provider.IsValidSignature(
+            "msg_p5jXN8AQM9LWM0D4loKWxJek",
+            "1614265330",
+            """{"test": 2432232314}""",
+            "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=");
+
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public async Task ParseWebhookAsync_EmptyWebhookSigningSecret_RejectsEvenAForgedEmptyKeySignature()
+    {
+        var body = """{"type":"user.created","data":{"id":"user_123"}}""";
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        const string svixId = "msg_1";
+
+        // Simulate an attacker exploiting a misconfigured (blank) signing secret: they can
+        // compute a signature using a zero-length HMAC key themselves, since that key is
+        // publicly derivable from an empty WebhookSigningSecret. The service must still reject
+        // it rather than accepting it as "valid" because it happens to match.
+        var signedContent = $"{svixId}.{timestamp}.{body}";
+        using var hmac = new HMACSHA256(Array.Empty<byte>());
+        var forgedSignature = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(signedContent)));
+
+        var context = new DefaultHttpContext();
+        context.Request.Headers["svix-id"] = svixId;
+        context.Request.Headers["svix-timestamp"] = timestamp;
+        context.Request.Headers["svix-signature"] = $"v1,{forgedSignature}";
+        context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
+
+        var provider = new ClerkIdentityProvider(
+            new HttpClient(),
+            Options.Create(new ClerkOptions { WebhookSigningSecret = string.Empty, SecretKey = "sk_test" }));
+
+        await Assert.ThrowsAsync<InvalidWebhookSignatureException>(
+            () => provider.ParseWebhookAsync(context.Request, CancellationToken.None));
+    }
 }

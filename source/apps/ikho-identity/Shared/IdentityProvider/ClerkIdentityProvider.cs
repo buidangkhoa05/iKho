@@ -58,8 +58,23 @@ public sealed class ClerkIdentityProvider(HttpClient httpClient, IOptions<ClerkO
         return ToWebhookEvent(svixId, payload);
     }
 
-    private bool IsValidSignature(string svixId, string svixTimestamp, string body, string svixSignatureHeader)
+    /// <summary>
+    /// Verifies <paramref name="svixSignatureHeader"/> against the HMAC computed from the
+    /// configured webhook signing secret. Internal (rather than private) so unit tests can
+    /// exercise this in isolation against known-answer vectors, bypassing the timestamp check in
+    /// <see cref="ParseWebhookAsync"/>.
+    /// </summary>
+    internal bool IsValidSignature(string svixId, string svixTimestamp, string body, string svixSignatureHeader)
     {
+        // Fail closed: an empty/unset signing secret must never be treated as a valid key. Without
+        // this check, Convert.FromBase64String("") yields a zero-length byte array, and
+        // HMACSHA256 accepts a zero-length key — so a misconfigured (blank) secret would let
+        // anyone forge a signature, since the "empty key" HMAC is publicly computable.
+        if (string.IsNullOrEmpty(_options.WebhookSigningSecret))
+        {
+            return false;
+        }
+
         var secretBytes = Convert.FromBase64String(_options.WebhookSigningSecret.Replace("whsec_", string.Empty));
         var signedContent = $"{svixId}.{svixTimestamp}.{body}";
 

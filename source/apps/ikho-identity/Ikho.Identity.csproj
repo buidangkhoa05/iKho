@@ -18,4 +18,10 @@
     <ProjectReference Include="..\..\libs\ikho-shared-library\Ikho.SharedLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Lets the test project call internal members (e.g. ClerkIdentityProvider.IsValidSignature)
+         directly for known-answer-vector tests without widening the public API surface. -->
+    <InternalsVisibleTo Include="Ikho.Identity.Tests" />
+  </ItemGroup>
+
 </Project>
