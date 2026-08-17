@@ -23,7 +23,9 @@ import { Icon } from '../icon/icon';
           [role]="role()"
           [roleAdminLabel]="roleAdminLabel()"
           [roleOperatorLabel]="roleOperatorLabel()"
+          [roleSectionLabel]="roleSectionLabel()"
           [lang]="lang()"
+          [langSectionLabel]="langSectionLabel()"
           (roleChange)="roleChange.emit($event)"
           (langChange)="langChange.emit($event)"
         >
@@ -31,7 +33,7 @@ import { Icon } from '../icon/icon';
             trigger
             type="button"
             class="flex size-11 flex-none cursor-pointer items-center justify-center rounded-md border border-hairline-operator bg-transparent hover:bg-canvas-operator"
-            aria-label="Account settings"
+            [attr.aria-label]="accountSettingsLabel()"
             [attr.aria-expanded]="menu.open()"
             aria-haspopup="menu"
             (click)="menu.toggle()"
@@ -61,7 +63,10 @@ export class OperatorNavBar {
   readonly role = input.required<AccountMenuRole>();
   readonly roleAdminLabel = input('Admin');
   readonly roleOperatorLabel = input('Operator');
+  readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
+  readonly langSectionLabel = input('Language');
+  readonly accountSettingsLabel = input('Account settings');
 
   readonly cancelClick = output<void>();
   readonly roleChange = output<AccountMenuRole>();

@@ -38,7 +38,9 @@ import { AppRole, RoleService } from '../../../core/session/role.service';
           [role]="role.role()"
           [roleAdminLabel]="lang.pick(strings.roleAdmin)"
           [roleOperatorLabel]="lang.pick(strings.roleOperator)"
+          [roleSectionLabel]="lang.pick(strings.roleSection)"
           [lang]="lang.lang()"
+          [langSectionLabel]="lang.pick(strings.langSection)"
           (roleChange)="onRoleChange($event)"
           (langChange)="lang.setLang($event)"
         />

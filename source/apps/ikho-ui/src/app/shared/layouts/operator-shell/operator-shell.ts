@@ -43,7 +43,10 @@ const ITEM_ACTIVE = 'border-l-accent-teal bg-accent-teal/14 text-on-primary';
           [role]="role.role()"
           [roleAdminLabel]="lang.pick(strings.roleAdmin)"
           [roleOperatorLabel]="lang.pick(strings.roleOperator)"
+          [roleSectionLabel]="lang.pick(strings.roleSection)"
           [lang]="lang.lang()"
+          [langSectionLabel]="lang.pick(strings.langSection)"
+          [accountSettingsLabel]="lang.pick(strings.accountSettings)"
           (roleChange)="onRoleChange($event)"
           (langChange)="lang.setLang($event)"
         />

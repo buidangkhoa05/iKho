@@ -44,7 +44,9 @@ export interface OfficeNavBarUser {
             [role]="role()"
             [roleAdminLabel]="roleAdminLabel()"
             [roleOperatorLabel]="roleOperatorLabel()"
+            [roleSectionLabel]="roleSectionLabel()"
             [lang]="lang()"
+            [langSectionLabel]="langSectionLabel()"
             (roleChange)="roleChange.emit($event)"
             (langChange)="langChange.emit($event)"
           >
@@ -61,12 +63,12 @@ export interface OfficeNavBarUser {
               >
                 {{ u.initials }}
               </span>
-              <div class="flex flex-col leading-tight">
+              <span class="flex flex-col leading-tight">
                 <span class="font-core text-[13px] font-semibold text-ink">{{ u.name }}</span>
                 @if (u.role) {
                   <span class="font-core text-[11px] text-shade-50">{{ u.role }}</span>
                 }
-              </div>
+              </span>
             </button>
           </lib-account-menu>
         }
@@ -83,7 +85,9 @@ export class OfficeNavBar {
   readonly role = input.required<AccountMenuRole>();
   readonly roleAdminLabel = input('Admin');
   readonly roleOperatorLabel = input('Operator');
+  readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
+  readonly langSectionLabel = input('Language');
 
   readonly searchChange = output<string>();
   readonly roleChange = output<AccountMenuRole>();
