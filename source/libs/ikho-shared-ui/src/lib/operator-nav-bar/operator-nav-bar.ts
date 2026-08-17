@@ -1,8 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { AccountMenu, AccountMenuLang, AccountMenuRole } from '../account-menu/account-menu';
+import { Icon } from '../icon/icon';
 
 @Component({
   selector: 'lib-operator-nav-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Icon, AccountMenu],
   host: { class: 'block' },
   template: `
     <header
@@ -14,15 +17,40 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
           <span class="font-core text-sm text-shade-40">{{ m }}</span>
         }
       </div>
-      @if (onCancel()) {
-        <button
-          type="button"
-          class="flex-none cursor-pointer rounded-md border border-hairline-operator bg-transparent px-5 py-3 font-core text-sm font-semibold text-on-primary hover:bg-canvas-operator"
-          (click)="cancelClick.emit()"
+      <div class="flex flex-none items-center gap-2">
+        <lib-account-menu
+          #menu="libAccountMenu"
+          [role]="role()"
+          [roleAdminLabel]="roleAdminLabel()"
+          [roleOperatorLabel]="roleOperatorLabel()"
+          [roleSectionLabel]="roleSectionLabel()"
+          [lang]="lang()"
+          [langSectionLabel]="langSectionLabel()"
+          (roleChange)="roleChange.emit($event)"
+          (langChange)="langChange.emit($event)"
         >
-          {{ cancelLabel() }}
-        </button>
-      }
+          <button
+            trigger
+            type="button"
+            class="flex size-11 flex-none cursor-pointer items-center justify-center rounded-md border-none bg-transparent hover:bg-canvas-operator"
+            [attr.aria-label]="accountSettingsLabel()"
+            [attr.aria-expanded]="menu.open()"
+            aria-haspopup="menu"
+            (click)="menu.toggle()"
+          >
+            <lib-icon name="settings" [size]="22" color="var(--color-on-primary)" />
+          </button>
+        </lib-account-menu>
+        @if (onCancel()) {
+          <button
+            type="button"
+            class="flex-none cursor-pointer rounded-md border border-hairline-operator bg-transparent px-5 py-3 font-core text-sm font-semibold text-on-primary hover:bg-canvas-operator"
+            (click)="cancelClick.emit()"
+          >
+            {{ cancelLabel() }}
+          </button>
+        }
+      </div>
     </header>
   `,
 })
@@ -32,6 +60,15 @@ export class OperatorNavBar {
   readonly cancelLabel = input('Cancel');
   /** Whether to show the cancel action at all. */
   readonly onCancel = input(true);
+  readonly role = input.required<AccountMenuRole>();
+  readonly roleAdminLabel = input('Admin');
+  readonly roleOperatorLabel = input('Operator');
+  readonly roleSectionLabel = input('Role');
+  readonly lang = input.required<AccountMenuLang>();
+  readonly langSectionLabel = input('Language');
+  readonly accountSettingsLabel = input('Account settings');
 
   readonly cancelClick = output<void>();
+  readonly roleChange = output<AccountMenuRole>();
+  readonly langChange = output<AccountMenuLang>();
 }

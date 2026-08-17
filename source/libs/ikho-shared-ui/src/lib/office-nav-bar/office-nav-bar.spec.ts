@@ -17,8 +17,30 @@ describe('OfficeNavBar', () => {
   it('should render the signed-in user when provided', () => {
     const fixture = TestBed.createComponent(OfficeNavBar);
     fixture.componentRef.setInput('user', { name: 'Jane Doe', initials: 'JD' });
+    fixture.componentRef.setInput('role', 'admin');
+    fixture.componentRef.setInput('lang', 'en');
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Jane Doe');
+  });
+
+  it('should emit roleChange when a role is picked from the account menu', () => {
+    const fixture = TestBed.createComponent(OfficeNavBar);
+    fixture.componentRef.setInput('user', { name: 'Jane Doe', initials: 'JD' });
+    fixture.componentRef.setInput('role', 'admin');
+    fixture.componentRef.setInput('lang', 'en');
+    let emitted: string | undefined;
+    fixture.componentInstance.roleChange.subscribe((role) => (emitted = role));
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    compiled.querySelector('button[aria-haspopup="menu"]')!.dispatchEvent(new Event('click', { bubbles: true }));
+    fixture.detectChanges();
+    const operatorPill = Array.from(compiled.querySelectorAll('[role="group"][aria-label="Role"] button')).find(
+      (el) => el.textContent?.trim() === 'Operator',
+    ) as HTMLButtonElement;
+    operatorPill.click();
+
+    expect(emitted).toBe('operator');
   });
 });

@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AppTopBar } from './shared/layouts/app-top-bar/app-top-bar';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, AppTopBar],
+  imports: [RouterOutlet],
   selector: 'app-root',
+  host: { class: 'flex min-h-screen flex-col' },
   templateUrl: './app.html',
 })
 export class App {}

@@ -11,6 +11,8 @@ describe('OperatorNavBar', () => {
   it('should create', () => {
     const fixture = TestBed.createComponent(OperatorNavBar);
     fixture.componentRef.setInput('task', 'Receive PO-1042');
+    fixture.componentRef.setInput('role', 'operator');
+    fixture.componentRef.setInput('lang', 'en');
     fixture.detectChanges();
     expect(fixture.componentInstance).toBeTruthy();
   });
@@ -18,8 +20,30 @@ describe('OperatorNavBar', () => {
   it('should render the current task', () => {
     const fixture = TestBed.createComponent(OperatorNavBar);
     fixture.componentRef.setInput('task', 'Receive PO-1042');
+    fixture.componentRef.setInput('role', 'operator');
+    fixture.componentRef.setInput('lang', 'en');
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Receive PO-1042');
+  });
+
+  it('should emit langChange when a language is picked from the account menu', () => {
+    const fixture = TestBed.createComponent(OperatorNavBar);
+    fixture.componentRef.setInput('task', 'My tasks');
+    fixture.componentRef.setInput('role', 'operator');
+    fixture.componentRef.setInput('lang', 'en');
+    let emitted: string | undefined;
+    fixture.componentInstance.langChange.subscribe((lang) => (emitted = lang));
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    compiled.querySelector('button[aria-haspopup="menu"]')!.dispatchEvent(new Event('click', { bubbles: true }));
+    fixture.detectChanges();
+    const viPill = Array.from(compiled.querySelectorAll('[role="group"][aria-label="Language"] button')).find(
+      (el) => el.textContent?.trim() === 'VI',
+    ) as HTMLButtonElement;
+    viPill.click();
+
+    expect(emitted).toBe('vi');
   });
 });

@@ -6,7 +6,8 @@ import { filter, map, startWith } from 'rxjs';
 import { Icon, OperatorNavBar } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
-import { OPERATOR_ORDER, ScreenId, SCREENS, screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
+import { OPERATOR_ORDER, ScreenId, SCREENS, equivalentScreen, screenMeta, screenTitle } from '../../../core/mock-data/screens.data';
+import { AppRole, RoleService } from '../../../core/session/role.service';
 
 const ITEM_BASE =
   'flex w-full items-center gap-3 rounded-[10px] border-l-[3px] px-3.5 py-0 min-h-14 cursor-pointer text-left font-core text-[15px] font-semibold';
@@ -39,6 +40,15 @@ const ITEM_ACTIVE = 'border-l-accent-teal bg-accent-teal/14 text-on-primary';
           [task]="screenTitleText()"
           [meta]="screenMetaText()"
           [cancelLabel]="lang.pick(strings.signOut)"
+          [role]="role.role()"
+          [roleAdminLabel]="lang.pick(strings.roleAdmin)"
+          [roleOperatorLabel]="lang.pick(strings.roleOperator)"
+          [roleSectionLabel]="lang.pick(strings.roleSection)"
+          [lang]="lang.lang()"
+          [langSectionLabel]="lang.pick(strings.langSection)"
+          [accountSettingsLabel]="lang.pick(strings.accountSettings)"
+          (roleChange)="onRoleChange($event)"
+          (langChange)="lang.setLang($event)"
         />
         <div class="flex max-w-[760px] flex-col gap-6 px-8 py-7">
           <router-outlet />
@@ -51,6 +61,7 @@ export class OperatorShell {
   private readonly router = inject(Router);
   private readonly title = inject(Title);
   protected readonly lang = inject(LangService);
+  protected readonly role = inject(RoleService);
   protected readonly strings = UI_STRINGS;
 
   private readonly url = toSignal(
@@ -86,5 +97,12 @@ export class OperatorShell {
 
   onSelect(id: ScreenId): void {
     this.router.navigate(['/operator', id]);
+  }
+
+  onRoleChange(target: AppRole): void {
+    if (this.role.role() === target) return;
+    const next = equivalentScreen(this.activeScreen(), target);
+    this.role.setRole(target);
+    this.router.navigate(['/', target === 'admin' ? 'office' : 'operator', next]);
   }
 }

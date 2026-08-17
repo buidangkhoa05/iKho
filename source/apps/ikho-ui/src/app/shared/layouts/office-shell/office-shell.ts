@@ -6,8 +6,9 @@ import { filter, map, startWith } from 'rxjs';
 import { Icon, OfficeNavBar, OfficeNavBarUser, OfficeSidebar, OfficeSidebarItem } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
-import { ADMIN_ORDER, ScreenId, SCREENS, screenTitle } from '../../../core/mock-data/screens.data';
+import { ADMIN_ORDER, ScreenId, SCREENS, equivalentScreen, screenTitle } from '../../../core/mock-data/screens.data';
 import { ViewportService } from '../../../core/layout/viewport.service';
+import { AppRole, RoleService } from '../../../core/session/role.service';
 
 @Component({
   selector: 'app-office-shell',
@@ -34,6 +35,14 @@ import { ViewportService } from '../../../core/layout/viewport.service';
           [searchPlaceholder]="lang.pick(strings.searchOffice)"
           [notifications]="4"
           [user]="navUser()"
+          [role]="role.role()"
+          [roleAdminLabel]="lang.pick(strings.roleAdmin)"
+          [roleOperatorLabel]="lang.pick(strings.roleOperator)"
+          [roleSectionLabel]="lang.pick(strings.roleSection)"
+          [lang]="lang.lang()"
+          [langSectionLabel]="lang.pick(strings.langSection)"
+          (roleChange)="onRoleChange($event)"
+          (langChange)="lang.setLang($event)"
         />
       </div>
       <div class="relative flex min-h-0 flex-1">
@@ -66,6 +75,7 @@ export class OfficeShell {
   protected readonly lang = inject(LangService);
   protected readonly strings = UI_STRINGS;
   protected readonly viewport = inject(ViewportService);
+  protected readonly role = inject(RoleService);
 
   protected readonly mobileNavOpen = signal(false);
 
@@ -112,5 +122,12 @@ export class OfficeShell {
   onSelect(id: string): void {
     this.router.navigate(['/office', id]);
     this.mobileNavOpen.set(false);
+  }
+
+  onRoleChange(target: AppRole): void {
+    if (this.role.role() === target) return;
+    const next = equivalentScreen(this.activeScreen(), target);
+    this.role.setRole(target);
+    this.router.navigate(['/', target === 'admin' ? 'office' : 'operator', next]);
   }
 }

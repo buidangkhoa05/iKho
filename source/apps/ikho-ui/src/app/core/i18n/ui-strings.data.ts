@@ -1,9 +1,11 @@
 import { Localized } from './localized.type';
 
 export const UI_STRINGS = {
-  roleHint: { en: 'One web app · features shown by role', vi: 'Một ứng dụng web · chức năng hiển thị theo vai trò' },
   roleAdmin: { en: 'Admin', vi: 'Quản trị' },
   roleOperator: { en: 'Operator', vi: 'Vận hành' },
+  roleSection: { en: 'Role', vi: 'Vai trò' },
+  langSection: { en: 'Language', vi: 'Ngôn ngữ' },
+  accountSettings: { en: 'Account settings', vi: 'Cài đặt tài khoản' },
   company: { en: 'Rotterdam Logistics BV', vi: 'Rotterdam Logistics BV' },
   adminUser: { en: 'M. de Vries', vi: 'M. de Vries' },
   searchOffice: { en: 'Search SKUs, orders, partners', vi: 'Tìm SKU, đơn hàng, đối tác' },

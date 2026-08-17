@@ -1,3 +1,4 @@
+export * from './lib/account-menu/account-menu';
 export * from './lib/icon/icon';
 export * from './lib/button/button';
 export * from './lib/text-input/text-input';
