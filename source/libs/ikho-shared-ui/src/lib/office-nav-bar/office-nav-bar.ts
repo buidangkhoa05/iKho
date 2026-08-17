@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { AccountMenu, AccountMenuLang, AccountMenuRole } from '../account-menu/account-menu';
 import { Icon } from '../icon/icon';
 import { TextInput } from '../text-input/text-input';
 
@@ -11,7 +12,7 @@ export interface OfficeNavBarUser {
 @Component({
   selector: 'lib-office-nav-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon, TextInput],
+  imports: [Icon, TextInput, AccountMenu],
   host: { class: 'block' },
   template: `
     <header
@@ -38,19 +39,36 @@ export interface OfficeNavBarUser {
           }
         </div>
         @if (user(); as u) {
-          <div class="flex items-center gap-2">
-            <span
-              class="flex size-8 flex-none items-center justify-center rounded-full bg-primary font-core text-xs font-semibold text-on-primary"
+          <lib-account-menu
+            #menu="libAccountMenu"
+            [role]="role()"
+            [roleAdminLabel]="roleAdminLabel()"
+            [roleOperatorLabel]="roleOperatorLabel()"
+            [lang]="lang()"
+            (roleChange)="roleChange.emit($event)"
+            (langChange)="langChange.emit($event)"
+          >
+            <button
+              trigger
+              type="button"
+              class="flex cursor-pointer items-center gap-2 border-none bg-transparent p-0"
+              [attr.aria-expanded]="menu.open()"
+              aria-haspopup="menu"
+              (click)="menu.toggle()"
             >
-              {{ u.initials }}
-            </span>
-            <div class="flex flex-col leading-tight">
-              <span class="font-core text-[13px] font-semibold text-ink">{{ u.name }}</span>
-              @if (u.role) {
-                <span class="font-core text-[11px] text-shade-50">{{ u.role }}</span>
-              }
-            </div>
-          </div>
+              <span
+                class="flex size-8 flex-none items-center justify-center rounded-full bg-primary font-core text-xs font-semibold text-on-primary"
+              >
+                {{ u.initials }}
+              </span>
+              <div class="flex flex-col leading-tight">
+                <span class="font-core text-[13px] font-semibold text-ink">{{ u.name }}</span>
+                @if (u.role) {
+                  <span class="font-core text-[11px] text-shade-50">{{ u.role }}</span>
+                }
+              </div>
+            </button>
+          </lib-account-menu>
         }
       </div>
     </header>
@@ -62,6 +80,12 @@ export class OfficeNavBar {
   readonly searchPlaceholder = input('Search');
   readonly notifications = input(0);
   readonly user = input<OfficeNavBarUser | undefined>(undefined);
+  readonly role = input.required<AccountMenuRole>();
+  readonly roleAdminLabel = input('Admin');
+  readonly roleOperatorLabel = input('Operator');
+  readonly lang = input.required<AccountMenuLang>();
 
   readonly searchChange = output<string>();
+  readonly roleChange = output<AccountMenuRole>();
+  readonly langChange = output<AccountMenuLang>();
 }
