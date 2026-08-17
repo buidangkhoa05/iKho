@@ -32,7 +32,7 @@ import { Icon } from '../icon/icon';
           <button
             trigger
             type="button"
-            class="flex size-11 flex-none cursor-pointer items-center justify-center rounded-md border border-hairline-operator bg-transparent hover:bg-canvas-operator"
+            class="flex size-11 flex-none cursor-pointer items-center justify-center rounded-md border-none bg-transparent hover:bg-canvas-operator"
             [attr.aria-label]="accountSettingsLabel()"
             [attr.aria-expanded]="menu.open()"
             aria-haspopup="menu"
