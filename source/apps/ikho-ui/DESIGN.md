@@ -259,13 +259,22 @@ iKho is a warehouse and inventory management platform, not a storefront — so t
 
 Both tracks use **Inter Variable** as the only typeface — headings and body share the family, differing only in weight and size, which keeps the system light to ship and consistent across Angular components. A dedicated status-color vocabulary (`status-in-stock`, `status-low-stock`, `status-out-of-stock`, `status-inbound`, `status-outbound`, `status-returns`) is the system's signature: every stock, order, and movement state maps to exactly one color pair (10%-tint background + full-strength text/icon), reused identically across badges, table rows, KPI cards, and charts.
 
+**Update (shell theming):** the light/dark canvas split described above now applies
+to each track's *feature content area* only — dashboards, tables, cards, and forms
+still render Office Console light and Operator Mode dark as documented. The
+*shell chrome* (both nav bars, both sidebars, and the base app canvas) has since
+converged on one shared structure and is driven by an explicit app-wide light/dark
+theme toggle instead of by track — see `--color-shell-*` tokens in `tokens.css`.
+Operator's sidebar keeps its teal active-item accent and Office's keeps its indigo
+one regardless of the toggle; those are interaction colors, not surface colors.
+
 **Key Characteristics:**
-- Two-canvas system by *context of use* (office vs. floor), not by page type — a single feature (e.g. Inbound) can render its dashboard on the light Office Console and its receiving/scan flow in dark Operator Mode.
+- Two-canvas system by *context of use* (office vs. floor) for feature content — a single feature (e.g. Inbound) can render its dashboard on the light Office Console and its receiving/scan flow in dark Operator Mode. The shell chrome (headers/sidebars) no longer follows this split; it follows the app-wide theme toggle instead.
 - One typeface (Inter Variable) across both tracks; hierarchy comes from weight/size, not family-switching.
 - A fixed six-color status vocabulary is the brand's most important visual language — colors are never reused for anything other than their assigned state.
 - Rounded rectangles (`{rounded.md}` / `{rounded.lg}`), not pills, are the default shape for buttons and cards — pill shape (`{rounded.pill}`) is reserved for status badges and chips only, so "pill" always reads as "status," never as "action."
 - Operator Mode uses oversized type (`{typography.operator-xl}`) and generous padding so a warehouse worker wearing gloves can act on a tablet without missing a tap.
-- Deep indigo (`{colors.primary}`) is the sole brand/action color on the Office Console; teal (`{colors.accent-teal}`) is reserved for primary actions in Operator Mode so the two tracks are never confused for each other even in a screenshot.
+- Deep indigo (`{colors.primary}`) is the primary brand/action color across the shell chrome and the Office Console's feature content; teal (`{colors.accent-teal}`) remains Operator Mode's signature — its sidebar's active-item accent and its feature content's primary actions — regardless of the active shell theme.
 
 ## Colors
 
@@ -274,7 +283,7 @@ Both tracks use **Inter Variable** as the only typeface — headings and body sh
 ### Brand & Action
 - **Primary** (`{colors.primary}` — `#14213D`): Deep indigo. Primary buttons, active nav state, links on the Office Console.
 - **Primary Hover** (`{colors.primary-hover}` — `#0F1930`): Pressed/hover state of primary actions.
-- **Accent Teal** (`{colors.accent-teal}` — `#0ea5a0`): Reserved exclusively for Operator Mode primary actions (scan, confirm, complete pick) — never appears on the Office Console.
+- **Accent Teal** (`{colors.accent-teal}` — `#0ea5a0`): Operator Mode's signature accent — its sidebar's active-item indicator and its feature content's primary actions (scan, confirm, complete pick). Does not appear in Office Console's feature content or in either track's shared shell chrome.
 
 ### Status Vocabulary
 - **In Stock** (`{colors.status-in-stock}` `#16a34a` / tint `{colors.status-in-stock-10}`): Healthy inventory levels, completed receipts.
