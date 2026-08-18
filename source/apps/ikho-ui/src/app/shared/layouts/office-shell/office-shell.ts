@@ -9,6 +9,7 @@ import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
 import { ADMIN_ORDER, ScreenId, SCREENS, equivalentScreen, screenTitle } from '../../../core/mock-data/screens.data';
 import { ViewportService } from '../../../core/layout/viewport.service';
 import { AppRole, RoleService } from '../../../core/session/role.service';
+import { ThemeService } from '../../../core/theme/theme.service';
 
 @Component({
   selector: 'app-office-shell',
@@ -41,8 +42,10 @@ import { AppRole, RoleService } from '../../../core/session/role.service';
           [roleSectionLabel]="lang.pick(strings.roleSection)"
           [lang]="lang.lang()"
           [langSectionLabel]="lang.pick(strings.langSection)"
+          [theme]="theme.theme()"
           (roleChange)="onRoleChange($event)"
           (langChange)="lang.setLang($event)"
+          (themeChange)="theme.setTheme($event)"
         />
       </div>
       <div class="relative flex min-h-0 flex-1">
@@ -73,6 +76,7 @@ export class OfficeShell {
   private readonly router = inject(Router);
   private readonly title = inject(Title);
   protected readonly lang = inject(LangService);
+  protected readonly theme = inject(ThemeService);
   protected readonly strings = UI_STRINGS;
   protected readonly viewport = inject(ViewportService);
   protected readonly role = inject(RoleService);

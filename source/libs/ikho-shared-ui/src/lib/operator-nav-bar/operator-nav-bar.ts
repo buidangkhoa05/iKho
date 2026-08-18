@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { AccountMenu, AccountMenuLang, AccountMenuRole } from '../account-menu/account-menu';
+import { AccountMenu, AccountMenuLang, AccountMenuRole, AccountMenuTheme } from '../account-menu/account-menu';
 import { Icon } from '../icon/icon';
 
 @Component({
@@ -26,8 +26,15 @@ import { Icon } from '../icon/icon';
           [roleSectionLabel]="roleSectionLabel()"
           [lang]="lang()"
           [langSectionLabel]="langSectionLabel()"
+          [theme]="theme()"
+          [themeLightLabel]="themeLightLabel()"
+          [themeDarkLabel]="themeDarkLabel()"
+          [themeSectionLabel]="themeSectionLabel()"
+          [signOutLabel]="signOutLabel()"
           (roleChange)="roleChange.emit($event)"
           (langChange)="langChange.emit($event)"
+          (themeChange)="themeChange.emit($event)"
+          (signOutClick)="signOutClick.emit()"
         >
           <button
             trigger
@@ -66,9 +73,16 @@ export class OperatorNavBar {
   readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
   readonly langSectionLabel = input('Language');
+  readonly theme = input.required<AccountMenuTheme>();
+  readonly themeLightLabel = input('Light');
+  readonly themeDarkLabel = input('Dark');
+  readonly themeSectionLabel = input('Theme');
+  readonly signOutLabel = input('Sign out');
   readonly accountSettingsLabel = input('Account settings');
 
   readonly cancelClick = output<void>();
   readonly roleChange = output<AccountMenuRole>();
   readonly langChange = output<AccountMenuLang>();
+  readonly themeChange = output<AccountMenuTheme>();
+  readonly signOutClick = output<void>();
 }

@@ -9,8 +9,11 @@ import { AccountMenu } from './account-menu';
       #menu="libAccountMenu"
       [role]="role"
       [lang]="lang"
+      [theme]="theme"
       (roleChange)="onRoleChange($event)"
       (langChange)="onLangChange($event)"
+      (themeChange)="onThemeChange($event)"
+      (signOutClick)="onSignOutClick()"
     >
       <button trigger type="button" (click)="menu.toggle()" [attr.aria-expanded]="menu.open()" aria-haspopup="menu">open</button>
     </lib-account-menu>
@@ -19,8 +22,11 @@ import { AccountMenu } from './account-menu';
 class HostComponent {
   role: 'admin' | 'operator' = 'admin';
   lang: 'en' | 'vi' = 'en';
+  theme: 'light' | 'dark' = 'light';
   lastRole: 'admin' | 'operator' | undefined;
   lastLang: 'en' | 'vi' | undefined;
+  lastTheme: 'light' | 'dark' | undefined;
+  signOutClicked = false;
 
   onRoleChange(role: 'admin' | 'operator'): void {
     this.lastRole = role;
@@ -28,6 +34,14 @@ class HostComponent {
 
   onLangChange(lang: 'en' | 'vi'): void {
     this.lastLang = lang;
+  }
+
+  onThemeChange(theme: 'light' | 'dark'): void {
+    this.lastTheme = theme;
+  }
+
+  onSignOutClick(): void {
+    this.signOutClicked = true;
   }
 }
 
@@ -88,6 +102,42 @@ describe('AccountMenu', () => {
     fixture.detectChanges();
 
     expect(fixture.componentInstance.lastLang).toBe('vi');
+  });
+
+  it('should emit themeChange and close the panel when a theme pill is clicked', () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    compiled.querySelector('button[aria-haspopup="menu"]')!.dispatchEvent(new Event('click', { bubbles: true }));
+    fixture.detectChanges();
+
+    const darkPill = Array.from(compiled.querySelectorAll('[role="group"][aria-label="Theme"] button')).find(
+      (el) => el.textContent?.trim() === 'Dark',
+    ) as HTMLButtonElement;
+    darkPill.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.lastTheme).toBe('dark');
+    expect(compiled.querySelector('[role="menu"]')).toBeNull();
+  });
+
+  it('should emit signOutClick and close the panel when the sign-out item is clicked', () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    compiled.querySelector('button[aria-haspopup="menu"]')!.dispatchEvent(new Event('click', { bubbles: true }));
+    fixture.detectChanges();
+
+    const signOutButton = Array.from(compiled.querySelectorAll('[role="menuitem"]')).find(
+      (el) => el.textContent?.trim() === 'Sign out',
+    ) as HTMLButtonElement;
+    signOutButton.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.signOutClicked).toBe(true);
+    expect(compiled.querySelector('[role="menu"]')).toBeNull();
   });
 
   it('should close the panel on an outside click', () => {

@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, i
 
 export type AccountMenuRole = 'admin' | 'operator';
 export type AccountMenuLang = 'en' | 'vi';
+export type AccountMenuTheme = 'light' | 'dark';
 
 const PILL_BASE = 'rounded-md border-none bg-transparent px-3 py-1.5 font-core text-xs font-semibold text-shade-40 cursor-pointer';
 const PILL_ACTIVE = 'bg-primary text-on-primary';
 
 /**
- * Role/language switcher dropdown, opened from a caller-supplied trigger element.
+ * Role/language/theme switcher dropdown, opened from a caller-supplied trigger element.
  *
  * The content projected via `[trigger]` is NOT wrapped in a button by this component
  * (deliberately, to avoid nesting a button inside a button). The consumer's own trigger
@@ -21,8 +22,11 @@ const PILL_ACTIVE = 'bg-primary text-on-primary';
  *   #menu="libAccountMenu"
  *   [role]="role()"
  *   [lang]="lang()"
+ *   [theme]="theme()"
  *   (roleChange)="onRoleChange($event)"
  *   (langChange)="onLangChange($event)"
+ *   (themeChange)="onThemeChange($event)"
+ *   (signOutClick)="onSignOut()"
  * >
  *   <button
  *     trigger
@@ -45,12 +49,12 @@ const PILL_ACTIVE = 'bg-primary text-on-primary';
     <ng-content select="[trigger]" />
     @if (open()) {
       <div
-        class="absolute right-0 top-full z-10 mt-2 flex w-56 flex-col gap-3 rounded-lg border border-hairline-light bg-canvas-light p-3 shadow-modal"
+        class="absolute right-0 top-full z-10 mt-2 flex w-56 flex-col gap-3 rounded-lg border border-shell-hairline bg-shell-canvas p-3 shadow-modal"
         role="menu"
       >
         <div class="flex flex-col gap-1.5">
           <span class="font-core text-[11px] font-semibold tracking-wide text-shade-50 uppercase">{{ roleSectionLabel() }}</span>
-          <div class="flex gap-0.5 rounded-lg bg-canvas-cream p-0.5" role="group" [attr.aria-label]="roleSectionLabel()">
+          <div class="flex gap-0.5 rounded-lg bg-shell-canvas-elevated p-0.5" role="group" [attr.aria-label]="roleSectionLabel()">
             <button
               type="button"
               [class]="pillClasses(role() === 'admin')"
@@ -72,28 +76,47 @@ const PILL_ACTIVE = 'bg-primary text-on-primary';
           </div>
         </div>
         <div class="flex flex-col gap-1.5">
-          <span class="font-core text-[11px] font-semibold tracking-wide text-shade-50 uppercase">{{ langSectionLabel() }}</span>
-          <div class="flex gap-0.5 rounded-lg bg-canvas-cream p-0.5" role="group" [attr.aria-label]="langSectionLabel()">
+          <span class="font-core text-[11px] font-semibold tracking-wide text-shade-50 uppercase">{{ themeSectionLabel() }}</span>
+          <div class="flex gap-0.5 rounded-lg bg-shell-canvas-elevated p-0.5" role="group" [attr.aria-label]="themeSectionLabel()">
             <button
               type="button"
-              [class]="pillClasses(lang() === 'en')"
+              [class]="pillClasses(theme() === 'light')"
               role="menuitemradio"
-              [attr.aria-checked]="lang() === 'en'"
-              (click)="selectLang('en')"
+              [attr.aria-checked]="theme() === 'light'"
+              (click)="selectTheme('light')"
             >
-              EN
+              {{ themeLightLabel() }}
             </button>
             <button
               type="button"
-              [class]="pillClasses(lang() === 'vi')"
+              [class]="pillClasses(theme() === 'dark')"
               role="menuitemradio"
-              [attr.aria-checked]="lang() === 'vi'"
-              (click)="selectLang('vi')"
+              [attr.aria-checked]="theme() === 'dark'"
+              (click)="selectTheme('dark')"
             >
+              {{ themeDarkLabel() }}
+            </button>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <span class="font-core text-[11px] font-semibold tracking-wide text-shade-50 uppercase">{{ langSectionLabel() }}</span>
+          <div class="flex gap-0.5 rounded-lg bg-shell-canvas-elevated p-0.5" role="group" [attr.aria-label]="langSectionLabel()">
+            <button type="button" [class]="pillClasses(lang() === 'en')" role="menuitemradio" [attr.aria-checked]="lang() === 'en'" (click)="selectLang('en')">
+              EN
+            </button>
+            <button type="button" [class]="pillClasses(lang() === 'vi')" role="menuitemradio" [attr.aria-checked]="lang() === 'vi'" (click)="selectLang('vi')">
               VI
             </button>
           </div>
         </div>
+        <button
+          type="button"
+          class="cursor-pointer rounded-md border-none bg-transparent px-3 py-1.5 text-left font-core text-xs font-semibold text-shade-40 hover:bg-shell-canvas-elevated"
+          role="menuitem"
+          (click)="onSignOutClick()"
+        >
+          {{ signOutLabel() }}
+        </button>
       </div>
     }
   `,
@@ -107,9 +130,16 @@ export class AccountMenu {
   readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
   readonly langSectionLabel = input('Language');
+  readonly theme = input.required<AccountMenuTheme>();
+  readonly themeLightLabel = input('Light');
+  readonly themeDarkLabel = input('Dark');
+  readonly themeSectionLabel = input('Theme');
+  readonly signOutLabel = input('Sign out');
 
   readonly roleChange = output<AccountMenuRole>();
   readonly langChange = output<AccountMenuLang>();
+  readonly themeChange = output<AccountMenuTheme>();
+  readonly signOutClick = output<void>();
 
   private readonly _open = signal(false);
   /** Public: consumers toggle this via a `#menu="libAccountMenu"` template reference on their trigger element. */
@@ -127,6 +157,16 @@ export class AccountMenu {
   selectLang(lang: AccountMenuLang): void {
     this._open.set(false);
     this.langChange.emit(lang);
+  }
+
+  selectTheme(theme: AccountMenuTheme): void {
+    this._open.set(false);
+    this.themeChange.emit(theme);
+  }
+
+  onSignOutClick(): void {
+    this._open.set(false);
+    this.signOutClick.emit();
   }
 
   protected pillClasses(active: boolean): string {

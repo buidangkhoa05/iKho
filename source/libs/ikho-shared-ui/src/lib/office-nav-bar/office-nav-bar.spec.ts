@@ -19,6 +19,7 @@ describe('OfficeNavBar', () => {
     fixture.componentRef.setInput('user', { name: 'Jane Doe', initials: 'JD' });
     fixture.componentRef.setInput('role', 'admin');
     fixture.componentRef.setInput('lang', 'en');
+    fixture.componentRef.setInput('theme', 'light');
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Jane Doe');
@@ -29,6 +30,7 @@ describe('OfficeNavBar', () => {
     fixture.componentRef.setInput('user', { name: 'Jane Doe', initials: 'JD' });
     fixture.componentRef.setInput('role', 'admin');
     fixture.componentRef.setInput('lang', 'en');
+    fixture.componentRef.setInput('theme', 'light');
     let emitted: string | undefined;
     fixture.componentInstance.roleChange.subscribe((role) => (emitted = role));
     fixture.detectChanges();
