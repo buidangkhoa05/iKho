@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { AccountMenu, AccountMenuLang, AccountMenuRole } from '../account-menu/account-menu';
+import { AccountMenu, AccountMenuLang, AccountMenuRole, AccountMenuTheme } from '../account-menu/account-menu';
 import { Icon } from '../icon/icon';
 import { TextInput } from '../text-input/text-input';
 
@@ -16,10 +16,10 @@ export interface OfficeNavBarUser {
   host: { class: 'block' },
   template: `
     <header
-      class="box-border flex h-16 items-center gap-4 border-b border-hairline-light bg-canvas-light px-6 py-3 shadow-card"
+      class="box-border flex h-16 items-center gap-4 border-b border-shell-hairline bg-shell-canvas px-6 py-3 shadow-card"
     >
       <div class="flex flex-none flex-col">
-        <span class="font-core text-sm font-bold tracking-[-0.2px] text-ink">{{ workspace() }}</span>
+        <span class="font-core text-sm font-bold tracking-[-0.2px] text-shell-ink">{{ workspace() }}</span>
         <span class="font-core text-xs text-shade-50">{{ company() }}</span>
       </div>
 
@@ -47,8 +47,15 @@ export interface OfficeNavBarUser {
             [roleSectionLabel]="roleSectionLabel()"
             [lang]="lang()"
             [langSectionLabel]="langSectionLabel()"
+            [theme]="theme()"
+            [themeLightLabel]="themeLightLabel()"
+            [themeDarkLabel]="themeDarkLabel()"
+            [themeSectionLabel]="themeSectionLabel()"
+            [signOutLabel]="signOutLabel()"
             (roleChange)="roleChange.emit($event)"
             (langChange)="langChange.emit($event)"
+            (themeChange)="themeChange.emit($event)"
+            (signOutClick)="signOutClick.emit()"
           >
             <button
               trigger
@@ -64,7 +71,7 @@ export interface OfficeNavBarUser {
                 {{ u.initials }}
               </span>
               <span class="flex flex-col leading-tight">
-                <span class="font-core text-[13px] font-semibold text-ink">{{ u.name }}</span>
+                <span class="font-core text-[13px] font-semibold text-shell-ink">{{ u.name }}</span>
                 @if (u.role) {
                   <span class="font-core text-[11px] text-shade-50">{{ u.role }}</span>
                 }
@@ -88,8 +95,15 @@ export class OfficeNavBar {
   readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
   readonly langSectionLabel = input('Language');
+  readonly theme = input<AccountMenuTheme>('light');
+  readonly themeLightLabel = input('Light');
+  readonly themeDarkLabel = input('Dark');
+  readonly themeSectionLabel = input('Theme');
+  readonly signOutLabel = input('Sign out');
 
   readonly searchChange = output<string>();
   readonly roleChange = output<AccountMenuRole>();
   readonly langChange = output<AccountMenuLang>();
+  readonly themeChange = output<AccountMenuTheme>();
+  readonly signOutClick = output<void>();
 }
