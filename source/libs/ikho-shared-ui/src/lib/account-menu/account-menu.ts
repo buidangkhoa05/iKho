@@ -130,7 +130,7 @@ export class AccountMenu {
   readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
   readonly langSectionLabel = input('Language');
-  readonly theme = input.required<AccountMenuTheme>();
+  readonly theme = input<AccountMenuTheme>('light');
   readonly themeLightLabel = input('Light');
   readonly themeDarkLabel = input('Dark');
   readonly themeSectionLabel = input('Theme');
