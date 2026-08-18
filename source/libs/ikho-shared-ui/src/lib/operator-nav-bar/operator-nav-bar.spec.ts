@@ -13,7 +13,6 @@ describe('OperatorNavBar', () => {
     fixture.componentRef.setInput('task', 'Receive PO-1042');
     fixture.componentRef.setInput('role', 'operator');
     fixture.componentRef.setInput('lang', 'en');
-    fixture.componentRef.setInput('theme', 'light');
     fixture.detectChanges();
     expect(fixture.componentInstance).toBeTruthy();
   });
@@ -23,7 +22,6 @@ describe('OperatorNavBar', () => {
     fixture.componentRef.setInput('task', 'Receive PO-1042');
     fixture.componentRef.setInput('role', 'operator');
     fixture.componentRef.setInput('lang', 'en');
-    fixture.componentRef.setInput('theme', 'light');
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Receive PO-1042');
@@ -34,7 +32,6 @@ describe('OperatorNavBar', () => {
     fixture.componentRef.setInput('task', 'My tasks');
     fixture.componentRef.setInput('role', 'operator');
     fixture.componentRef.setInput('lang', 'en');
-    fixture.componentRef.setInput('theme', 'light');
     let emitted: string | undefined;
     fixture.componentInstance.langChange.subscribe((lang) => (emitted = lang));
     fixture.detectChanges();
