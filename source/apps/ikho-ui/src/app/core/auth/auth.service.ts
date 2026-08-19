@@ -25,7 +25,7 @@ export class AuthService {
       this.isLoaded.set(true);
       return;
     }
-    this.clerk = this.clerkFactory(environment.clerkPublishableKey);
+    this.clerk = await this.clerkFactory(environment.clerkPublishableKey);
     await this.clerk.load();
     this.syncState();
     this.clerk.addListener(() => this.syncState());

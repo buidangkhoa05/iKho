@@ -20,7 +20,7 @@ function createFakeClerk(overrides: Partial<Clerk> = {}): Clerk {
 
 function configureWithFakeClerk(clerk: Clerk): void {
   TestBed.configureTestingModule({
-    providers: [{ provide: CLERK_FACTORY, useValue: () => clerk }],
+    providers: [{ provide: CLERK_FACTORY, useValue: () => Promise.resolve(clerk) }],
   });
 }
 
