@@ -309,7 +309,9 @@ git commit -m "feat(ikho-shared-ui): make OfficeSidebar theme-aware"
 - Modify: `source/libs/ikho-shared-ui/src/lib/account-menu/account-menu.spec.ts`
 
 **Interfaces:**
-- Produces: new exported type `AccountMenuTheme = 'light' | 'dark'`. New inputs on `AccountMenu`: `theme: input.required<AccountMenuTheme>()`, `themeLightLabel` (default `'Light'`), `themeDarkLabel` (default `'Dark'`), `themeSectionLabel` (default `'Theme'`), `signOutLabel` (default `'Sign out'`). New outputs: `themeChange: output<AccountMenuTheme>()`, `signOutClick: output<void>()`. Panel order: Role, Theme, Language, then a Sign out row below Language.
+- Produces: new exported type `AccountMenuTheme = 'light' | 'dark'`. New inputs on `AccountMenu`: `theme: input<AccountMenuTheme>('light')` (default `'light'` — see note below), `themeLightLabel` (default `'Light'`), `themeDarkLabel` (default `'Dark'`), `themeSectionLabel` (default `'Theme'`), `signOutLabel` (default `'Sign out'`). New outputs: `themeChange: output<AccountMenuTheme>()`, `signOutClick: output<void>()`. Panel order: Role, Theme, Language, then a Sign out row below Language.
+
+**Correction discovered during execution:** the original plan draft made `theme` `input.required`, matching `role`/`lang`. Unlike `role`/`lang` (which were introduced alongside their first consumer in an earlier plan), `AccountMenu` already has two existing consumers — `OfficeNavBar` and `OperatorNavBar` — left over from that earlier, already-merged plan. Making `theme` required here means this task's `AccountMenu` change alone does not compile: `pnpm nx test ikho-shared-ui` fails with `NG8008: Required input 'theme' from component AccountMenu must be specified` at both existing call sites, because neither passes `[theme]` yet (that only happens in Task 5). `'light'` is `ThemeService`'s own default (see Task 1), so defaulting `theme` to `'light'` here is not a design compromise — it lets this task build and test in true isolation, and Task 5 still explicitly binds the real value once it lands.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -616,7 +618,7 @@ export class AccountMenu {
   readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
   readonly langSectionLabel = input('Language');
-  readonly theme = input.required<AccountMenuTheme>();
+  readonly theme = input<AccountMenuTheme>('light');
   readonly themeLightLabel = input('Light');
   readonly themeDarkLabel = input('Dark');
   readonly themeSectionLabel = input('Theme');
@@ -696,7 +698,9 @@ git commit -m "feat(ikho-shared-ui): add Theme pill group and Sign out to Accoun
 
 **Interfaces:**
 - Consumes: `AccountMenuTheme` from Task 4.
-- Produces: `OfficeNavBar` gains inputs `theme: input.required<AccountMenuTheme>()`, `themeLightLabel` (default `'Light'`), `themeDarkLabel` (default `'Dark'`), `themeSectionLabel` (default `'Theme'`), `signOutLabel` (default `'Sign out'`); outputs `themeChange: output<AccountMenuTheme>()`, `signOutClick: output<void>()`.
+- Produces: `OfficeNavBar` gains inputs `theme: input<AccountMenuTheme>('light')`, `themeLightLabel` (default `'Light'`), `themeDarkLabel` (default `'Dark'`), `themeSectionLabel` (default `'Theme'`), `signOutLabel` (default `'Sign out'`); outputs `themeChange: output<AccountMenuTheme>()`, `signOutClick: output<void>()`.
+
+**Same correction as Task 4:** `theme` defaults to `'light'` rather than being required. `OfficeShell`/`OperatorShell` (Task 7/6) don't bind `[theme]` to `<lib-office-nav-bar>` until they land — if this input were required, this task alone would break `ikho-ui`'s build the same way Task 4 broke `ikho-shared-ui`'s.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -746,7 +750,7 @@ Add to `source/libs/ikho-shared-ui/src/lib/office-nav-bar/office-nav-bar.spec.ts
   });
 ```
 
-Also update the two existing tests that call `fixture.detectChanges()` after setting `user`/`role`/`lang` — add `fixture.componentRef.setInput('theme', 'light');` alongside the existing `role`/`lang` lines in `'should render the signed-in user when provided'` and `'should emit roleChange...'` (same reason `role`/`lang` needed it: `theme` is `input.required` and is read inside the `@if (user(); as u)` block once the account menu renders).
+Also update the two existing tests that call `fixture.detectChanges()` after setting `user`/`role`/`lang` — add `fixture.componentRef.setInput('theme', 'light');` alongside the existing `role`/`lang` lines in `'should render the signed-in user when provided'` and `'should emit roleChange...'`. `theme` now defaults to `'light'` so this isn't strictly required for compilation the way `role`/`lang` are, but set it explicitly anyway for clarity and consistency with the other state inputs on the same fixture.
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
@@ -855,7 +859,7 @@ export class OfficeNavBar {
   readonly roleSectionLabel = input('Role');
   readonly lang = input.required<AccountMenuLang>();
   readonly langSectionLabel = input('Language');
-  readonly theme = input.required<AccountMenuTheme>();
+  readonly theme = input<AccountMenuTheme>('light');
   readonly themeLightLabel = input('Light');
   readonly themeDarkLabel = input('Dark');
   readonly themeSectionLabel = input('Theme');

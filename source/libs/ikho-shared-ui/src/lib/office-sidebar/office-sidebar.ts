@@ -50,7 +50,7 @@ export class OfficeSidebar {
 
   private static readonly ITEM_BASE =
     'flex min-h-[var(--tap-target-office)] w-full items-center gap-3 rounded-md border-none px-3 py-2.5 text-left font-core text-sm font-medium [transition:var(--transition-control)]';
-  private static readonly ITEM_DEFAULT = 'bg-transparent text-shade-60 hover:bg-shell-canvas hover:text-shell-ink';
+  private static readonly ITEM_DEFAULT = 'bg-transparent text-shade-40 hover:bg-shell-canvas hover:text-shell-ink';
   private static readonly ITEM_ACTIVE = 'bg-primary text-on-primary';
 
   protected readonly navClasses = computed(() =>

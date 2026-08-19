@@ -39,6 +39,13 @@
   --color-hairline-light: #e2e8f0;
   --color-hairline-operator: #1f2937;
 
+  /* Shell (nav bars, sidebars, root canvas) — theme-aware via [data-theme].
+     Feature screens do NOT use these; they keep the surface tokens above. */
+  --color-shell-canvas: var(--color-canvas-light);
+  --color-shell-canvas-elevated: var(--color-surface-elevated-light);
+  --color-shell-ink: var(--color-ink);
+  --color-shell-hairline: var(--color-hairline-light);
+
   /* Shade ladder */
   --color-shade-30: #cbd5e1;
   --color-shade-40: #94a3b8;
@@ -142,12 +149,17 @@
 }
 
 /* Operator Mode canvas — applied on the operator shell root */
-[data-track='operator'] {
-  background: var(--color-canvas-operator);
-  color: var(--color-on-primary);
-}
 [data-track='operator'] a {
   color: var(--color-accent-teal);
+}
+
+/* App-wide dark theme override for shell tokens only — reuses the existing
+   Operator dark palette verbatim. Feature-screen tokens are untouched. */
+[data-theme='dark'] {
+  --color-shell-canvas: var(--color-canvas-operator);
+  --color-shell-canvas-elevated: var(--color-canvas-operator-elevated);
+  --color-shell-ink: var(--color-on-primary);
+  --color-shell-hairline: var(--color-hairline-operator);
 }
 
 /* Type scale utility classes, matching DESIGN.md's `typography` tokens 1:1.

@@ -8,4 +8,3 @@ export * from './lib/kpi-card/kpi-card';
 export * from './lib/data-panel/data-panel';
 export * from './lib/office-nav-bar/office-nav-bar';
 export * from './lib/office-sidebar/office-sidebar';
-export * from './lib/operator-nav-bar/operator-nav-bar';
