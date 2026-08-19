@@ -1,6 +1,7 @@
 import { provideRouter } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { OfficeScreen } from './office-screen';
+import { OfficeLayoutState } from '../../../core/layout/office-layout-state';
 
 describe('OfficeScreen', () => {
   beforeEach(async () => {
@@ -120,5 +121,63 @@ describe('OfficeScreen', () => {
 
     expect(tabButton.className).toContain('focus-visible:outline-2');
     expect(chipButton.className).toContain('focus-visible:outline-2');
+  });
+
+  it('opens and closes OfficeLayoutState.detailPanelOpen as the detail panel is shown and hidden', () => {
+    const fixture = TestBed.createComponent(OfficeScreen);
+    fixture.componentRef.setInput('title', 'Inventory');
+    fixture.componentRef.setInput('detailedTabId', 'stock');
+    fixture.componentRef.setInput('rowKey', (row: Record<string, unknown>) => String(row['id']));
+    fixture.componentRef.setInput('detail', () => ({
+      eyebrow: 'Detail',
+      title: 'Row title',
+      code: 'ROW-1',
+      status: 'in-stock' as const,
+      statusLabel: 'In stock',
+      fields: [],
+    }));
+    fixture.componentRef.setInput('tabs', [
+      { id: 'stock', label: 'Stock', columns: [{ key: 'id', label: 'ID' }], rows: [{ id: 'ROW-1' }] },
+    ]);
+    fixture.detectChanges();
+
+    const layoutState = TestBed.inject(OfficeLayoutState);
+    expect(layoutState.detailPanelOpen()).toBe(false);
+
+    fixture.componentInstance.onRowClick({ id: 'ROW-1' });
+    fixture.detectChanges();
+    expect(layoutState.detailPanelOpen()).toBe(true);
+
+    const closeButton = (fixture.nativeElement as HTMLElement).querySelector('aside button') as HTMLButtonElement;
+    closeButton.click();
+    fixture.detectChanges();
+    expect(layoutState.detailPanelOpen()).toBe(false);
+  });
+
+  it('resets OfficeLayoutState.detailPanelOpen to false when the component is destroyed with a panel open', () => {
+    const fixture = TestBed.createComponent(OfficeScreen);
+    fixture.componentRef.setInput('title', 'Inventory');
+    fixture.componentRef.setInput('detailedTabId', 'stock');
+    fixture.componentRef.setInput('rowKey', (row: Record<string, unknown>) => String(row['id']));
+    fixture.componentRef.setInput('detail', () => ({
+      eyebrow: 'Detail',
+      title: 'Row title',
+      code: 'ROW-1',
+      status: 'in-stock' as const,
+      statusLabel: 'In stock',
+      fields: [],
+    }));
+    fixture.componentRef.setInput('tabs', [
+      { id: 'stock', label: 'Stock', columns: [{ key: 'id', label: 'ID' }], rows: [{ id: 'ROW-1' }] },
+    ]);
+    fixture.detectChanges();
+    fixture.componentInstance.onRowClick({ id: 'ROW-1' });
+    fixture.detectChanges();
+
+    const layoutState = TestBed.inject(OfficeLayoutState);
+    expect(layoutState.detailPanelOpen()).toBe(true);
+
+    fixture.destroy();
+    expect(layoutState.detailPanelOpen()).toBe(false);
   });
 });

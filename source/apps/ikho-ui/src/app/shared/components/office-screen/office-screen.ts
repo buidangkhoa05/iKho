@@ -1,7 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { Button, DataPanel, DataTable, Icon, KpiCard, StatusBadge, StockStatus, TextInput } from '@ikho/shared-ui';
 import { LangService } from '../../../core/i18n/lang.service';
 import { UI_STRINGS } from '../../../core/i18n/ui-strings.data';
+import { OfficeLayoutState } from '../../../core/layout/office-layout-state';
 import { ResolvedKpi, ResolvedTab } from '../../../core/mock-data/admin-screen.util';
 
 export interface OfficeDetailPanel {
@@ -145,6 +156,13 @@ export class OfficeScreen {
   protected readonly lang = inject(LangService);
   protected readonly strings = UI_STRINGS;
   protected readonly statusFilters = STATUS_FILTERS;
+
+  private readonly layoutState = inject(OfficeLayoutState);
+
+  constructor() {
+    effect(() => this.layoutState.setDetailPanelOpen(!!this.detailPanel()));
+    inject(DestroyRef).onDestroy(() => this.layoutState.setDetailPanelOpen(false));
+  }
 
   readonly title = input.required<string>();
   readonly meta = input('');
