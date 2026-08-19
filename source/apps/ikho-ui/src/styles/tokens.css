@@ -16,7 +16,7 @@
   /* Status vocabulary — never reused for anything but its assigned state */
   --color-status-in-stock: #16a34a;
   --color-status-in-stock-10: #dcfce7;
-  --color-status-low-stock: #f59e0b;
+  --color-status-low-stock: #b45309;
   --color-status-low-stock-10: #fef3c7;
   --color-status-out-of-stock: #dc2626;
   --color-status-out-of-stock-hover: #b91c1c;
