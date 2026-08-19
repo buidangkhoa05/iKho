@@ -24,7 +24,7 @@ colors:
   accent-teal-10: "#ccfbf1"
   status-in-stock: "#16a34a"
   status-in-stock-10: "#dcfce7"
-  status-low-stock: "#f59e0b"
+  status-low-stock: "#b45309"
   status-low-stock-10: "#fef3c7"
   status-out-of-stock: "#dc2626"
   status-out-of-stock-10: "#fee2e2"
@@ -281,7 +281,7 @@ one regardless of the toggle; those are interaction colors, not surface colors.
 
 ### Status Vocabulary
 - **In Stock** (`{colors.status-in-stock}` `#16a34a` / tint `{colors.status-in-stock-10}`): Healthy inventory levels, completed receipts.
-- **Low Stock** (`{colors.status-low-stock}` `#f59e0b` / tint `{colors.status-low-stock-10}`): Reorder-point warnings, partial picks.
+- **Low Stock** (`{colors.status-low-stock}` `#b45309` / tint `{colors.status-low-stock-10}`): Reorder-point warnings, partial picks.
 - **Out of Stock** (`{colors.status-out-of-stock}` `#dc2626` / tint `{colors.status-out-of-stock-10}`): Zero on-hand, failed scans, blocking errors.
 - **Inbound** (`{colors.status-inbound}` `#2563eb` / tint `{colors.status-inbound-10}`): Purchase orders, receiving, ASNs.
 - **Outbound** (`{colors.status-outbound}` `#7c3aed` / tint `{colors.status-outbound-10}`): Sales orders, picking, shipping.

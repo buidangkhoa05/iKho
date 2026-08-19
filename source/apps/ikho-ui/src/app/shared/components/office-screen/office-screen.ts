@@ -40,9 +40,9 @@ const TAB_DEFAULT = 'border-b-transparent text-shade-50';
 const TAB_ACTIVE = 'border-b-primary text-primary';
 
 const CHIP_BASE =
-  'min-h-8 cursor-pointer rounded-pill border px-3.5 py-[7px] font-core text-[13px] font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring';
-const CHIP_DEFAULT = 'border-hairline-light bg-canvas-light text-shade-60';
-const CHIP_ACTIVE = 'border-primary bg-primary text-on-primary';
+  'min-h-8 cursor-pointer rounded-pill border px-3.5 py-[7px] font-core text-[13px] font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2';
+const CHIP_DEFAULT = 'border-hairline-light bg-canvas-light text-shade-60 focus-visible:outline-focus-ring';
+const CHIP_ACTIVE = 'border-primary bg-primary text-on-primary focus-visible:outline-on-primary';
 
 @Component({
   selector: 'app-office-screen',

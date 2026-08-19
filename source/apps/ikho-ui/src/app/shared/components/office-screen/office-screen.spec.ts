@@ -104,7 +104,7 @@ describe('OfficeScreen', () => {
     expect(actionCalls).toBe(1);
   });
 
-  it('renders tab and status-filter chip buttons with a visible focus-visible ring', () => {
+  it('renders tab and default status-filter chip buttons with a visible focus-visible ring', () => {
     const fixture = TestBed.createComponent(OfficeScreen);
     fixture.componentRef.setInput('title', 'Inventory');
     fixture.componentRef.setInput('detailedTabId', 'stock');
@@ -117,10 +117,31 @@ describe('OfficeScreen', () => {
 
     const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
     const tabButton = buttons.find((b) => b.textContent?.trim() === 'Stock') as HTMLButtonElement;
-    const chipButton = buttons.find((b) => b.textContent?.trim() === 'All') as HTMLButtonElement;
+    // 'In Stock' (not 'All') is used here because the status filter defaults to 'all',
+    // which makes the 'All' chip active by default — this asserts the non-active chip state.
+    const chipButton = buttons.find((b) => b.textContent?.trim() === 'In Stock') as HTMLButtonElement;
 
     expect(tabButton.className).toContain('focus-visible:outline-2');
+    expect(tabButton.className).toContain('focus-visible:outline-focus-ring');
     expect(chipButton.className).toContain('focus-visible:outline-2');
+    expect(chipButton.className).toContain('focus-visible:outline-focus-ring');
+  });
+
+  it('renders the active status-filter chip with a light focus-visible ring against its navy background', () => {
+    const fixture = TestBed.createComponent(OfficeScreen);
+    fixture.componentRef.setInput('title', 'Inventory');
+    fixture.componentRef.setInput('detailedTabId', 'stock');
+    fixture.componentRef.setInput('rowKey', (row: Record<string, unknown>) => String(row['id']));
+    fixture.componentRef.setInput('tabs', [{ id: 'stock', label: 'Stock', columns: [], rows: [] }]);
+    fixture.detectChanges();
+
+    const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    const chipButton = buttons.find((b) => b.textContent?.trim() === 'In Stock') as HTMLButtonElement;
+    chipButton.click();
+    fixture.detectChanges();
+
+    expect(chipButton.className).toContain('focus-visible:outline-2');
+    expect(chipButton.className).toContain('focus-visible:outline-on-primary');
   });
 
   it('opens and closes OfficeLayoutState.detailPanelOpen as the detail panel is shown and hidden', () => {
