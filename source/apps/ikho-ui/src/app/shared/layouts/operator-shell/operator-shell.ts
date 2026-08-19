@@ -12,7 +12,7 @@ import { ThemeService } from '../../../core/theme/theme.service';
 
 const ITEM_BASE =
   'flex w-full items-center gap-3 rounded-[10px] border-l-[3px] px-3.5 py-0 min-h-14 cursor-pointer text-left font-core text-[15px] font-semibold';
-const ITEM_DEFAULT = 'border-l-transparent bg-transparent text-shade-40';
+const ITEM_DEFAULT = 'border-l-transparent bg-transparent text-shade-60';
 const ITEM_ACTIVE = 'border-l-accent-teal bg-accent-teal/14 text-on-primary';
 
 @Component({
@@ -63,7 +63,7 @@ const ITEM_ACTIVE = 'border-l-accent-teal bg-accent-teal/14 text-on-primary';
           <div class="flex flex-col gap-1">
             <span class="font-core text-operator-xl tracking-[-0.2px] text-shell-ink">{{ screenTitleText() }}</span>
             @if (screenMetaText(); as m) {
-              <span class="font-core text-sm text-shade-40">{{ m }}</span>
+              <span class="font-core text-sm text-shade-60">{{ m }}</span>
             }
           </div>
           <router-outlet />

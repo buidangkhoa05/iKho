@@ -111,7 +111,7 @@ const PILL_ACTIVE = 'bg-primary text-on-primary';
         </div>
         <button
           type="button"
-          class="cursor-pointer rounded-md border-none bg-transparent px-3 py-1.5 text-left font-core text-xs font-semibold text-shade-40 hover:bg-shell-canvas-elevated"
+          class="cursor-pointer rounded-md border-none bg-transparent px-3 py-1.5 text-left font-core text-xs font-semibold text-shade-60 hover:bg-shell-canvas-elevated"
           role="menuitem"
           (click)="onSignOutClick()"
         >

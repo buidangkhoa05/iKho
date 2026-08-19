@@ -8,7 +8,6 @@ export const UI_STRINGS = {
   themeSection: { en: 'Theme', vi: 'Chủ đề' },
   themeLight: { en: 'Light', vi: 'Sáng' },
   themeDark: { en: 'Dark', vi: 'Tối' },
-  accountSettings: { en: 'Account settings', vi: 'Cài đặt tài khoản' },
   company: { en: 'Rotterdam Logistics BV', vi: 'Rotterdam Logistics BV' },
   adminUser: { en: 'M. de Vries', vi: 'M. de Vries' },
   searchOffice: { en: 'Search SKUs, orders, partners', vi: 'Tìm SKU, đơn hàng, đối tác' },

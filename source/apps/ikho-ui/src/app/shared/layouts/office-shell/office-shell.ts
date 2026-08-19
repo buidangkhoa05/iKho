@@ -22,12 +22,12 @@ import { ThemeService } from '../../../core/theme/theme.service';
         @if (viewport.isMobile()) {
           <button
             type="button"
-            class="flex w-14 flex-none cursor-pointer items-center justify-center border-none border-r border-hairline-light bg-canvas-light"
+            class="flex w-14 flex-none cursor-pointer items-center justify-center border-none border-r border-shell-hairline bg-shell-canvas"
             [attr.aria-expanded]="mobileNavOpen()"
             aria-label="Toggle navigation"
             (click)="mobileNavOpen.set(!mobileNavOpen())"
           >
-            <lib-icon name="menu" [size]="22" color="var(--color-ink)" />
+            <lib-icon name="menu" [size]="22" color="var(--color-shell-ink)" />
           </button>
         }
         <lib-office-nav-bar
