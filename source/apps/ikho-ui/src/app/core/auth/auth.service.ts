@@ -27,7 +27,6 @@ export class AuthService {
     }
     try {
       this.clerk = await this.clerkFactory(environment.clerkPublishableKey);
-      await this.clerk.load();
       this.syncState();
       this.clerk.addListener(() => this.syncState());
     } catch (error) {
