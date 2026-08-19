@@ -102,4 +102,23 @@ describe('OfficeScreen', () => {
     actionButton!.click();
     expect(actionCalls).toBe(1);
   });
+
+  it('renders tab and status-filter chip buttons with a visible focus-visible ring', () => {
+    const fixture = TestBed.createComponent(OfficeScreen);
+    fixture.componentRef.setInput('title', 'Inventory');
+    fixture.componentRef.setInput('detailedTabId', 'stock');
+    fixture.componentRef.setInput('rowKey', (row: Record<string, unknown>) => String(row['id']));
+    fixture.componentRef.setInput('tabs', [
+      { id: 'stock', label: 'Stock', columns: [], rows: [] },
+      { id: 'reservations', label: 'Reservations', columns: [], rows: [] },
+    ]);
+    fixture.detectChanges();
+
+    const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    const tabButton = buttons.find((b) => b.textContent?.trim() === 'Stock') as HTMLButtonElement;
+    const chipButton = buttons.find((b) => b.textContent?.trim() === 'All') as HTMLButtonElement;
+
+    expect(tabButton.className).toContain('focus-visible:outline-2');
+    expect(chipButton.className).toContain('focus-visible:outline-2');
+  });
 });

@@ -23,11 +23,13 @@ const STATUS_FILTERS: { id: StatusFilterId }[] = [
   { id: 'out-of-stock' },
 ];
 
-const TAB_BASE = 'min-h-11 border-none border-b-2 bg-transparent px-0.5 py-2.5 font-core text-sm font-semibold cursor-pointer';
+const TAB_BASE =
+  'min-h-11 border-none border-b-2 bg-transparent px-0.5 py-2.5 font-core text-sm font-semibold cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring';
 const TAB_DEFAULT = 'border-b-transparent text-shade-50';
 const TAB_ACTIVE = 'border-b-primary text-primary';
 
-const CHIP_BASE = 'min-h-8 cursor-pointer rounded-pill border px-3.5 py-[7px] font-core text-[13px] font-semibold';
+const CHIP_BASE =
+  'min-h-8 cursor-pointer rounded-pill border px-3.5 py-[7px] font-core text-[13px] font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring';
 const CHIP_DEFAULT = 'border-hairline-light bg-canvas-light text-shade-60';
 const CHIP_ACTIVE = 'border-primary bg-primary text-on-primary';
 
