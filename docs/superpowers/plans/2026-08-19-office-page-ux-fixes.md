@@ -580,11 +580,24 @@ git commit -m "feat(ikho-ui): collapse office sidebar to rail when a detail pane
 
 ---
 
+## Known limitation
+
+Tasks 5-7 (the sidebar-collapse fix) only reach the four `OfficeScreen`-based
+pages: `office-dashboard.ts`, `office-inbound.ts`, `office-outbound.ts`,
+`office-returns.ts`. Dashboard passes no `detailedTabId`, so it renders no
+detail panel at all — effectively only three pages (Inbound, Outbound,
+Returns) ever trigger the collapse. The other five Office pages (Inventory,
+Catalogue, Billing, Organization, Partners) render their own inline
+detail-panel markup and are not wired to `OfficeLayoutState`, so opening
+their detail panels does not collapse the sidebar. This is a known,
+deliberate descope — extending the fix to those five pages is left to a
+follow-up plan.
+
 ## Manual verification (after all tasks)
 
 Run `pnpm nx serve ikho-ui`, sign in, and in the browser:
 
-1. Open Inventory (or any screen with a detailed tab), resize to ~1300px and ~1440px, click a row to open the detail panel — confirm the sidebar collapses to its icon rail and the table gets more room; closing the panel restores the full sidebar.
+1. Open Outbound or Returns (both use `OfficeScreen` and have a detailed tab), resize to ~1300px and ~1440px, click a row to open the detail panel — confirm the sidebar collapses to its icon rail and the table gets more room; closing the panel restores the full sidebar.
 2. Resize past 1440px — confirm the content column stops growing and centers with equal whitespace on both sides, on both `/office/*` and `/operator/*`.
 3. Tab through sidebar items, screen tabs, and status-filter chips — confirm a visible focus ring on each.
 4. Visually confirm the low-stock badge/trend color still reads as "amber/warning," not shifted toward orange/brown.

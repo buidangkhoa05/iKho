@@ -7,9 +7,11 @@
 ## Problem
 
 A UI/UX review of the Office console — covering `office-shell.ts`, the shared
-`office-screen.ts` used by all nine Office feature pages, and the
-`ikho-shared-ui` primitives it composes — found four concrete, verified
-issues, prioritized P0 (accessibility bugs) and P1 (layout robustness):
+`office-screen.ts` (used by four of the nine Office feature pages —
+Dashboard, Inbound, Outbound, Returns; Dashboard passes no `detailedTabId`
+so it renders no detail panel), and the `ikho-shared-ui` primitives it
+composes — found four concrete, verified issues, prioritized P0
+(accessibility bugs) and P1 (layout robustness):
 
 1. **Contrast failure.** `--color-status-low-stock: #f59e0b` (amber), used as
    text in `StatusBadge` (on its `-10` tint background) and in `KpiCard`'s
@@ -179,8 +181,8 @@ is unused whitespace on large screens, not a broken layout.
   is true.
 - Manual, in-browser:
   - Resize to ~1300px and ~1440px; open a detail panel on a detailed-tab
-    screen (e.g. Inventory); confirm the sidebar collapses to rail and the
-    table gets more room.
+    `OfficeScreen`-based screen (e.g. Outbound or Returns); confirm the
+    sidebar collapses to rail and the table gets more room.
   - Resize past 1440px; confirm the content column stops growing and
     centers with whitespace on both sides, on both `/office/*` and
     `/operator/*`.
