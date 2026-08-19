@@ -72,7 +72,9 @@ import { AuthService } from '../../../core/auth/auth.service';
           />
         </div>
         <main class="flex min-w-0 flex-1 flex-col gap-6 overflow-auto bg-canvas-cream p-8">
-          <router-outlet />
+          <div class="mx-auto w-full max-w-[var(--content-max)]">
+            <router-outlet />
+          </div>
         </main>
       </div>
     </div>
