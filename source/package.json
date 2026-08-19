@@ -14,6 +14,7 @@
     "@angular/platform-server": "~22.0.4",
     "@angular/router": "~22.0.4",
     "@angular/ssr": "~22.0.4",
+    "@clerk/clerk-js": "^6.29.2",
     "express": "^4.21.2",
     "rxjs": "~7.8.0"
   },
