@@ -25,4 +25,13 @@ describe('OfficeSidebar', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelectorAll('button').length).toBe(2);
   });
+
+  it('renders sidebar items with a visible focus-visible ring', () => {
+    const fixture = TestBed.createComponent(OfficeSidebar);
+    fixture.componentRef.setInput('items', [{ id: 'dashboard', label: 'Dashboard', icon: 'boxes' }]);
+    fixture.detectChanges();
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
+    expect(button.className).toContain('focus-visible:outline-2');
+    expect(button.className).toContain('focus-visible:outline-focus-ring');
+  });
 });

@@ -49,7 +49,7 @@ export class OfficeSidebar {
   readonly itemSelect = output<string>();
 
   private static readonly ITEM_BASE =
-    'flex min-h-[var(--tap-target-office)] w-full items-center gap-3 rounded-md border-none px-3 py-2.5 text-left font-core text-sm font-medium [transition:var(--transition-control)]';
+    'flex min-h-[var(--tap-target-office)] w-full items-center gap-3 rounded-md border-none px-3 py-2.5 text-left font-core text-sm font-medium [transition:var(--transition-control)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring';
   private static readonly ITEM_DEFAULT = 'bg-transparent text-shade-40 hover:bg-shell-canvas hover:text-shell-ink';
   private static readonly ITEM_ACTIVE = 'bg-primary text-on-primary';
 
