@@ -130,7 +130,8 @@ jobs:
           - key: ui
             nx_project: ikho-ui
             dockerfile: apps/ikho-ui/Dockerfile
-            build_args: ""
+            build_args: |
+              NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
             repo: buidangkhoa05/ikho-ui
           - key: identity
             nx_project: Ikho.Identity

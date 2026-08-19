@@ -6,8 +6,20 @@
   "sourceRoot": "apps/ikho-ui/src",
   "tags": ["frontend"],
   "targets": {
+    "write-env": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node apps/ikho-ui/scripts/write-environment.mjs"
+      },
+      "metadata": {
+        "description": "Writes environment.prod.ts from NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY before building",
+        "technologies": ["node"]
+      }
+    },
     "build": {
       "executor": "@angular/build:application",
+      "dependsOn": ["write-env"],
       "outputs": [
         "{options.outputPath}"
       ],

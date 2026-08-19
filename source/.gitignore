@@ -54,3 +54,6 @@ __screenshots__/
 **/bin/
 **/obj/
 /artifacts/
+
+# local secrets for docker-compose (see .env.example)
+.env

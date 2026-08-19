@@ -24,6 +24,8 @@ RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 WORKDIR /workspace
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=""
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
 COPY . .
 RUN pnpm nx build ikho-ui --configuration=production
 

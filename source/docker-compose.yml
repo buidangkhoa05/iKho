@@ -344,6 +344,10 @@ services:
       Database__ConnectionString: Host=postgres;Port=5432;Database=ikho_identity;Username=ikho;Password=ikho
       MessageBroker__BootstrapServers: kafka:29092
       Services__Organization__BaseUrl: http://warehouse-organization:8080
+      Jwt__Authority: ${JWT_AUTHORITY:-}
+      Jwt__Audience: ${JWT_AUDIENCE:-}
+      Clerk__SecretKey: ${CLERK_SECRET_KEY:-}
+      Clerk__WebhookSigningSecret: ${CLERK_WEBHOOK_SIGNING_SECRET:-}
     ports:
       - "5160:8080"
     depends_on:
@@ -379,6 +383,8 @@ services:
       ReverseProxy__Clusters__warehouse-billing-cluster__Destinations__destination1__Address: http://warehouse-billing:8080
       ReverseProxy__Clusters__warehouse-reporting-cluster__Destinations__destination1__Address: http://warehouse-reporting:8080
       ReverseProxy__Clusters__identity-cluster__Destinations__destination1__Address: http://identity:8080
+      Jwt__Authority: ${JWT_AUTHORITY:-}
+      Jwt__Audience: ${JWT_AUDIENCE:-}
     ports:
       - "5080:8080"
     depends_on:
