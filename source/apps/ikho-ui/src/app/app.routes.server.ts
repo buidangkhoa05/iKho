@@ -28,8 +28,19 @@ export const serverRoutes: ServerRoute[] = [
     path: 'operator/returns/disposition/:rma',
     renderMode: RenderMode.Client,
   },
+  // Everything under /office and /operator now requires a real signed-in Clerk session,
+  // which only exists in the browser — a build-time prerenderer has no session to check,
+  // so these render client-side instead of being baked into static HTML.
+  {
+    path: 'office/**',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'operator/**',
+    renderMode: RenderMode.Client,
+  },
   {
     path: '**',
-    renderMode: RenderMode.Prerender
-  }
+    renderMode: RenderMode.Prerender,
+  },
 ];
