@@ -128,19 +128,26 @@ git commit -m "feat(ikho-ui): add @clerk/clerk-js dependency and environment con
 - Create: `source/apps/ikho-ui/src/app/core/auth/auth.service.spec.ts`
 
 **Interfaces:**
-- Produces: `CLERK_FACTORY: InjectionToken<(publishableKey: string) => Clerk>`. `AuthService` (`providedIn: 'root'`) with `isLoaded: Signal<boolean>`, `isSignedIn: Signal<boolean>`, `currentUser: Signal<AuthUser | undefined>` (`AuthUser = { name: string; email: string; imageUrl: string }`), `initialize(): Promise<void>`, `getToken(forceRefresh?: boolean): Promise<string | null>`, `signOut(): Promise<void>`, `mountSignIn(el: HTMLElement): void`, `unmountSignIn(el: HTMLElement): void`, `mountSignUp(el: HTMLElement): void`, `unmountSignUp(el: HTMLElement): void`.
+- Produces: `CLERK_FACTORY: InjectionToken<(publishableKey: string) => Promise<Clerk>>`. `AuthService` (`providedIn: 'root'`) with `isLoaded: Signal<boolean>`, `isSignedIn: Signal<boolean>`, `currentUser: Signal<AuthUser | undefined>` (`AuthUser = { name: string; email: string; imageUrl: string }`), `initialize(): Promise<void>`, `getToken(forceRefresh?: boolean): Promise<string | null>`, `signOut(): Promise<void>`, `mountSignIn(el: HTMLElement): void`, `unmountSignIn(el: HTMLElement): void`, `mountSignUp(el: HTMLElement): void`, `unmountSignUp(el: HTMLElement): void`.
+
+> **Correction discovered during execution:** the original brief had `CLERK_FACTORY` do a static `import { Clerk } from '@clerk/clerk-js'` and construct synchronously. Task 5's build check caught the real consequence: `app.routes.ts` imports `authGuard` → `AuthService` → this factory, and `provideRouter(appRoutes)` is wired eagerly in `app.config.ts` — so the ~1.8MB `@clerk/clerk-js` SDK was landing in the initial bundle instead of behind a lazy boundary, blowing the 1MB production budget set in Task 1. Fix: `CLERK_FACTORY`'s factory does a dynamic `import('@clerk/clerk-js')` instead, making it `async` and changing its type to return `Promise<Clerk>`. This is a packaging-only change — Clerk still finishes loading before the first navigation via `provideAppInitializer` (Task 6), just via a separate, lazily-fetched chunk instead of inline in `main.js`. `AuthService.initialize()` below reflects the corrected `await this.clerkFactory(...)` call.
 
 - [ ] **Step 1: Write the Clerk factory injection token**
 
 ```typescript
 // source/apps/ikho-ui/src/app/core/auth/clerk-factory.ts
 import { InjectionToken } from '@angular/core';
-import { Clerk } from '@clerk/clerk-js';
+import type { Clerk } from '@clerk/clerk-js';
 
-/** Seam for tests: override this token to inject a fake Clerk-shaped object instead of the real SDK. */
-export const CLERK_FACTORY = new InjectionToken<(publishableKey: string) => Clerk>('CLERK_FACTORY', {
+/** Seam for tests: override this token to inject a fake Clerk-shaped object instead of the real SDK.
+ *  Dynamic import keeps @clerk/clerk-js out of the eagerly-loaded main bundle — see the
+ *  "Correction discovered during execution" note above this step. */
+export const CLERK_FACTORY = new InjectionToken<(publishableKey: string) => Promise<Clerk>>('CLERK_FACTORY', {
   providedIn: 'root',
-  factory: () => (publishableKey: string) => new Clerk(publishableKey),
+  factory: () => async (publishableKey: string) => {
+    const { Clerk } = await import('@clerk/clerk-js');
+    return new Clerk(publishableKey);
+  },
 });
 ```
 
@@ -175,7 +182,7 @@ export class AuthService {
       this.isLoaded.set(true);
       return;
     }
-    this.clerk = this.clerkFactory(environment.clerkPublishableKey);
+    this.clerk = await this.clerkFactory(environment.clerkPublishableKey);
     await this.clerk.load();
     this.syncState();
     this.clerk.addListener(() => this.syncState());
@@ -251,7 +258,7 @@ function createFakeClerk(overrides: Partial<Clerk> = {}): Clerk {
 
 function configureWithFakeClerk(clerk: Clerk): void {
   TestBed.configureTestingModule({
-    providers: [{ provide: CLERK_FACTORY, useValue: () => clerk }],
+    providers: [{ provide: CLERK_FACTORY, useValue: () => Promise.resolve(clerk) }],
   });
 }
 
