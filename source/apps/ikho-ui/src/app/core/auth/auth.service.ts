@@ -25,11 +25,17 @@ export class AuthService {
       this.isLoaded.set(true);
       return;
     }
-    this.clerk = await this.clerkFactory(environment.clerkPublishableKey);
-    await this.clerk.load();
-    this.syncState();
-    this.clerk.addListener(() => this.syncState());
-    this.isLoaded.set(true);
+    try {
+      this.clerk = await this.clerkFactory(environment.clerkPublishableKey);
+      await this.clerk.load();
+      this.syncState();
+      this.clerk.addListener(() => this.syncState());
+    } catch (error) {
+      console.error('Clerk failed to initialize; continuing signed out.', error);
+      this.clerk = undefined;
+    } finally {
+      this.isLoaded.set(true);
+    }
   }
 
   async getToken(forceRefresh = false): Promise<string | null> {
@@ -43,8 +49,8 @@ export class AuthService {
     await this.clerk?.signOut();
   }
 
-  mountSignIn(el: HTMLElement): void {
-    this.clerk?.mountSignIn(el as HTMLDivElement);
+  mountSignIn(el: HTMLElement, redirectUrl?: string): void {
+    this.clerk?.mountSignIn(el as HTMLDivElement, redirectUrl ? { forceRedirectUrl: redirectUrl } : undefined);
   }
 
   unmountSignIn(el: HTMLElement): void {

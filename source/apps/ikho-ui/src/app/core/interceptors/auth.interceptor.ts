@@ -12,6 +12,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
+  const signOutAndRedirect = (error: unknown) => {
+    void auth.signOut().then(() => router.navigateByUrl('/login'));
+    return throwError(() => error);
+  };
+
   return from(auth.getToken()).pipe(
     switchMap((token) => {
       const authedReq = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
@@ -23,11 +28,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           return from(auth.getToken(true)).pipe(
             switchMap((freshToken) => {
               if (!freshToken) {
-                void auth.signOut().then(() => router.navigateByUrl('/login'));
-                return throwError(() => error);
+                return signOutAndRedirect(error);
               }
               const retryReq = req.clone({ setHeaders: { Authorization: `Bearer ${freshToken}` } });
-              return next(retryReq);
+              return next(retryReq).pipe(
+                catchError((retryError: unknown) => {
+                  if (retryError instanceof HttpErrorResponse && retryError.status === 401) {
+                    return signOutAndRedirect(retryError);
+                  }
+                  return throwError(() => retryError);
+                }),
+              );
             }),
           );
         }),

@@ -5,13 +5,13 @@ import { CLERK_FACTORY } from './clerk-factory';
 
 function createFakeClerk(overrides: Partial<Clerk> = {}): Clerk {
   return {
-    load: async () => {},
-    signOut: async () => {},
-    addListener: () => () => {},
-    mountSignIn: () => {},
-    unmountSignIn: () => {},
-    mountSignUp: () => {},
-    unmountSignUp: () => {},
+    load: async () => undefined,
+    signOut: async () => undefined,
+    addListener: () => () => undefined,
+    mountSignIn: () => undefined,
+    unmountSignIn: () => undefined,
+    mountSignUp: () => undefined,
+    unmountSignUp: () => undefined,
     user: null,
     session: null,
     ...overrides,
@@ -90,10 +90,12 @@ describe('AuthService', () => {
 
   it('should call clerk.mountSignIn with the given element', async () => {
     let mountedEl: HTMLElement | undefined;
+    let mountedProps: unknown;
     configureWithFakeClerk(
       createFakeClerk({
-        mountSignIn: ((el: HTMLElement) => {
+        mountSignIn: ((el: HTMLElement, props?: unknown) => {
           mountedEl = el;
+          mountedProps = props;
         }) as Clerk['mountSignIn'],
       }),
     );
@@ -102,5 +104,32 @@ describe('AuthService', () => {
     const div = document.createElement('div');
     service.mountSignIn(div);
     expect(mountedEl).toBe(div);
+    expect(mountedProps).toBeUndefined();
+  });
+
+  it('should call clerk.mountSignIn with forceRedirectUrl when a redirect URL is given', async () => {
+    let mountedProps: unknown;
+    configureWithFakeClerk(
+      createFakeClerk({
+        mountSignIn: ((_el: HTMLElement, props?: unknown) => {
+          mountedProps = props;
+        }) as Clerk['mountSignIn'],
+      }),
+    );
+    const service = TestBed.inject(AuthService);
+    await service.initialize();
+    const div = document.createElement('div');
+    service.mountSignIn(div, '/office/dashboard');
+    expect(mountedProps).toEqual({ forceRedirectUrl: '/office/dashboard' });
+  });
+
+  it('should resolve, mark loaded, and stay signed out when Clerk fails to initialize', async () => {
+    TestBed.configureTestingModule({
+      providers: [{ provide: CLERK_FACTORY, useValue: () => Promise.reject(new Error('boom')) }],
+    });
+    const service = TestBed.inject(AuthService);
+    await expect(service.initialize()).resolves.toBeUndefined();
+    expect(service.isLoaded()).toBe(true);
+    expect(service.isSignedIn()).toBe(false);
   });
 });

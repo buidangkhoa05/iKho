@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
@@ -9,10 +10,12 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class Login implements AfterViewInit, OnDestroy {
   private readonly auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
   @ViewChild('mount', { static: true }) private readonly mountRef!: ElementRef<HTMLDivElement>;
 
   ngAfterViewInit(): void {
-    this.auth.mountSignIn(this.mountRef.nativeElement);
+    const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl') ?? undefined;
+    this.auth.mountSignIn(this.mountRef.nativeElement, redirectUrl);
   }
 
   ngOnDestroy(): void {

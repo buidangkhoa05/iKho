@@ -10,6 +10,7 @@ import { ADMIN_ORDER, ScreenId, SCREENS, equivalentScreen, screenTitle } from '.
 import { ViewportService } from '../../../core/layout/viewport.service';
 import { AppRole, RoleService } from '../../../core/session/role.service';
 import { ThemeService } from '../../../core/theme/theme.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-office-shell',
@@ -85,6 +86,7 @@ export class OfficeShell {
   protected readonly viewport = inject(ViewportService);
   protected readonly role = inject(RoleService);
   protected readonly theme = inject(ThemeService);
+  private readonly auth = inject(AuthService);
 
   protected readonly mobileNavOpen = signal(false);
 
@@ -141,7 +143,6 @@ export class OfficeShell {
   }
 
   onSignOut(): void {
-    // No real auth/session system exists yet — placeholder for future sign-out logic.
-    return;
+    this.auth.signOut().then(() => this.router.navigateByUrl('/login'));
   }
 }
