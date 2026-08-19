@@ -11,6 +11,7 @@ import { ViewportService } from '../../../core/layout/viewport.service';
 import { AppRole, RoleService } from '../../../core/session/role.service';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { OfficeLayoutState } from '../../../core/layout/office-layout-state';
 
 @Component({
   selector: 'app-office-shell',
@@ -67,7 +68,7 @@ import { AuthService } from '../../../core/auth/auth.service';
           <lib-office-sidebar
             [items]="sidebarItems()"
             [active]="activeScreen()"
-            [collapsed]="viewport.isSidebarRail()"
+            [collapsed]="sidebarCollapsed()"
             (itemSelect)="onSelect($event)"
           />
         </div>
@@ -89,6 +90,7 @@ export class OfficeShell {
   protected readonly role = inject(RoleService);
   protected readonly theme = inject(ThemeService);
   private readonly auth = inject(AuthService);
+  private readonly layoutState = inject(OfficeLayoutState);
 
   protected readonly mobileNavOpen = signal(false);
 
@@ -120,6 +122,10 @@ export class OfficeShell {
     const base = 'fixed top-0 bottom-0 left-0 z-30 w-[var(--sidebar-width)] shadow-modal transition-transform duration-[180ms] ease-standard';
     return this.mobileNavOpen() ? `${base} translate-x-0` : `${base} -translate-x-full`;
   });
+
+  protected readonly sidebarCollapsed = computed(
+    () => this.viewport.isSidebarRail() || (this.layoutState.detailPanelOpen() && !this.viewport.isMobile()),
+  );
 
   constructor() {
     effect(() => {
